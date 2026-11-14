@@ -57,16 +57,24 @@ var is_moving := false
 
 var _sprite: AnimatedSprite2D
 
+var _tag: Label                      # role name above the head (spacesuits all look alike)
+
+## Short role names shown above each crew member.
+const TAG_TEXT := {"eng": "ENGINEER", "sci": "SCIENTIST", "nav": "NAVIGATOR", "qm": "QUARTERMASTER"}
+const TAG_FONT_SIZE := 18            # bigger number = bigger text
+const TAG_SCALE := 0.25              # drawn at 4x then shrunk, so the pixel font stays sharp at camera zoom 4
+
 const SEND_INTERVAL := 0.05          # seconds between position updates (20 per second)
 var _send_timer := 0.0
 var _net_target := Vector2.ZERO      # where a remote player should be
 var _has_net_target := false
 
 
+
 func _redress() -> void:
 	if _sprite and role != "":
 		RoleSprites.dress(_sprite, role, suited, robot, sprite_scale)
-
+	_place_tag()          # <-- add this line
 
 func _ready() -> void:
 	InputSetup.ensure()
@@ -74,6 +82,7 @@ func _ready() -> void:
 	if _sprite == null and role != "":
 		_sprite = RoleSprites.make(role, suited, sprite_scale, robot)
 		add_child(_sprite)
+	_make_tag() 
 	if get_node_or_null("CollisionShape2D") == null:
 		# Feet-sized box: in top-down games only the feet should hit walls.
 		var shape := CollisionShape2D.new()
@@ -93,6 +102,48 @@ func _ready() -> void:
 		var cam := Camera2D.new()
 		cam.zoom = Vector2(4, 4)
 		get_parent().add_child.call_deferred(cam)
+		
+		
+# ---------------------------------------------------------------- name tag above the head
+
+func _make_tag() -> void:
+	if role == "" or not TAG_TEXT.has(role):
+		return
+	_tag = Label.new()
+	_tag.text = TAG_TEXT[role]
+	_tag.add_theme_font_override("font", DawnTheme.body_font())
+	_tag.add_theme_font_size_override("font_size", TAG_FONT_SIZE)
+	_tag.add_theme_color_override("font_color", RoleSprites.TAGS[role])
+	_tag.add_theme_color_override("font_outline_color", Color("#181425"))
+	_tag.add_theme_constant_override("outline_size", 6)
+	_tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_tag.size = Vector2(200, 22)
+	_tag.scale = Vector2(TAG_SCALE, TAG_SCALE)
+	_tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tag.z_index = 5
+	add_child(_tag)
+	_place_tag()
+
+
+## Sit the tag just above the head (the Mars robot is shorter than a person).
+func _place_tag() -> void:
+	if _tag == null:
+		return
+	var head := float(RoleSprites.frame_size(robot).y) * sprite_scale
+	_tag.position = Vector2(-_tag.size.x * TAG_SCALE / 2.0, -head - 6.0)
+
+
+## The crew member you control shows "▼ENG" in yellow, like the HTML's yellow arrow.
+func _update_tag() -> void:
+	if _tag == null:
+		return
+	var mine := is_multiplayer_authority() and not ai
+	_tag.text = ("▼" + TAG_TEXT[role]) if mine else TAG_TEXT[role]
+	_tag.add_theme_color_override("font_color", Color("#fee761") if mine else RoleSprites.TAGS[role])
+
+
+func _process(_delta: float) -> void:
+	_update_tag()
 
 
 func _physics_process(delta: float) -> void:

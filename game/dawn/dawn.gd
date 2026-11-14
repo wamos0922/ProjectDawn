@@ -20,6 +20,7 @@ const DawnUI := preload("res://game/dawn/dawn_ui.gd")
 const Designers := preload("res://game/dawn/designers.gd")
 const Crew := preload("res://game/dawn/crew.gd")
 const WorldMap := preload("res://game/dawn/world_map.gd")
+const EscMenu := preload("res://game/dawn/esc_menu.gd")
 const STORY_PATH := "res://game/dawn/story.gd"
 const LOBBY := "res://game/dawn/title.tscn"
 const POSTERS_FILE := "res://data/posters.json"
@@ -44,6 +45,7 @@ var S := {}                     ## shared state (host is the boss of it)
 var crew := {}                  ## role -> player node (always all four); same dict as crew_ctl.members
 var crew_ctl                    ## crew.gd: who controls whom, TAB switching, follow, autopilot
 var world_map                   ## world_map.gd: M map + corridor walk between rooms
+var esc_menu
 var camera: Camera2D
 var ui: CanvasLayer
 var story                       ## story.gd (null until that feature exists)
@@ -88,6 +90,10 @@ func _ready() -> void:
 	world_map.name = "WorldMap"
 	world_map.g = self
 	add_child(world_map)
+	esc_menu = EscMenu.new()
+	esc_menu.name = "EscMenu"
+	esc_menu.g = self
+	add_child(esc_menu)
 	if Network.is_online():
 		Network.players_changed.connect(_rebuild_crew)
 		Network.disconnected.connect(_back_to_lobby)
@@ -507,6 +513,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		world_map.toggle()
 	elif k == KEY_ESCAPE and ui.panel_open():
 		ui.close_panel()
+	elif k == KEY_ESCAPE and not ui.dialogue_open():
+		esc_menu.open()
 	elif not Network.is_online() and k in [KEY_F9, KEY_F10, KEY_F11]:
 		S["world"] = {KEY_F9: "earth", KEY_F10: "moon", KEY_F11: "mars"}[k]
 		commit()
@@ -543,11 +551,12 @@ func refresh_locks() -> void:
 
 # ---------------------------------------------------------------- objective, clock, HUD
 
+## The objective THIS screen shows (HUD text, blinking door, map arrow, console ring):
+## the job of the crew member you control right now.
 func objective() -> Dictionary:
 	if story:
-		return story.objective()
+		return story.objective_for(crew_ctl.me_role)
 	return {"room": "", "text": "Explore. Story missions arrive with the story update."}
-
 
 func game_minutes() -> float:
 	var t: float = S["time"]
