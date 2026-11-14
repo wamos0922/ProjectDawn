@@ -1,0 +1,29 @@
+{
+  "id": "4_1_mars_scouts",
+  "objective": "4.1",
+  "destination": "mars",
+  "orbit": "mars_400",
+  "needs_functions": [
+    "air_sniffer"
+  ],
+  "platforms_allowed": [
+    "espa_class",
+    "lcross_bus",
+    "lro_bus"
+  ],
+  "reference_missions": [
+    "maven",
+    "mro",
+    "phoenix",
+    "viking_1_lander",
+    "mars_pathfinder"
+  ],
+  "instruments_allowed": [
+    "ngims_mass_spec",
+    "mro_mcs",
+    "mro_marci",
+    "mro_hirise",
+    "mro_crism",
+    "curiosity_rems"
+  ]
+}

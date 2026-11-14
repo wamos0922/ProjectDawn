@@ -1,0 +1,142 @@
+[
+  {
+    "id": "cubesat_3u",
+    "name": "3U CubeSat bus",
+    "bus_class": "cubesat",
+    "total_mass_kg": 4,
+    "peak_power_w": 52,
+    "payload_mass_kg": 2.0,
+    "payload_power_w": 26.0,
+    "downlink_mbps": 0.1,
+    "source_url": "https://www.nasa.gov/smallsat-institute/sst-soa/",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "total_mass_kg": "PROTOTYPE",
+      "peak_power_w": "DERIVED",
+      "payload_mass_kg": "SCALED",
+      "payload_power_w": "SCALED",
+      "downlink_mbps": "PROTOTYPE"
+    },
+    "notes": "SOA-2026 (NASA Small Spacecraft Technology State of the Art 2025 report, uploaded PDF) Table 2-3: median peak power of 28 market buses 51.6 W. Mass ~4 kg (CanX-7 3U 3.6 kg in same report). Payload = 50% of bus (gameplay rule). Downlink assumed UHF/S-band class"
+  },
+  {
+    "id": "cubesat_6u",
+    "name": "6U CubeSat bus",
+    "bus_class": "cubesat",
+    "total_mass_kg": 12,
+    "peak_power_w": 150,
+    "payload_mass_kg": 6.0,
+    "payload_power_w": 75.0,
+    "downlink_mbps": 1,
+    "source_url": "https://www.nasa.gov/smallsat-institute/sst-soa/",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "total_mass_kg": "PROTOTYPE",
+      "peak_power_w": "DERIVED",
+      "payload_mass_kg": "SCALED",
+      "payload_power_w": "SCALED",
+      "downlink_mbps": "PROTOTYPE"
+    },
+    "notes": "SOA-2026 (NASA Small Spacecraft Technology State of the Art 2025 report, uploaded PDF) Table 2-4: median peak power of 28 buses 150 W (max 1000 W). Mass 12 kg is the common 6U limit, recalled not stated in the report. Payload 50% rule; downlink assumed S/X-band"
+  },
+  {
+    "id": "cubesat_12u",
+    "name": "12U CubeSat bus",
+    "bus_class": "cubesat",
+    "total_mass_kg": 25,
+    "peak_power_w": 200,
+    "payload_mass_kg": 12.5,
+    "payload_power_w": 100.0,
+    "downlink_mbps": 2,
+    "source_url": "https://www.nasa.gov/smallsat-institute/sst-soa/",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "total_mass_kg": "REAL",
+      "peak_power_w": "DERIVED",
+      "payload_mass_kg": "SCALED",
+      "payload_power_w": "SCALED",
+      "downlink_mbps": "PROTOTYPE"
+    },
+    "notes": "SOA-2026 (NASA Small Spacecraft Technology State of the Art 2025 report, uploaded PDF) Table 2-5: median peak power of 24 buses 200 W. 25 kg from the report's lunar 12U example (Section 4). Payload 50% rule; downlink assumed"
+  },
+  {
+    "id": "espa_class",
+    "name": "ESPA-class SmallSat bus",
+    "bus_class": "smallsat",
+    "total_mass_kg": 500,
+    "peak_power_w": 1800,
+    "payload_mass_kg": 250.0,
+    "payload_power_w": 900.0,
+    "downlink_mbps": 10,
+    "source_url": "https://www.nasa.gov/smallsat-institute/sst-soa/",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "total_mass_kg": "REAL",
+      "peak_power_w": "DERIVED",
+      "payload_mass_kg": "SCALED",
+      "payload_power_w": "SCALED",
+      "downlink_mbps": "PROTOTYPE"
+    },
+    "notes": "SOA-2026 (NASA Small Spacecraft Technology State of the Art 2025 report, uploaded PDF) Table 2-7: median peak power of 38 buses 1800 W; report says ESPA-class is typically under 500 kg (upper bound used). Payload 50% rule; downlink assumed"
+  },
+  {
+    "id": "lro_bus",
+    "name": "LRO-class orbiter bus",
+    "bus_class": "flagship",
+    "total_mass_kg": 1000,
+    "peak_power_w": 400,
+    "payload_mass_kg": 100,
+    "payload_power_w": 100,
+    "downlink_mbps": 100,
+    "source_url": "https://science.nasa.gov/mission/lro/spacecraft-and-instruments/",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "total_mass_kg": "REAL",
+      "peak_power_w": "REAL",
+      "payload_mass_kg": "REAL",
+      "payload_power_w": "REAL",
+      "downlink_mbps": "REAL"
+    },
+    "notes": "PDF LRO/LRO2.pdf: total ~1000 kg / 400 W; payload capacity 100 kg / 100 W; Ka-band downlink 100-300 Mbps (low end used)"
+  },
+  {
+    "id": "lcross_bus",
+    "name": "LCROSS-class shepherd bus",
+    "bus_class": "smallsat",
+    "total_mass_kg": 900,
+    "peak_power_w": 368,
+    "payload_mass_kg": 450.0,
+    "payload_power_w": 184.0,
+    "downlink_mbps": 1,
+    "source_url": "https://pds-geosciences.wustl.edu/lunar/lcross-e_l-mir1-2-raw-v1/lcro_0001/catalog/insthost.cat",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "total_mass_kg": "REAL",
+      "peak_power_w": "REAL",
+      "payload_mass_kg": "SCALED",
+      "payload_power_w": "SCALED",
+      "downlink_mbps": "REAL"
+    },
+    "notes": "PDF LCROSS/LCROSS2.pdf: nearly 900 kg wet; 368 W solar array; downlink up to 1 Mbps. Payload = 50% rule (gameplay)"
+  },
+  {
+    "id": "sounding_rocket",
+    "name": "Sounding rocket payload",
+    "bus_class": "suborbital",
+    "total_mass_kg": 454,
+    "peak_power_w": 200,
+    "payload_mass_kg": 454,
+    "payload_power_w": 100,
+    "downlink_mbps": 1,
+    "source_url": "https://www.nasa.gov/wp-content/uploads/2023/09/sounding-rocket-program-handbook.pdf",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "total_mass_kg": "REAL",
+      "peak_power_w": "PROTOTYPE",
+      "payload_mass_kg": "REAL",
+      "payload_power_w": "SCALED",
+      "downlink_mbps": "PROTOTYPE"
+    },
+    "notes": null
+  }
+]

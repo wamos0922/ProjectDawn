@@ -1,0 +1,30 @@
+{
+  "id": "2_2_outpost_lander",
+  "objective": "2.2",
+  "destination": "moon",
+  "orbit": "lunar_100",
+  "needs_functions": [
+    "ice_finder",
+    "drill",
+    "chemistry_lab"
+  ],
+  "platforms_allowed": [
+    "espa_class",
+    "lcross_bus",
+    "lro_bus"
+  ],
+  "reference_missions": [
+    "blue_ghost_1",
+    "apollo_17_lm",
+    "lro"
+  ],
+  "instruments_allowed": [
+    "lend_neutron",
+    "lcross_nir",
+    "opportunity_rat",
+    "tega_phoenix",
+    "sam_suite",
+    "curiosity_chemin",
+    "curiosity_rad"
+  ]
+}

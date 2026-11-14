@@ -1,0 +1,22 @@
+{
+  "id": "1_1_sounding_rocket",
+  "objective": "1.1",
+  "destination": "earth",
+  "orbit": "suborbital_150",
+  "needs_functions": [
+    "ozone_mapper"
+  ],
+  "platforms_allowed": [
+    "sounding_rocket"
+  ],
+  "reference_missions": [
+    "toms",
+    "aura"
+  ],
+  "instruments_allowed": [
+    "omi_ozone",
+    "mro_marci_uv",
+    "lroc_wac",
+    "crater_radiation"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "3_2_shield_satellites",
+  "objective": "3.2",
+  "destination": "earth",
+  "orbit": "geo_35786",
+  "needs_functions": [
+    "radiation_meter",
+    "ozone_mapper"
+  ],
+  "platforms_allowed": [
+    "cubesat_12u",
+    "espa_class"
+  ],
+  "reference_missions": [
+    "ace",
+    "wind",
+    "sdo"
+  ],
+  "instruments_allowed": [
+    "crater_radiation",
+    "curiosity_rad",
+    "omi_ozone",
+    "mro_marci_uv",
+    "lroc_wac"
+  ]
+}

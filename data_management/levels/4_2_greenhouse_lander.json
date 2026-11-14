@@ -1,0 +1,30 @@
+{
+  "id": "4_2_greenhouse_lander",
+  "objective": "4.2",
+  "destination": "mars",
+  "orbit": "mars_400",
+  "needs_functions": [
+    "oxygen_maker",
+    "air_sniffer"
+  ],
+  "platforms_allowed": [
+    "espa_class",
+    "lcross_bus",
+    "lro_bus"
+  ],
+  "reference_missions": [
+    "perseverance",
+    "curiosity",
+    "phoenix",
+    "insight"
+  ],
+  "instruments_allowed": [
+    "moxie_oxygen",
+    "curiosity_rems",
+    "ngims_mass_spec",
+    "sam_suite",
+    "curiosity_mastcam",
+    "curiosity_navcam",
+    "curiosity_hazcam"
+  ]
+}

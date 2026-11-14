@@ -1,0 +1,22 @@
+{
+  "id": "3_1_moon_launch",
+  "objective": "3.1",
+  "destination": "moon",
+  "orbit": "lunar_100",
+  "needs_functions": [
+    "terrain_mapper"
+  ],
+  "platforms_allowed": [
+    "espa_class",
+    "lro_bus"
+  ],
+  "reference_missions": [
+    "apollo_11_lm",
+    "apollo_17_lm"
+  ],
+  "instruments_allowed": [
+    "lola_altimeter",
+    "lroc_nac",
+    "crater_radiation"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "5_1_mars_launch",
+  "objective": "5.1",
+  "destination": "mars",
+  "orbit": "mars_400",
+  "needs_functions": [
+    "oxygen_maker"
+  ],
+  "platforms_allowed": [
+    "espa_class",
+    "lro_bus"
+  ],
+  "reference_missions": [
+    "perseverance",
+    "apollo_17_lm"
+  ],
+  "instruments_allowed": [
+    "moxie_oxygen",
+    "curiosity_rems",
+    "mro_mcs",
+    "curiosity_rad"
+  ]
+}
