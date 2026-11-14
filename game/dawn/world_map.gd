@@ -249,12 +249,16 @@ func _label(text: String, at: Vector2, color: Color) -> void:
 	var l := Label.new()
 	l.text = text
 	l.add_theme_font_override("font", DawnTheme.title_font())
-	l.add_theme_font_size_override("font_size", 9)
+	l.add_theme_font_size_override("font_size", 12)
 	l.add_theme_color_override("font_color", color)
 	l.add_theme_color_override("font_outline_color", DawnTheme.C["ink"])
-	l.add_theme_constant_override("outline_size", 6)
+	l.add_theme_constant_override("outline_size", 4)
+	l.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.75))
+	l.add_theme_constant_override("shadow_offset_x", 3)
+	l.add_theme_constant_override("shadow_offset_y", 3)
+	l.add_theme_constant_override("shadow_outline_size", 4)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	l.size = Vector2(200, 40)
+	l.size = Vector2(320, 64)
 	l.position = at * 4.0 - l.size / 2.0
 	_labels.add_child(l)

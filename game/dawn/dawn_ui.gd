@@ -130,16 +130,28 @@ func _build_crewbar() -> void:
 	bar.position = Vector2(1060, 6)
 	bar.add_theme_constant_override("separation", 6)
 	root.add_child(bar)
-	for r in RoleSprites.TAGS:
+	for i in RoleSprites.ROLES.size():
+		var r: String = RoleSprites.ROLES[i]
+		var col := VBoxContainer.new()
+		col.add_theme_constant_override("separation", 2)
+		bar.add_child(col)
 		var b := Button.new()
 		b.custom_minimum_size = Vector2(48, 48)
 		b.focus_mode = Control.FOCUS_NONE
-		b.text = RoleSprites.NAMES[r][0]
-		b.add_theme_font_override("font", DawnTheme.title_font())
-		b.add_theme_font_size_override("font_size", 14)
-		for k in ["font_color", "font_hover_color", "font_pressed_color"]:
-			b.add_theme_color_override(k, DawnTheme.C["ink"])
 		b.pressed.connect(func(): game.crew_ctl.switch_to(r))
+		# the character's head: top 8 rows of the first (front-facing) frame, 3x bigger
+		var head := AtlasTexture.new()
+		head.atlas = load(RoleSprites.sheet_path(r))
+		head.region = Rect2(0, 0, 14, 8)
+		var face := TextureRect.new()
+		face.texture = head
+		face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		face.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		face.position = Vector2(3, 12)
+		face.size = Vector2(42, 24)
+		face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(face)
 		var dot := ColorRect.new()
 		dot.name = "Online"
 		dot.color = DawnTheme.C["green"]
@@ -147,7 +159,17 @@ func _build_crewbar() -> void:
 		dot.position = Vector2(40, -4)
 		dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		b.add_child(dot)
-		bar.add_child(b)
+		col.add_child(b)
+		# the key to press, under the head
+		var key := Label.new()
+		key.text = str(i + 1)
+		key.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		key.add_theme_font_override("font", DawnTheme.title_font())
+		key.add_theme_font_size_override("font_size", 12)
+		key.add_theme_color_override("font_color", DawnTheme.C["white"])
+		key.add_theme_color_override("font_outline_color", DawnTheme.C["ink"])
+		key.add_theme_constant_override("outline_size", 4)
+		col.add_child(key)
 		_crew_buttons[r] = b
 
 
