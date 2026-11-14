@@ -87,8 +87,12 @@ func _canvas(M: Game, w: float, h: float, fn: Callable) -> Canvas:
 	return c
 
 
+## The main button of a minigame. fn receives the button itself (fn(button)), so it can disable it.
+## (GDScript lambdas copy local variables when they are created, so a lambda must not use a
+## Button variable that is assigned after the lambda exists: it would still be null inside.)
 func _foot_button(M: Game, text: String, fn: Callable) -> Button:
-	var b: Button = g.ui.button(M.foot, text, fn)
+	var b: Button = g.ui.button(M.foot, text, Callable())
+	b.pressed.connect(fn.bind(b))
 	M.foot.move_child(b, 0)
 	b.grab_focus.call_deferred()
 	return b
@@ -125,8 +129,7 @@ func timing(role: String, title: String, text: String, target: Array, on_win: Ca
 	if not bands.is_empty():
 		var legend := "   ".join(bands.map(func(b): return "[color=#%s]■[/color] %s" % [b["c"].to_html(false), b["label"]]))
 		M.add(_rt(legend, 14))
-	var stop: Button
-	stop = _foot_button(M, opts.get("label", "STOP"), func():
+	_foot_button(M, opts.get("label", "STOP"), func(stop: Button):
 		var tg: Array = st["tg"]
 		if st["x"] >= tg[0] and st["x"] <= tg[1]:
 			st["h"] += 1
@@ -197,8 +200,7 @@ func sliders(role: String, title: String, text: String, sl: Array, evaluate: Cal
 	M.add(read)
 	M.add(meter)
 	upd.call()
-	var lock: Button
-	lock = _foot_button(M, btn, func():
+	_foot_button(M, btn, func(lock: Button):
 		var r: Dictionary = evaluate.call(vals)
 		if r["ok"]:
 			lock.disabled = true
@@ -235,8 +237,7 @@ func fuel(role: String, title: String, text: String, need: int, on_win: Callable
 		rng.text = "Known range: [b]%d–%d kg[/b]" % [st["lo"], st["hi"]]
 	hs.value_changed.connect(func(_v): upd.call())
 	upd.call()
-	var test: Button
-	test = _foot_button(M, "TEST BURN", func():
+	_foot_button(M, "TEST BURN", func(test: Button):
 		var f := int(hs.value)
 		if f < need:
 			st["lo"] = maxi(st["lo"], f)
@@ -308,8 +309,7 @@ func orbit(role: String, title: String, text: String, mode: String, on_win: Call
 				c.draw_line(Vector2(sx, sy) * S, ep * S, P["green"], 3.0)
 			read.text = "[b][color=#63c74d]LAUNCH WINDOW OPEN[/color][/b] · Earth will be waiting when we arrive" if st["ok"] else "Earth is %d° %s Mars · window closed" % [absi(roundi(ph)), "behind" if ph < 0 else "ahead of"])
 	M.add(read)
-	var go: Button
-	go = _foot_button(M, "LAUNCH NOW", func():
+	_foot_button(M, "LAUNCH NOW", func(go: Button):
 		if st["ok"]:
 			go.disabled = true
 			M.win(on_win, fact)
@@ -559,8 +559,7 @@ func pack(role: String, title: String, text: String, items: Array, cap: int, on_
 			first = cb
 	M.add(read)
 	upd.call()
-	var lock: Button
-	lock = _foot_button(M, "SEAL CARGO", func():
+	_foot_button(M, "SEAL CARGO", func(lock: Button):
 		var r: Dictionary = check.call()
 		if r["ok"]:
 			lock.disabled = true

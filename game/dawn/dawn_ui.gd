@@ -334,7 +334,8 @@ func button(box: Node, text: String, fn: Callable, primary := true) -> Button:
 	if not primary:
 		b.theme_type_variation = "GhostButton"
 	b.custom_minimum_size = Vector2(0, 46)
-	b.pressed.connect(fn)
+	if fn.is_valid():
+		b.pressed.connect(fn)
 	box.add_child(b)
 	return b
 
@@ -371,8 +372,8 @@ func task(t: String, text: String, btn: String, secs: float, on_done: Callable, 
 	if fact != "":
 		rich(box, "[color=#fee761]★ %s[/color]" % fact, 16)
 	var r := row(box)
-	var go: Button
-	go = button(r, btn + "  ▸▸", func():
+	var go := button(r, btn + "  ▸▸", Callable())
+	go.pressed.connect(func():
 		go.disabled = true
 		var tw := create_tween()
 		tw.tween_property(bar, "value", 1.0, maxf(0.2, secs))
