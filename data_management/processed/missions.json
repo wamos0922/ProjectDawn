@@ -1,0 +1,548 @@
+[
+  {
+    "id": "lro",
+    "name": "Lunar Reconnaissance Orbiter",
+    "agency": "NASA",
+    "year": 2009,
+    "body": "moon",
+    "role": "orbiter",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2009-031A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "phonesat",
+    "name": "PhoneSat 2.0",
+    "agency": "NASA",
+    "year": 2013,
+    "body": "earth",
+    "role": "cubesat",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2013-064B",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": "built at NASA Ames; smartphone is a Samsung Nexus S"
+  },
+  {
+    "id": "toms",
+    "name": "Earth Probe TOMS",
+    "agency": "NASA",
+    "year": 1996,
+    "body": "earth",
+    "role": "earth_observer",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1996-037A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": "carried the Total Ozone Mapping Spectrometer"
+  },
+  {
+    "id": "aura",
+    "name": "Aura",
+    "agency": "NASA",
+    "year": 2004,
+    "body": "earth",
+    "role": "earth_observer",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2004-026A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": "carries the OMI and MLS ozone instruments"
+  },
+  {
+    "id": "lunar_prospector",
+    "name": "Lunar Prospector",
+    "agency": "NASA",
+    "year": 1998,
+    "body": "moon",
+    "role": "orbiter",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1998-001A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": "neutron spectrometer looked for hydrogen"
+  },
+  {
+    "id": "lcross",
+    "name": "Lunar Crater Observation and Sensing Satellite",
+    "agency": "NASA",
+    "year": 2009,
+    "body": "moon",
+    "role": "impactor",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2009-031B",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": "launched with LRO"
+  },
+  {
+    "id": "prime_1",
+    "name": "Polar Resources Ice Mining Experiment-1",
+    "agency": "NASA",
+    "year": 2025,
+    "body": "moon",
+    "role": "lander",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=PRIME-1",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "ace",
+    "name": "Advanced Composition Explorer",
+    "agency": "NASA",
+    "year": 1997,
+    "body": "l1",
+    "role": "space_weather",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1997-045A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": "solar wind monitor"
+  },
+  {
+    "id": "goes_15",
+    "name": "Geostationary Operational Environmental Satellite 15",
+    "agency": "NOAA",
+    "year": 2010,
+    "body": "earth",
+    "role": "earth_observer",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2010-008A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": "weather satellite"
+  },
+  {
+    "id": "apollo_11_lm",
+    "name": "Apollo 11 Lunar Module (Eagle)",
+    "agency": "NASA",
+    "year": 1969,
+    "body": "moon",
+    "role": "ascent_stage",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059C",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "apollo_12_lm",
+    "name": "Apollo 12 Lunar Module (Intrepid)",
+    "agency": "NASA",
+    "year": 1969,
+    "body": "moon",
+    "role": "ascent_stage",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-099C",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "apollo_14_lm",
+    "name": "Apollo 14 Lunar Module (Antares)",
+    "agency": "NASA",
+    "year": 1971,
+    "body": "moon",
+    "role": "ascent_stage",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-008C",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "apollo_15_lm",
+    "name": "Apollo 15 Lunar Module (Falcon)",
+    "agency": "NASA",
+    "year": 1971,
+    "body": "moon",
+    "role": "ascent_stage",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-063C",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "apollo_16_lm",
+    "name": "Apollo 16 Lunar Module (Orion)",
+    "agency": "NASA",
+    "year": 1972,
+    "body": "moon",
+    "role": "ascent_stage",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1972-031C",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "apollo_17_lm",
+    "name": "Apollo 17 Lunar Module (Challenger)",
+    "agency": "NASA",
+    "year": 1972,
+    "body": "moon",
+    "role": "ascent_stage",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1972-096C",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "wind",
+    "name": "Wind",
+    "agency": "NASA",
+    "year": 1994,
+    "body": "l1",
+    "role": "space_weather",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1994-071A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": "solar wind monitor"
+  },
+  {
+    "id": "mariner_4",
+    "name": "Mariner 4",
+    "agency": "NASA",
+    "year": 1964,
+    "body": "mars",
+    "role": "flyby",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1964-077A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "mariner_6",
+    "name": "Mariner 6",
+    "agency": "NASA",
+    "year": 1969,
+    "body": "mars",
+    "role": "flyby",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-014A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "mariner_7",
+    "name": "Mariner 7",
+    "agency": "NASA",
+    "year": 1969,
+    "body": "mars",
+    "role": "flyby",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-030A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "maven",
+    "name": "Mars Atmosphere and Volatile EvolutioN",
+    "agency": "NASA",
+    "year": 2013,
+    "body": "mars",
+    "role": "orbiter",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2013-063A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": "studies atmosphere loss"
+  },
+  {
+    "id": "viking_1_lander",
+    "name": "Viking 1 Lander",
+    "agency": "NASA",
+    "year": 1975,
+    "body": "mars",
+    "role": "lander",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1975-075C",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "viking_2_lander",
+    "name": "Viking 2 Lander",
+    "agency": "NASA",
+    "year": 1975,
+    "body": "mars",
+    "role": "lander",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1975-083C",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "phoenix",
+    "name": "Phoenix Mars Lander",
+    "agency": "NASA",
+    "year": 2007,
+    "body": "mars",
+    "role": "lander",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2007-034A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "insight",
+    "name": "Interior Exploration using Seismic Investigations Geodesy and Heat Transport",
+    "agency": "NASA",
+    "year": 2018,
+    "body": "mars",
+    "role": "lander",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2018-042A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "mars_pathfinder",
+    "name": "Mars Pathfinder",
+    "agency": "NASA",
+    "year": 1996,
+    "body": "mars",
+    "role": "lander",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1996-068A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "mro",
+    "name": "Mars Reconnaissance Orbiter",
+    "agency": "NASA",
+    "year": 2005,
+    "body": "mars",
+    "role": "orbiter",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2005-029A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "opportunity",
+    "name": "Opportunity (Mars Exploration Rover B)",
+    "agency": "NASA",
+    "year": 2003,
+    "body": "mars",
+    "role": "rover",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2003-032A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "tdrs_m",
+    "name": "Tracking and Data Relay Satellite M",
+    "agency": "NASA",
+    "year": 2017,
+    "body": "earth",
+    "role": "relay",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2017-047A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "sdo",
+    "name": "Solar Dynamics Observatory",
+    "agency": "NASA",
+    "year": 2010,
+    "body": "earth",
+    "role": "space_weather",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2010-005A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "landsat_8",
+    "name": "Landsat 8",
+    "agency": "NASA",
+    "year": 2013,
+    "body": "earth",
+    "role": "earth_observer",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2013-008A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "landsat_9",
+    "name": "Landsat 9",
+    "agency": "NASA",
+    "year": 2021,
+    "body": "earth",
+    "role": "earth_observer",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2021-088A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "smap",
+    "name": "Soil Moisture Active Passive (SMAP)",
+    "agency": "NASA",
+    "year": 2015,
+    "body": "earth",
+    "role": "earth_observer",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2015-003A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "terra",
+    "name": "Terra",
+    "agency": "NASA",
+    "year": 1999,
+    "body": "earth",
+    "role": "earth_observer",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1999-068A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "dart",
+    "name": "Double Asteroid Redirection Test",
+    "agency": "NASA",
+    "year": 2021,
+    "body": "asteroid",
+    "role": "impactor",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2021-110A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "wise",
+    "name": "Wide-field Infrared Survey Explorer",
+    "agency": "NASA",
+    "year": 2009,
+    "body": "earth",
+    "role": "observatory",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2009-071A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "osiris_rex",
+    "name": "OSIRIS-REx",
+    "agency": "NASA",
+    "year": 2016,
+    "body": "asteroid",
+    "role": "sample_return",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2016-055A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": "full name: Origins Spectral Interpretation Resource Identification Security Regolith Explorer"
+  },
+  {
+    "id": "blue_ghost_1",
+    "name": "Blue Ghost Mission 1",
+    "agency": "Firefly Aerospace",
+    "year": 2025,
+    "body": "moon",
+    "role": "lander",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2025-010A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": null
+  },
+  {
+    "id": "perseverance",
+    "name": "Mars 2020 Perseverance",
+    "agency": "NASA",
+    "year": 2020,
+    "body": "mars",
+    "role": "rover",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2020-052A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": "carries the MOXIE oxygen experiment"
+  },
+  {
+    "id": "curiosity",
+    "name": "Mars Science Laboratory (Curiosity)",
+    "agency": "NASA",
+    "year": 2011,
+    "body": "mars",
+    "role": "rover",
+    "source_url": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2011-070A",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "year": "REAL"
+    },
+    "notes": "carries the SAM instrument that measured methane"
+  }
+]

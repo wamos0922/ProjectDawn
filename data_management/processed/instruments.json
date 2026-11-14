@@ -1,0 +1,648 @@
+[
+  {
+    "id": "lend_neutron",
+    "name": "LEND (Lunar Exploration Neutron Detector)",
+    "game_name": "Ice Finder",
+    "function": "ice_finder",
+    "type": "neutron_detector",
+    "mission_id": "lro",
+    "mass_kg": 26.3,
+    "power_w": 13,
+    "data_rate_mbps": 0.0029,
+    "source_url": "https://np.cosmos.ru/en-us/instruments/lend",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "DERIVED"
+    },
+    "notes": "PDF LRO/LEND.pdf 'Main parameters': 26.3 kg 13 W 250 Mb/day; Mbps = 250/86400."
+  },
+  {
+    "id": "crater_radiation",
+    "name": "CRaTER",
+    "game_name": "Radiation Meter",
+    "function": "radiation_meter",
+    "type": "particle_telescope",
+    "mission_id": "lro",
+    "mass_kg": 5.53,
+    "power_w": 6.66,
+    "data_rate_mbps": 0.0891,
+    "source_url": "https://crater.unh.edu/instrument.shtml",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "REAL"
+    },
+    "notes": "PDF LRO/CRaTER.pdf table; 89.1 kbps value is OCR-read so check it against the PDF"
+  },
+  {
+    "id": "lola_altimeter",
+    "name": "LOLA (Lunar Orbiter Laser Altimeter)",
+    "game_name": "Terrain Mapper",
+    "function": "terrain_mapper",
+    "type": "laser_altimeter",
+    "mission_id": "lro",
+    "mass_kg": 9.6,
+    "power_w": 26.2,
+    "data_rate_mbps": 0.01,
+    "source_url": "https://science.nasa.gov/wp-content/uploads/2024/01/lola-fact-sheet.pdf",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "REAL"
+    },
+    "notes": "PDF LRO/LOLA.pdf Key Instrument Parameters: 9.6 kg 26.2 W (29.9 W turn-on peak) 10 kbps"
+  },
+  {
+    "id": "lroc_nac",
+    "name": "LROC Narrow Angle Camera (each of 2)",
+    "game_name": "Close-up Camera",
+    "function": "shadow_imager",
+    "type": "visible_camera",
+    "mission_id": "lro",
+    "mass_kg": 8.2,
+    "power_w": 6.4,
+    "data_rate_mbps": 2,
+    "source_url": "https://lroc.im-ldi.com/about/specs",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF LRO/LROC.pdf: 8.2 kg per NAC; avg 6.4 W (peak 9.3 W); no data rate in PDF | EST data: LRO downlink up to 900 Gb/day (LRO2.pdf)=10.4 Mbps avg; cameras are the biggest user, assume half split 2 NAC + WAC ~2 Mbps per NAC"
+  },
+  {
+    "id": "lroc_wac",
+    "name": "LROC Wide Angle Camera",
+    "game_name": "Wide Camera",
+    "function": "camera",
+    "type": "visible_uv_camera",
+    "mission_id": "lro",
+    "mass_kg": 0.9,
+    "power_w": 2.6,
+    "data_rate_mbps": 1,
+    "source_url": "https://lroc.im-ldi.com/about/specs",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF LRO/LROC.pdf: 0.9 kg avg 2.6 W (peak 2.7 W); 7 filters 321-689 nm | EST data: share of LRO downlink, see lroc_nac"
+  },
+  {
+    "id": "lcross_vsp",
+    "name": "LCROSS Visible Spectrometer (VSP)",
+    "game_name": "Impact Chemistry Reader",
+    "function": "chemistry_lab",
+    "type": "uv_vis_spectrometer",
+    "mission_id": "lcross",
+    "mass_kg": 1.7,
+    "power_w": 4.8,
+    "data_rate_mbps": 0.1,
+    "source_url": "https://pds-geosciences.wustl.edu/lunar/lcross-e_l-mir1-2-raw-v1/lcro_0001/catalog/vsp_inst.cat",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "power_w": "REAL",
+      "mass_kg": "PROTOTYPE",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF LCROSS/LCROSS2.pdf: 4.8 W TEC off up to 11.8 W; mass not given | EST mass 4.8W x ~0.35 kg per W = median of real small optical instruments in this file (WAC 0.9kg/2.6W, CTX 3kg/7W, Mini-TES 2.4kg/5.6W); EST data: LCROSS downlink up to 1 Mbps shared by 9 instruments (LCROSS2.pdf), ~0.1 each"
+  },
+  {
+    "id": "lcross_nir",
+    "name": "LCROSS Near-IR Camera (NIR1/NIR2)",
+    "game_name": "Water Spotter",
+    "function": "ice_finder",
+    "type": "nir_camera",
+    "mission_id": "lcross",
+    "mass_kg": 0.56,
+    "power_w": 1.6,
+    "data_rate_mbps": 0.1,
+    "source_url": "https://pds-geosciences.wustl.edu/lunar/lcross-e_l-mir1-2-raw-v1/lcro_0001/catalog/nir1_inst.cat",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "power_w": "REAL",
+      "mass_kg": "PROTOTYPE",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF LCROSS/LCROSS2.pdf: 1.6 W peak per camera; mass not given | EST mass 1.6W x ~0.35 kg per W = median of real small optical instruments in this file (WAC 0.9kg/2.6W, CTX 3kg/7W, Mini-TES 2.4kg/5.6W); data share of 1 Mbps downlink"
+  },
+  {
+    "id": "lcross_mir",
+    "name": "LCROSS Mid-IR Camera (MIR1/MIR2)",
+    "game_name": "Heat Camera",
+    "function": "heat_mapper",
+    "type": "mir_camera",
+    "mission_id": "lcross",
+    "mass_kg": 0.46,
+    "power_w": 1.3,
+    "data_rate_mbps": 0.1,
+    "source_url": "https://pds-geosciences.wustl.edu/lunar/lcross-e_l-mir1-2-raw-v1/lcro_0001/catalog/mir1_inst.cat",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "power_w": "REAL",
+      "mass_kg": "PROTOTYPE",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF LCROSS/LCROSS2.pdf: 1.3 W peak per camera; mass not given | EST mass 1.3W x ~0.35 kg per W = median of real small optical instruments in this file (WAC 0.9kg/2.6W, CTX 3kg/7W, Mini-TES 2.4kg/5.6W); data share of 1 Mbps downlink"
+  },
+  {
+    "id": "mro_hirise",
+    "name": "MRO HiRISE",
+    "game_name": "Super Camera",
+    "function": "terrain_mapper",
+    "type": "visible_camera",
+    "mission_id": "mro",
+    "mass_kg": 65,
+    "power_w": 60,
+    "data_rate_mbps": 4,
+    "source_url": "https://science.nasa.gov/mission/mars-reconnaissance-orbiter/science-instruments/",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF MRO/Cameras.pdf: 65 kg incl thermal control; 60 W | HiRISE can acquire 28 Gb in 6 s (Cameras.pdf) but average is limited by MRO downlink (~4 Mbps assumed for gameplay); function = terrain_mapper (stereo DEMs)"
+  },
+  {
+    "id": "mro_ctx",
+    "name": "MRO CTX Context Camera",
+    "game_name": "Context Camera",
+    "function": "camera",
+    "type": "visible_camera",
+    "mission_id": "mro",
+    "mass_kg": 3,
+    "power_w": 7,
+    "data_rate_mbps": 1,
+    "source_url": "https://science.nasa.gov/mission/mars-reconnaissance-orbiter/science-instruments/",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF MRO/Cameras.pdf: 3 kg; 7 W imaging (5 W idle) | EST data: context camera, assumed 1 Mbps while imaging"
+  },
+  {
+    "id": "mro_crism",
+    "name": "MRO CRISM",
+    "game_name": "Mineral Mapper",
+    "function": "chemistry_lab",
+    "type": "vnir_spectrometer",
+    "mission_id": "mro",
+    "mass_kg": 32.92,
+    "power_w": 44.4,
+    "data_rate_mbps": 0.5,
+    "source_url": "http://crism.jhuapl.edu/instrument/design/specifications.php",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "DERIVED"
+    },
+    "notes": "PDF MRO/CRISM.pdf: 32.92 kg; 44.4-47.3 W operating (lower bound used) | DERIVED: typical observation 2-2.5 Gb (Cameras.pdf) over ~80 min of observing is ~0.5 Mbps"
+  },
+  {
+    "id": "mro_mcs",
+    "name": "MRO Mars Climate Sounder",
+    "game_name": "Weather Sounder",
+    "function": "air_sniffer",
+    "type": "ir_radiometer",
+    "mission_id": "mro",
+    "mass_kg": 9,
+    "power_w": 11,
+    "data_rate_mbps": 0.01,
+    "source_url": "https://science.nasa.gov/mission/mars-reconnaissance-orbiter/science-instruments/",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF MRO/Cameras.pdf: ~9 kg; 11 W | EST data: small radiometer, assumed 10 kbps"
+  },
+  {
+    "id": "minites",
+    "name": "MER Mini-TES",
+    "game_name": "Heat Reader",
+    "function": "heat_mapper",
+    "type": "ir_spectrometer",
+    "mission_id": "opportunity",
+    "mass_kg": 2.4,
+    "power_w": 5.6,
+    "data_rate_mbps": 0.05,
+    "source_url": "https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/MER/Instruments/MTES.htm",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF Opportunity/Mini-TES.pdf: 2.40 kg; 5.6 W average | EST data: spectrometer, assumed 50 kbps"
+  },
+  {
+    "id": "tega_phoenix",
+    "name": "Phoenix TEGA",
+    "game_name": "Soil Oven",
+    "function": "chemistry_lab",
+    "type": "evolved_gas_analyzer",
+    "mission_id": "phoenix",
+    "mass_kg": 5.7,
+    "power_w": 13,
+    "data_rate_mbps": 0.01,
+    "source_url": "https://atmos.nmsu.edu/data_and_services/atmospheres_data/phoenix/phoenix.html",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF Phoenix/Thermal Evolved Gas Analyzer.pdf: 5.7 kg; 13 W | EST data: oven plus mass spec, assumed 10 kbps"
+  },
+  {
+    "id": "perseverance_engcams",
+    "name": "Perseverance Engineering Cameras (each)",
+    "game_name": "Rover Eyes",
+    "function": "camera",
+    "type": "engineering_camera",
+    "mission_id": "perseverance",
+    "mass_kg": 0.75,
+    "power_w": 4.5,
+    "data_rate_mbps": 0.2,
+    "source_url": "https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/M20/Instruments/M20%20ECAM.htm",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF Perseverance/Engineering Cameras.pdf: <0.75 kg each; ~4.5 W each | EST data: ~0.5 MB compressed image every ~20 s while active ~0.2 Mbps"
+  },
+  {
+    "id": "curiosity_navcam",
+    "name": "MSL Navcam (each)",
+    "game_name": "Rover Nav Eyes",
+    "function": "camera",
+    "type": "engineering_camera",
+    "mission_id": "curiosity",
+    "mass_kg": 0.22,
+    "power_w": 2.2,
+    "data_rate_mbps": 0.2,
+    "source_url": "https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/MSL/Instruments/MSL%20Navcam.htm",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF Curiosity/Navcam.pdf: 220 g each; ~2.2 W heater off (3.5 W heater) | EST data: same engineering-camera assumption as perseverance_engcams"
+  },
+  {
+    "id": "curiosity_hazcam",
+    "name": "MSL Hazcam (each)",
+    "game_name": "Hazard Eyes",
+    "function": "camera",
+    "type": "engineering_camera",
+    "mission_id": "curiosity",
+    "mass_kg": 0.245,
+    "power_w": 2.2,
+    "data_rate_mbps": 0.2,
+    "source_url": "https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/MSL/Instruments/MSL%20Hazcam.htm",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF Curiosity/Hazcam.pdf: 245 g each without cover; ~2.2 W | EST data: same engineering-camera assumption as perseverance_engcams"
+  },
+  {
+    "id": "curiosity_chemin",
+    "name": "CheMin",
+    "game_name": "Mineral Scanner",
+    "function": "chemistry_lab",
+    "type": "xrd_xrf",
+    "mission_id": "curiosity",
+    "mass_kg": 10,
+    "power_w": 60,
+    "data_rate_mbps": 0.01,
+    "source_url": "https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/MSL/Instruments/CheMin.htm",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "power_w": "REAL",
+      "mass_kg": "PROTOTYPE",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF Curiosity/CheMin.pdf: ~60 W during analysis; mass not in PDF | EST mass ~10 kg is an unverified recalled value, confirm on the CheMin page; data: PDF says 1200 frames >800 MB per 5 h run = 0.04 Mbps, 0.01 used after compression assumption"
+  },
+  {
+    "id": "curiosity_rems",
+    "name": "REMS",
+    "game_name": "Weather Station",
+    "function": "air_sniffer",
+    "type": "weather_station",
+    "mission_id": "curiosity",
+    "mass_kg": 1.3,
+    "power_w": 1.6,
+    "data_rate_mbps": 0.001,
+    "source_url": "https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/MSL/Instruments/REMS.htm",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "PROTOTYPE",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF Curiosity/REMS.pdf: design limit under 1.3 kg (a limit not a measured mass) | EST power: MCS 11W scaled by mass (1.3/9 kg) = 1.6 W; weather station data tiny"
+  },
+  {
+    "id": "opportunity_mb",
+    "name": "MER Moessbauer Spectrometer",
+    "game_name": "Iron Reader",
+    "function": "chemistry_lab",
+    "type": "mossbauer",
+    "mission_id": "opportunity",
+    "mass_kg": 0.5,
+    "power_w": 2,
+    "data_rate_mbps": 0.001,
+    "source_url": "https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/MER/Instruments/Moessbauer%20Spectrometer.htm",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF Opportunity/MB.pdf: ~500 g (400 g sensor head); ~2 W | EST data: tiny spectrum files"
+  },
+  {
+    "id": "opportunity_rat",
+    "name": "MER Rock Abrasion Tool",
+    "game_name": "Rock Grinder",
+    "function": "drill",
+    "type": "rock_abrasion_tool",
+    "mission_id": "opportunity",
+    "mass_kg": 0.687,
+    "power_w": 10,
+    "data_rate_mbps": 0,
+    "source_url": "https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/MER/Instruments/RAT.htm",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "PROTOTYPE",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF Opportunity/RAT.pdf: 687 g; 128 mm long | EST power: small brushed-motor tool, assumed 10 W while grinding; produces no science data"
+  },
+  {
+    "id": "insight_payload",
+    "name": "InSight science payload (SEIS HP3 APSS IDS retroreflector)",
+    "game_name": "Interior Probe Kit",
+    "function": "seismic_probe",
+    "type": "seismometer_suite",
+    "mission_id": "insight",
+    "mass_kg": 50,
+    "power_w": 30,
+    "data_rate_mbps": 0.01,
+    "source_url": "https://www.jpl.nasa.gov/news/press_kits/insight/launch/download/mars_insight_launch_presskit.pdf",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "PROTOTYPE",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "PDF InSight/mars_insight_launch_presskit.pdf: about 50 kg for whole payload incl. arm deployment system; split per instrument not given | EST power ~5% of lander solar output (600-700 W clear day, InSight press kit)"
+  },
+  {
+    "id": "mro_sharad",
+    "name": "MRO SHARAD (Shallow Radar)",
+    "game_name": "Underground Ice Radar",
+    "function": "ice_finder",
+    "type": "sounding_radar",
+    "mission_id": "mro",
+    "mass_kg": 15,
+    "power_w": 30,
+    "data_rate_mbps": 0.0694,
+    "source_url": "https://science.nasa.gov/mission/mars-reconnaissance-orbiter/science-instruments/",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "PROTOTYPE",
+      "data_rate_mbps": "DERIVED"
+    },
+    "notes": "PDF MRO/Cameras.pdf: 15 kg; 10 W is RF transmit power not total. EST power 30 W (3x RF output, assumed electronics overhead). DERIVED data: 15% of MRO 40 Gb/day = 6 Gb/day"
+  },
+  {
+    "id": "mro_marci",
+    "name": "MRO MARCI (Mars Color Imager)",
+    "game_name": "Weather Camera",
+    "function": "camera",
+    "type": "wide_angle_camera",
+    "mission_id": "mro",
+    "mass_kg": 0.481,
+    "power_w": 5,
+    "data_rate_mbps": 0.0718,
+    "source_url": "https://science.nasa.gov/mission/mars-reconnaissance-orbiter/science-instruments/",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "DERIVED"
+    },
+    "notes": "PDF MRO/Cameras.pdf: 481 g; power under 5 W imaging (5 used as upper bound); 6.2 Gbit/day converted"
+  },
+  {
+    "id": "omi_ozone",
+    "name": "OMI (Ozone Monitoring Instrument)",
+    "game_name": "Ozone Mapper",
+    "function": "ozone_mapper",
+    "type": "uv_vis_spectrometer",
+    "mission_id": "aura",
+    "mass_kg": 65,
+    "power_w": 66,
+    "data_rate_mbps": 0.8,
+    "source_url": "http://webarchive.library.unt.edu/eot2008/20090830190910/http://aura.gsfc.nasa.gov/instruments/omi.html",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "REAL"
+    },
+    "notes": "Archived NASA OMI page (from earlier session)"
+  },
+  {
+    "id": "moxie_oxygen",
+    "name": "MOXIE",
+    "game_name": "Oxygen Maker",
+    "function": "oxygen_maker",
+    "type": "isru_electrolyzer",
+    "mission_id": "perseverance",
+    "mass_kg": 17.1,
+    "power_w": 300,
+    "data_rate_mbps": 0.001,
+    "source_url": "https://mars.nasa.gov/mars2020/mission/instruments/moxie/",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "PROTOTYPE",
+      "power_w": "PROTOTYPE",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "UNVERIFIED: 17.1 kg / 300 W recalled from NASA; confirm on page before changing flags to REAL. Data tiny (telemetry only)"
+  },
+  {
+    "id": "sam_suite",
+    "name": "SAM (Sample Analysis at Mars)",
+    "game_name": "Rock Chemistry Lab",
+    "function": "chemistry_lab",
+    "type": "gas_chromatograph_mass_spec",
+    "mission_id": "curiosity",
+    "mass_kg": 40,
+    "power_w": 60,
+    "data_rate_mbps": 0.01,
+    "source_url": "https://science.gsfc.nasa.gov/sam/samiam.html",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "PROTOTYPE",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "Mass 40 kg for whole suite (NASA Goddard). EST power 60 W = same class as CheMin (60 W analysis, Curiosity/CheMin.pdf) since both are heated chemistry lab instruments"
+  },
+  {
+    "id": "ngims_mass_spec",
+    "name": "NGIMS",
+    "game_name": "Air Sniffer",
+    "function": "air_sniffer",
+    "type": "quadrupole_mass_spec",
+    "mission_id": "maven",
+    "mass_kg": 12.5,
+    "power_w": 27,
+    "data_rate_mbps": 0.01,
+    "source_url": "https://pds-atmospheres.nmsu.edu/data_and_services/atmospheres_data/MAVEN/logs/Mission%20and%20spacecraft%20description.pdf",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "PROTOTYPE",
+      "power_w": "PROTOTYPE",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "UNVERIFIED: MAVEN press kit/PDF names NGIMS but gave no mass/power in text. EST 12.5 kg 27 W recalled; scaled-down quadrupole like SAM QMS part; confirm in MAVEN mission description"
+  },
+  {
+    "id": "lamp_uv",
+    "name": "LAMP (Lyman Alpha Mapping Project)",
+    "game_name": "UV Shadow Mapper",
+    "function": "shadow_imager",
+    "type": "uv_spectrograph",
+    "mission_id": "lro",
+    "mass_kg": 6.1,
+    "power_w": 4.0,
+    "data_rate_mbps": 0.01,
+    "source_url": "https://spaceflightnow.com/atlas/av020/090610lro.html",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "Secondary source (Spaceflight Now); sees ice in permanently shadowed craters using starlight; EST data"
+  },
+  {
+    "id": "diviner_radiometer",
+    "name": "Diviner Lunar Radiometer",
+    "game_name": "Moon Heat Mapper",
+    "function": "heat_mapper",
+    "type": "ir_radiometer",
+    "mission_id": "lro",
+    "mass_kg": 11.0,
+    "power_w": 24.7,
+    "data_rate_mbps": 0.02,
+    "source_url": "https://spaceflightnow.com/atlas/av020/090610lro.html",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "Secondary source (Spaceflight Now); replace with Diviner page when read; EST data"
+  },
+  {
+    "id": "curiosity_rad",
+    "name": "RAD (Radiation Assessment Detector)",
+    "game_name": "Mars Radiation Meter",
+    "function": "radiation_meter",
+    "type": "particle_detector",
+    "mission_id": "curiosity",
+    "mass_kg": 1.6,
+    "power_w": 4.2,
+    "data_rate_mbps": 0.005,
+    "source_url": "https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/MSL/Instruments/RAD.htm",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "PROTOTYPE",
+      "power_w": "PROTOTYPE",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "UNVERIFIED recalled values; same detector class as CRaTER (5.53 kg 6.66 W) but smaller; PDF has no numbers"
+  },
+  {
+    "id": "rimfax_radar",
+    "name": "RIMFAX",
+    "game_name": "Ground Radar",
+    "function": "ice_finder",
+    "type": "ground_penetrating_radar",
+    "mission_id": "perseverance",
+    "mass_kg": 3.1,
+    "power_w": 5,
+    "data_rate_mbps": 0.01,
+    "source_url": "https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/M20/Instruments/M20%20RIMFAX.htm",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "PROTOTYPE",
+      "power_w": "PROTOTYPE",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "UNVERIFIED recalled values; confirm on the RIMFAX page"
+  },
+  {
+    "id": "curiosity_mastcam",
+    "name": "Mastcam (pair)",
+    "game_name": "Rover Color Camera",
+    "function": "camera",
+    "type": "color_camera",
+    "mission_id": "curiosity",
+    "mass_kg": 2.0,
+    "power_w": 7,
+    "data_rate_mbps": 0.3,
+    "source_url": "https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/MSL/Instruments/MastCam.htm",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "PROTOTYPE",
+      "power_w": "PROTOTYPE",
+      "data_rate_mbps": "PROTOTYPE"
+    },
+    "notes": "EST: PDF has no numbers; scaled from engineering cameras (0.22 kg 2.2 W) x ~3 for zoom optics and 2 units"
+  },
+  {
+    "id": "mro_marci_uv",
+    "name": "MRO MARCI (two UV bands for ozone)",
+    "game_name": "UV Ozone Camera",
+    "function": "ozone_mapper",
+    "type": "uv_camera",
+    "mission_id": "mro",
+    "mass_kg": 0.481,
+    "power_w": 5,
+    "data_rate_mbps": 0.0718,
+    "source_url": "https://science.nasa.gov/mission/mars-reconnaissance-orbiter/science-instruments/",
+    "retrieved": "2026-11-14",
+    "flags": {
+      "mass_kg": "REAL",
+      "power_w": "REAL",
+      "data_rate_mbps": "DERIVED"
+    },
+    "notes": "PDF MRO/Cameras.pdf: 481 g; power under 5 W imaging (5 used as upper bound); 6.2 Gbit/day converted | Same hardware as mro_marci; Cameras.pdf says MARCI also makes 2 ultraviolet observations to track ozone, so it can be offered as a small ozone mapper"
+  }
+]
