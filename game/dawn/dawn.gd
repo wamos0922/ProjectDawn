@@ -551,11 +551,12 @@ func refresh_locks() -> void:
 
 # ---------------------------------------------------------------- objective, clock, HUD
 
+## The objective THIS screen shows (HUD text, blinking door, map arrow, console ring):
+## the job of the crew member you control right now.
 func objective() -> Dictionary:
 	if story:
-		return story.objective()
+		return story.objective_for(crew_ctl.me_role)
 	return {"room": "", "text": "Explore. Story missions arrive with the story update."}
-
 
 func game_minutes() -> float:
 	var t: float = S["time"]

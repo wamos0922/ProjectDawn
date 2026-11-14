@@ -143,6 +143,36 @@ func objective() -> Dictionary:
 		"mars": return _mars_obj(s)
 	return {"room": "", "text": ""}
 
+## The objective for ONE crew member (what their HUD, blinking door and map arrow point to).
+##   1. Storms and holds: everyone gets the same objective (all crew together).
+##   2. A job for my role in the room the crew objective points to (e.g. the NAVIGATOR's countdown).
+##   3. My role's own task (TASKS: the launch-prep / departure-prep checklists, L1, launch window):
+##      during prep, each role is sent to a different room at the same time.
+##   4. Otherwise: the crew objective, so I go and help (optional missions stay in the J panel).
+func objective_for(role: String) -> Dictionary:
+	var ob := objective()
+	if ob.get("alert", false) or ob.get("hold", false):
+		return ob
+	var mine := work_list().filter(func(j): return j["role"] == role and _still_to_do(j))
+	for job in mine:
+		if job["room"] == ob.get("room", ""):
+			return _job_objective(role, job)
+	for job in mine:
+		if not role_task(WD.key_of(job["room"])).is_empty():
+			return _job_objective(role, job)
+	return ob
+
+
+## A job from work_list() that is not finished yet ("REBUILD" = optional redo of a finished build).
+func _still_to_do(job: Dictionary) -> bool:
+	var what := String(job["what"])
+	return not what.ends_with("(done)") and not what.begins_with("REBUILD")
+
+
+## Objective text for my own job, e.g. "SCIENTIST · CALIBRATE UV SENSOR · OZONE LAB".
+func _job_objective(role: String, job: Dictionary) -> Dictionary:
+	var where: String = WD.room(job["room"]).get("name", "").replace("\n", " ")
+	return {"room": job["room"], "text": "%s · %s · %s" % [RoleSprites.NAMES[role], job["what"], where]}
 
 func _earth_obj(s: Dictionary) -> Dictionary:
 	var st: int = s["step"]
