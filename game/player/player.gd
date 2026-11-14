@@ -40,11 +40,6 @@ var suited := false:
 	set(v):
 		suited = v
 		_redress()
-## Shown as a Mars robot (the crew drives robots from the Moon in Acts 4-5).
-var robot := false:
-	set(v):
-		robot = v
-		_redress()
 
 
 ## Computer-controlled crew member (CERES autopilot): ignores the keyboard and walks by ai_input.
@@ -73,14 +68,14 @@ var _has_net_target := false
 
 func _redress() -> void:
 	if _sprite and role != "":
-		RoleSprites.dress(_sprite, role, suited, robot, sprite_scale)
+		RoleSprites.dress(_sprite, role, suited, sprite_scale)
 	_place_tag()          # <-- add this line
 
 func _ready() -> void:
 	InputSetup.ensure()
 	_sprite = get_node_or_null("Sprite") as AnimatedSprite2D
 	if _sprite == null and role != "":
-		_sprite = RoleSprites.make(role, suited, sprite_scale, robot)
+		_sprite = RoleSprites.make(role, suited, sprite_scale)
 		add_child(_sprite)
 	_make_tag() 
 	if get_node_or_null("CollisionShape2D") == null:
@@ -125,11 +120,11 @@ func _make_tag() -> void:
 	_place_tag()
 
 
-## Sit the tag just above the head (the Mars robot is shorter than a person).
+## Sit the tag just above the head.
 func _place_tag() -> void:
 	if _tag == null:
 		return
-	var head := float(RoleSprites.frame_size(robot).y) * sprite_scale
+	var head := float(RoleSprites.FRAME.y) * sprite_scale
 	_tag.position = Vector2(-_tag.size.x * TAG_SCALE / 2.0, -head - 6.0)
 
 

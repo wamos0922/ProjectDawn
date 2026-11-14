@@ -37,7 +37,7 @@ func _process(_d):
 		cases = [
 			["uvcal", "earth", 1, "ozone", "STOP"], ["tune", "earth", 1, "comms", "LOCK IN"], ["wind", "earth", 1, "nav", "cell"],
 			["perigee", "earth", 5, "nav", "LAUNCH NOW"], ["cargo", "earth", 5, "power", "SEAL CARGO"], ["bolts", "earth", 5, "pad", "TIGHTEN"],
-			["site", "earth", 5, "ozone", "card"], ["burn", "mars", 4, "fuel", "TEST BURN"], ["bolts2", "mars", 4, "pad", "TIGHTEN"], ["window", "mars", 6, "pad", "LAUNCH NOW"]]
+			["site", "earth", 5, "ozone", "card"], ["l1", "moon", 6, "port", "LOCK IN"]]
 		return false
 	n += 1
 	if phase == "" :
@@ -48,8 +48,7 @@ func _process(_d):
 		g.ui.close_panel()
 		g.S["world"] = c[1]; g.S["tasks"] = {}
 		if c[1] == "earth": g.S["step"] = c[2]
-		else: g.S["rs"] = c[2]
-		if c[0] == "window": g.S["tasks"] = {"pack2": true, "burn": true, "bolts2": true, "seeds": true}
+		else: g.S["ms"] = c[2]
 		g.commit()
 		var a: Dictionary = g.story.role_task(c[3])
 		if a.is_empty(): log.append("NO TASK " + c[0]); phase = ""; return false

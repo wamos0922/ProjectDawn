@@ -1,20 +1,19 @@
 extends RefCounted
-## The story of Project Dawn: objectives, actions, holds, storms and effects for all five acts.
+## The story of Project Dawn: objectives, actions, holds, storms and effects for the three acts.
 ## Owner: Sufi (gameplay). Ported from the HTML demo (web/demo, c4.js). dawn.gd owns this object.
 ##
 ## Progress lives in g.S (shared, host decides):
-##   Earth step 0 board · 1 build rocket · 2 readiness review · 3 countdown · 4 results · 5 fly to the Moon · 6 home
-##   Moon  ms   0 check in · 1 find ice · 2 power cable · 3 mine ice · 4 make fuel (→ solar storm) · 5 shield · 6 launch · 7 teleop
-##   Mars  rs   0 dock · 1 panels · 2 oxygen · 3 greenhouse (→ dust storm) · 4 seeds · 5 fuel · 6 ascent · 7 done
+##   Act 1 Earth step 0 board · 1 build rocket · 2 readiness review · 3 countdown · 4 results · 5 fly to the Moon · 6 home
+##   Act 2 Moon  ms   0 check in · 1 find ice · 2 power cable · 3 mine ice · 4 make fuel (→ solar storm)
+##   Act 3 Moon  ms   5 shield design + factory · 6 aim at L1, launch · 7 shield report → fly home → ending
+## See docs/STORY_MOON_ONLY.md for the whole flow.
 ## Everything that changes S runs on the host only (do_effect, host_tick).
 
 const WD := preload("res://game/dawn/world_data.gd")
 const RoleSprites := preload("res://game/player/role_sprites.gd")
 const StoryUI := preload("res://game/dawn/story_ui.gd")
 const ROLES := ["eng", "sci", "nav", "qm"]
-const OPTNAME := {"B": "B · UV Canopy", "C": "C · Water for All", "D": "D · Storm Watch", "G": "G · Planetary Defense",
-	"H": "H · Greenhouse for Every Bunker", "J": "J · The Mars Mystery"}
-const TRIP_DAYS := {"trip": 3, "shield": 90, "robots": 210, "home": 250}
+const TRIP_DAYS := {"trip": 3, "shield": 90, "home": 3}
 
 ## Workshop parts (game values, same as the HTML demo).
 const PARTS := {"uv": {"name": "UV sensor", "kg": 5, "cr": 35}, "cam": {"name": "Camera", "kg": 8, "cr": 25},
@@ -23,9 +22,8 @@ const PARTS := {"uv": {"name": "UV sensor", "kg": 5, "cr": 35}, "cam": {"name": 
 const BODY := {"kg": 30, "cr": 30}
 
 ## Every role has a job: prep checklists that must be done before the story moves on.
-const PREP := {"e1": ["build", "uvcal", "wind", "tune"], "e5": ["perigee", "cargo", "bolts", "site"], "m4": ["pack2", "burn", "bolts2", "seeds"]}
-const PREP_NAMES := {"e1": ["ENG rocket", "SCI UV sensor", "NAV launch hour", "QM radio"], "e5": ["NAV perigee", "QM cargo", "ENG bolts", "SCI landing site"],
-	"m4": ["QM capsule", "NAV fuel", "ENG bolts", "SCI seeds"]}
+const PREP := {"e1": ["build", "uvcal", "wind", "tune"], "e5": ["perigee", "cargo", "bolts", "site"]}
+const PREP_NAMES := {"e1": ["ENG rocket", "SCI UV sensor", "NAV launch hour", "QM radio"], "e5": ["NAV perigee", "QM cargo", "ENG bolts", "SCI landing site"]}
 ## task -> [role, world, progress key, value, line said when done]
 const TASKS := {
 	"uvcal": ["sci", "earth", "step", 1, "UV sensor calibrated on the UV-B band. It will measure exactly what hurts us."],
@@ -36,11 +34,6 @@ const TASKS := {
 	"bolts": ["eng", "earth", "step", 5, "Shuttle bolts torqued. She will hold together."],
 	"site": ["sci", "earth", "step", 5, "Landing site picked: the rim of a shadowed crater at the south pole."],
 	"l1": ["nav", "moon", "ms", 6, "Shield aimed at L1, where the pull of the Sun and Earth balance."],
-	"pack2": ["qm", "mars", "rs", 4, "Seeds and samples sealed in the capsule."],
-	"burn": ["nav", "mars", "rs", 4, "Fuel load set. We can reach orbit with Mars gravity."],
-	"bolts2": ["eng", "mars", "rs", 4, "Ascent rocket checked and torqued."],
-	"seeds": ["sci", "mars", "rs", 4, "UV-damaged seeds removed. Only healthy ones go home."],
-	"window": ["nav", "mars", "rs", 6, "Launch window open. Earth will be waiting when we arrive."],
 }
 const BUDGET := 150
 
@@ -71,10 +64,6 @@ func start() -> void:
 
 func S() -> Dictionary:
 	return g.S
-
-
-func has_opt(k: String) -> bool:
-	return k in g.S["opt"]
 
 
 func rid(k: String) -> String:
@@ -140,7 +129,6 @@ func objective() -> Dictionary:
 	match s["world"]:
 		"earth": return _earth_obj(s)
 		"moon": return _moon_obj(s)
-		"mars": return _mars_obj(s)
 	return {"room": "", "text": ""}
 
 ## The objective for ONE crew member (what their HUD, blinking door and map arrow point to).
@@ -148,7 +136,7 @@ func objective() -> Dictionary:
 ##   2. A job for my role in the room the crew objective points to (e.g. the NAVIGATOR's countdown).
 ##   3. My role's own task (TASKS: the launch-prep / departure-prep checklists, L1, launch window):
 ##      during prep, each role is sent to a different room at the same time.
-##   4. Otherwise: the crew objective, so I go and help (optional missions stay in the J panel).
+##   4. Otherwise: the crew objective, so I go and help.
 func objective_for(role: String) -> Dictionary:
 	var ob := objective()
 	if ob.get("alert", false) or ob.get("hold", false):
@@ -191,8 +179,8 @@ func _earth_obj(s: Dictionary) -> Dictionary:
 		{"room": "earth.mc", "hold": true, "text": "READINESS REVIEW · all 4 crew on your consoles in MISSION CONTROL"},
 		{"room": "earth.pad", "text": "NAVIGATOR · start the countdown at the LAUNCH PAD (UV outside!)"},
 		{"room": "earth.mc", "text": "ANYONE · hear the results in MISSION CONTROL"},
-		{"room": "earth.pad", "hold": true, "text": "ALL 4 CREW · board the shuttle at the LAUNCH PAD" + ("" if s["canopy"] else " · optional: UV CANOPY (Engineer)")},
-		{"room": "", "text": "The doors are open. Explore Bunker 4"} if has_opt("H") else {"room": "earth.hydro", "text": "SCIENTIST · plant food in HYDROPONICS (optional H)"},
+		{"room": "earth.pad", "hold": true, "text": "ALL 4 CREW · board the shuttle at the LAUNCH PAD"},
+		{"room": "", "text": "The sky is healing. The doors are open: explore Bunker 4"},
 	]
 	return list[clampi(st, 0, list.size() - 1)]
 
@@ -217,32 +205,9 @@ func _moon_obj(s: Dictionary) -> Dictionary:
 		{"room": "moon.fuel", "text": "NAVIGATOR · split the ice into fuel at the FUEL PLANT"},
 		{"room": "moon.factory", "text": "ACT 3 · ENGINEER · plan the shield at the MOON FACTORY"},
 		{"room": "moon.port", "hold": true, "text": "ALL 4 CREW · launch seats at the MOON PORT"},
-		{"room": "moon.teleop", "hold": true, "text": "ACT 4 · ALL 4 CREW · take a console in the TELEOP CENTER"},
+		{"room": "", "text": "The shield is up. Read the report, then the crew flies home"},
 	]
 	return list[clampi(m, 0, list.size() - 1)]
-
-
-func _mars_obj(s: Dictionary) -> Dictionary:
-	if not s["storm"].is_empty():
-		return {"room": "mars.power", "alert": true, "hold": true, "text": "DUST STORM! QUARTERMASTER on the RTG (POWER SHED) + ENGINEER on the heater (GREENHOUSE): %ds" % maxi(0, ceili(s["storm"]["t"]))}
-	if s["rs"] == 3 and s["gpower"].is_empty():
-		return {"room": "mars.power", "text": "QUARTERMASTER · design the greenhouse power at the POWER SHED. Dust is coming"}
-	if s["rs"] == 4:
-		var room := "mars.vault" if not task_done("pack2") else ("mars.fuel" if not task_done("burn") else ("mars.pad" if not task_done("bolts2") else "mars.green"))
-		return {"room": room, "text": "DEPARTURE PREP · " + checklist("m4")}
-	if s["rs"] == 6 and not task_done("window"):
-		return {"room": "mars.pad", "text": "NAVIGATOR · wait for the Earth launch window at the ASCENT PAD"}
-	var list := [
-		{"room": "mars.hangar", "text": "ANYONE · dock at the ROBOT HANGAR"},
-		{"room": "mars.solar", "text": "QUARTERMASTER · clean the SOLAR FIELD"},
-		{"room": "mars.oxy", "text": "ENGINEER · make oxygen at the OXYGEN PLANT"},
-		{"room": "mars.green", "text": "SCIENTIST · plant crops in the GREENHOUSE"},
-		{"room": "mars.vault", "text": "ACT 5 · QUARTERMASTER · pack seeds at the SEED VAULT"},
-		{"room": "mars.fuel", "text": "NAVIGATOR · fuel the rocket at the FUEL PLANT"},
-		{"room": "mars.pad", "hold": true, "text": "ALL 4 ROBOTS · load the rocket at the ASCENT PAD"},
-		{"room": "", "text": "Seeds are on their way home."},
-	]
-	return list[clampi(s["rs"], 0, list.size() - 1)]
 
 
 func all_suited() -> bool:
@@ -273,13 +238,6 @@ func hold() -> Dictionary:
 				return {"id": "factory", "need": {"eng": ["moon.factory", "asm"], "qm": ["moon.factory", "feed"]}, "secs": 5.0}
 			if s["ms"] == 6 and task_done("l1"):
 				return {"id": "port", "need": seats("port", "s_"), "secs": 3.0}
-			if s["ms"] == 7:
-				return {"id": "teleop", "need": seats("teleop", "c_"), "secs": 3.0}
-		"mars":
-			if not s["storm"].is_empty():
-				return {"id": "rtg", "need": {"qm": ["mars.power", "rtg"], "eng": ["mars.green", "heat"]}, "secs": 3.0}
-			if s["rs"] == 6 and task_done("window"):
-				return {"id": "ascent", "need": seats("pad", "s_"), "secs": 3.0}
 	return {}
 
 
@@ -298,16 +256,6 @@ func _hold_done(id: String) -> void:
 			g.say_all([{"who": "eng", "text": "%d shield satellites, built from Moon metal and glass." % s["sats"]}, {"who": "ceres", "text": "All four of you: take your launch seats at the Moon Port."}])
 		"port":
 			travel({"kind": "shield", "title": "ACT 3 · THE SHIELD", "sub": "%d satellites fly to the point between the Sun and Earth" % s["sats"], "after": "shield"})
-		"teleop":
-			g.say_all([{"who": "ceres", "text": "Mars is still too dangerous for people. We send robots, and you drive them from here."}, {"who": "nav", "text": "Every command takes time to reach Mars. Plan your moves."}])
-			travel({"kind": "robots", "from": "moon", "to": "mars", "title": "ACT 4 · THE RED TEACHER", "sub": "Robots land on Mars. The crew drives them from the Moon.", "after": "mars"})
-		"rtg":
-			s["storm"] = {}
-			s["rs"] = 4
-			g.say_all([{"who": "qm", "text": "Heaters on the RTG. The crops will make it."}, {"who": "ceres", "text": "Storm clearing. This is how Opportunity was lost in 2018. Not this time."}, {"who": "ceres", "text": "Act 5: Dawn. Quartermaster, pack the seeds."}])
-			_green_report(true)
-		"ascent":
-			travel({"kind": "home", "from": "mars", "to": "earth", "title": "ACT 5 · DAWN", "sub": "Seeds fly home while the last shield satellites take position", "after": "home"})
 
 
 ## Host, every frame: hold progress, storm timers and the timed scenes.
@@ -369,26 +317,16 @@ func _storm_fail() -> void:
 	s["storm"] = {}
 	s["ozone"] = maxi(0, s["ozone"] - 3)
 	s["pen"] += 1
-	if s["world"] == "moon":
-		s["ms"] = 5
-		g.say_all([{"who": "ceres", "text": "Radiation dose! Not everyone reached the shelter. Ozone work lost: −3%."}, {"who": "ceres", "text": "Storm passed. Act 3: The Moon Factory."}])
-	else:
-		s["rs"] = 4
-		s["ozone"] = mini(100, s["ozone"] + 3)     # the greenhouse report decides the loss instead
-		s["pen"] -= 1
-		g.say_all([{"who": "ceres", "text": "The heaters failed. The storm is passing."}, {"who": "ceres", "text": "Act 5: Dawn. Quartermaster, pack what seeds we have."}])
-		_green_report(false)
+	s["ms"] = 5
+	g.say_all([{"who": "ceres", "text": "Radiation dose! Not everyone reached the shelter. Ozone work lost: −3%."}, {"who": "ceres", "text": "Storm passed. Act 3: The Moon Factory."}])
 	g.commit()
 
 
 ## Where autopilot crew should be when no hold needs them ("" = stay).
-func npc_room(r: String) -> String:
+func npc_room(_r: String) -> String:
 	var s := S()
-	if not s["storm"].is_empty():
-		if s["world"] == "moon":
-			return "moon.shelter"
-		if s["world"] == "mars" and (r == "sci" or r == "nav"):
-			return "mars.hangar"
+	if not s["storm"].is_empty() and s["world"] == "moon":
+		return "moon.shelter"
 	return ""
 
 
@@ -411,15 +349,9 @@ func _act(id: String, p := {}) -> Callable:
 
 func action(k: String) -> Dictionary:
 	var t := role_task(k)
-	if not t.is_empty() or _blocked(k):
+	if not t.is_empty():
 		return t
 	return _base_action(k)
-
-
-## Rooms whose old one-click action is replaced by the prep checklist.
-func _blocked(k: String) -> bool:
-	var s := S()
-	return s["world"] == "mars" and s["rs"] == 4 and s["storm"].is_empty() and k in ["vault", "fuel", "pad", "green"]
 
 
 func _send(t: String) -> Callable:
@@ -454,7 +386,7 @@ func role_task(k: String) -> Dictionary:
 					_send("tune"), "NASA's Deep Space Network talks to spacecraft on radio bands like this one.")}
 		if st == 5:
 			if k == "nav" and not task_done("perigee"):
-				return {"label": "PLAN THE MOON TRIP", "role": "nav", "fn": func(): mg.orbit("nav", "LAUNCH AT PERIGEE", "The Moon's orbit is an ellipse. Launch when it swings closest to Earth (perigee) for the shortest trip.", "perigee", _send("perigee"), "The Moon's distance swings between about 363,000 and 405,000 km.")}
+				return {"label": "PLAN THE MOON TRIP", "role": "nav", "fn": func(): mg.orbit("nav", "LAUNCH AT PERIGEE", "The Moon's orbit is an ellipse. Launch when it swings closest to Earth (perigee) for the shortest trip.", _send("perigee"), "The Moon's distance swings between about 363,000 and 405,000 km.")}
 			if k == "power" and not task_done("cargo"):
 				return {"label": "PACK THE CARGO", "role": "qm", "fn": func(): mg.pack("qm", "PACK THE SHUTTLE", "The shuttle can carry 115 kg. Take everything we need on the Moon, and nothing that breaks the limit.",
 					[{"n": "Water", "kg": 30, "req": true}, {"n": "Food", "kg": 25, "req": true}, {"n": "Oxygen tanks", "kg": 30, "req": true}, {"n": "Ice drill", "kg": 20, "req": true}, {"n": "Spare radio", "kg": 10}, {"n": "Tool chest", "kg": 25}, {"n": "Books", "kg": 12}],
@@ -489,47 +421,6 @@ func role_task(k: String) -> Dictionary:
 				[{"label": "Distance from Earth", "min": 0.2, "max": 6.0, "step": 0.1, "val": 4.0, "unit": " M km"}],
 				func(v): var d: float = v[0]; var ok: bool = d >= 1.3 and d <= 1.7; return {"ok": ok, "meter": maxf(0.0, 1.0 - absf(d - 1.5) / 3.0), "read": "[b][color=#63c74d]Balanced: the shield will stay put[/color][/b]" if ok else ("Too close: Earth's pull wins" if d < 1.3 else "Too far: the Sun's pull wins"), "why": "Not balanced yet."},
 				_send("l1"), "L1 is about 1.5 million km from Earth, toward the Sun.")}
-	elif w == "mars":
-		var rs: int = s["rs"]
-		if k == "solar" and rs == 1:
-			return {"label": "CLEAN THE PANELS", "role": "qm", "fn": func(): mg.wipe("qm", func(): g.act("clean", {}, "qm"))}
-		if k == "oxy" and rs == 2:
-			return {"label": "RUN MOXIE", "role": "eng", "fn": func(): mg.sliders("eng", "OXYGEN FROM MARS AIR", "MOXIE pulls in carbon dioxide and splits it with heat. Set the oven hot enough and the intake steady to make oxygen.",
-				[{"label": "Oven temperature", "min": 100, "max": 1000, "step": 50, "val": 300, "unit": " °C"}, {"label": "CO₂ intake", "min": 1, "max": 10, "step": 1, "val": 2}],
-				func(v): var t: float = v[0]; var c: float = v[1]; var okT := t >= 750 and t <= 850; var okC := c >= 4 and c <= 6; var q := (maxf(0.0, 1.0 - absf(t - 800) / 600.0) + maxf(0.0, 1.0 - absf(c - 5) / 5.0)) / 2.0; return {"ok": okT and okC, "meter": q, "read": "Oxygen: [b]%s[/b]" % ("flowing" if okT and okC else ("oven too cold" if t < 750 else ("oven too hot" if t > 850 else ("not enough CO₂" if c < 4 else "intake choking")))), "why": "Not producing oxygen yet."},
-				func(): g.act("moxie", {}, "eng"), "The real MOXIE heats Martian air to about 800 °C.")}
-		if rs == 3 and s["gpower"].is_empty():
-			if k == "power":
-				return {"label": "DESIGN GREENHOUSE POWER", "role": "qm", "fn": func(): dz.mars(func(x): g.act("gpower", x, "qm"))}
-			if k == "green":
-				return {"label": "POWER FIRST", "fn": func(): g.ui.toast("The Quartermaster must design the greenhouse power in the Power Shed first. A storm is coming.", 3.2)}
-		if k == "green" and rs == 3:
-			var spec := func(cut: Callable) -> Callable:
-				return func(c, r): c.draw_rect(r, P["ink"]); c.draw_rect(Rect2(0, 0, 48, 96), P["plum"]); c.draw_rect(Rect2(48, 0, 96, 96), P["dgreen"]); for x in 144: if cut.call(x): c.draw_rect(Rect2(x, 18, 1, 60), P["yellow"])
-			return {"label": "FIT THE UV GLASS", "role": "sci", "fn": func(): mg.pick("sci", "CHOOSE THE GREENHOUSE GLASS", "Yellow shows what light each glass lets through. Purple is UV, green is the visible light plants need. Block the UV, keep the light.", [
-				{"label": "Glass A", "ok": false, "why": "That lets the deadly UV straight through.", "draw": spec.call(func(_x): return true)},
-				{"label": "Glass B", "ok": true, "draw": spec.call(func(x): return x >= 48)},
-				{"label": "Glass C", "ok": false, "why": "That blocks the light plants need and lets UV in.", "draw": spec.call(func(x): return x < 48)}],
-				func(): g.act("plant", {}, "sci"), {"fact": "Ordinary window glass already blocks most UV-B."})}
-		if rs == 4:
-			if k == "vault" and not task_done("pack2"):
-				return {"label": "PACK THE CAPSULE", "role": "qm", "fn": func(): mg.pack("qm", "PACK THE RETURN CAPSULE", "The capsule carries 50 kg. Seeds and greenhouse samples are a must, and the cargo has to be at least 30 kg to be worth the launch.",
-					[{"n": "Seeds", "kg": 10, "req": true}, {"n": "Greenhouse samples", "kg": 15, "req": true}, {"n": "Mars soil", "kg": 20}, {"n": "Rock cores", "kg": 12}, {"n": "Broken drill", "kg": 25}],
-					50, _send("pack2"), {"min": 30, "fact": "NASA is planning to bring Mars samples back to Earth one day."})}
-			if k == "fuel" and not task_done("burn"):
-				return {"label": "SET THE FUEL LOAD", "role": "nav", "fn": func(): mg.fuel("nav", "HOW MUCH FUEL?", "The exact amount is hidden. Run test burns: each one tells you if you were short or too heavy, and the known range narrows.", 300 + (randi() % 13) * 10, _send("burn"), "Mars gravity is about a third of Earth's.")}
-			if k == "pad" and not task_done("bolts2"):
-				return {"label": "ROCKET CHECK", "role": "eng", "fn": func(): mg.timing("eng", "TORQUE THE ASCENT ROCKET", "Stop the wrench in the green zone for each of the five bolts. The zone moves every time.", [0.45, 0.57], _send("bolts2"), {"hits": 5, "random": true, "label": "TIGHTEN", "fact": "No rocket has ever launched from the surface of Mars. Yet."})}
-			if k == "green" and not task_done("seeds"):
-				var seed := func(bad: bool) -> Callable:
-					return func(c, r): c.draw_rect(r, P["ink"]); c.draw_circle(Vector2(72, 48), 27, P["peach"]); c.draw_circle(Vector2(66, 42), 9, P["sand"]); if bad: c.draw_rect(Rect2(78, 45, 9, 9), P["dbrown"]); c.draw_rect(Rect2(57, 57, 6, 6), P["dbrown"]); c.draw_rect(Rect2(84, 60, 6, 6), P["dbrown"])
-				var cards := []
-				for i in 5:
-					var bad: bool = i == 2 or i == 4
-					cards.append({"label": "Seed %d" % (i + 1), "ok": bad, "why": "That one is healthy. Find the ones with dark UV spots.", "draw": seed.call(bad)})
-				return {"label": "SORT THE SEEDS", "role": "sci", "fn": func(): mg.pick("sci", "FIND THE DAMAGED SEEDS", "UV leaves dark spots on seeds. Pick out both damaged seeds so only healthy ones fly home.", cards, _send("seeds"), {"multi": 2, "fact": "Seeds have been grown into plants after trips to space."})}
-		if k == "pad" and rs == 6 and not task_done("window"):
-			return {"label": "FIND THE WINDOW", "role": "nav", "fn": func(): mg.orbit("nav", "THE LAUNCH WINDOW HOME", "Earth moves while we travel, so we launch only when the planets are lined up for us to meet it. Launch when the window opens.", "phase", _send("window"), "Launch windows between Earth and Mars open about every 26 months.")}
 	return {}
 
 
@@ -550,16 +441,6 @@ func _base_action(k: String) -> Dictionary:
 				return {"label": "HEAR THE RESULTS", "fn": _act("outro")}
 			if k == "pad" and st == 5:
 				return {"label": "BOARD THE SHUTTLE", "fn": func(): g.ui.toast("All four crew: take your seats here at the same time." if all_suited() else "Suits first: the locker is in Crew Quarters.", 3.0)}
-			if k == "canopy" and not s["canopy"] and st >= 4:
-				return {"label": "BUILD UV CANOPY", "role": "eng", "fn": func(): _quiz("OPTIONAL B", "UV CANOPY", "Workers must cross the surface to reach the pad. What canopy keeps them safe?", [
-					{"label": "Clear plastic sheet", "sub": "Cheap and light", "why": "Most clear plastics let a lot of UV straight through."},
-					{"label": "UV-blocking film", "sub": "Coated, like spacecraft windows", "ok": true},
-					{"label": "No canopy, run faster", "sub": "Free", "why": "UV damage adds up with every trip. Running only shortens each dose."}], _act("canopy"))}
-			if k == "hydro" and s["hydro"] and not has_opt("H"):
-				return {"label": "GROW FOOD", "role": "sci", "fn": func(): _quiz("OPTIONAL H", "GREENHOUSE FOR EVERY BUNKER", "How should every bunker grow food underground?", [
-					{"label": "Soil from the surface", "sub": "Lots of it outside", "why": "Hauling soil means long UV exposure outside, and it is heavy to move."},
-					{"label": "Hydroponics + LED lights", "sub": "Water, nutrients, light", "ok": true},
-					{"label": "Wait for sunlight", "sub": "No work needed", "why": "The ozone takes years to heal. The bunkers need food now."}], _act("hydro"))}
 		"moon":
 			var m: int = s["ms"]
 			if not s["storm"].is_empty():
@@ -585,48 +466,6 @@ func _base_action(k: String) -> Dictionary:
 						{"label": "2 satellites", "sub": "Fast · about 20% cover", "fn": _act("sats", {"n": 2})},
 						{"label": "4 satellites", "sub": "Balanced · about 30% cover", "fn": _act("sats", {"n": 4}), "best": true},
 						{"label": "6 satellites", "sub": "Slow · about 40% cover", "fn": _act("sats", {"n": 6})}])}
-			if k == "tele" and m >= 7 and not has_opt("G"):
-				return {"label": "TRACK THE ASTEROID", "role": "nav", "fn": func(): _quiz("OPTIONAL G", "PLANETARY DEFENSE", "An asteroid is heading for Earth. How do we stop it?", [
-					{"label": "Blow it up at the last minute", "sub": "Big and dramatic", "why": "Breaking it apart late can send many pieces toward Earth."},
-					{"label": "Impactor, years early", "sub": "A small nudge, early (like DART)", "ok": true},
-					{"label": "Hit it the week before", "sub": "Fast response", "why": "A nudge needs time to grow. Too late and the change is too small."}], _act("opt", {"k": "G"}))}
-			if k == "tele" and not has_opt("D"):
-				return {"label": "START STORM WATCH", "role": "nav", "fn": func(): _quiz("OPTIONAL D", "STORM WATCH", "Where should a space-weather satellite sit to warn the bunkers before a solar storm arrives?", [
-					{"label": "Low Earth orbit", "sub": "Close and cheap", "why": "From there the storm reaches the satellite and Earth at almost the same time."},
-					{"label": "The L1 point", "sub": "1.5 million km toward the Sun", "ok": true},
-					{"label": "On the Moon", "sub": "We are already here", "why": "The Moon spends half of each orbit on the far side from the Sun's direction."}], _act("opt", {"k": "D"}))}
-			if k == "purifier" and m >= 5 and not has_opt("C"):
-				return {"label": "SEND WATER KITS", "role": "sci", "fn": func(): _quiz("OPTIONAL C", "WATER FOR ALL", "Which water kit should every bunker get?", [
-					{"label": "Boil everything", "sub": "Simple", "why": "Boiling uses lots of scarce power and does not remove chemicals."},
-					{"label": "Filter + UV-C lamp", "sub": "Recycle, like the space station", "ok": true},
-					{"label": "Ship Moon ice down", "sub": "Plenty of it", "why": "Launching water costs far more than cleaning what the bunkers already have."}], _act("opt", {"k": "C"}))}
-		"mars":
-			var rs: int = s["rs"]
-			if not s["storm"].is_empty():
-				return {}
-			if k == "hangar" and rs == 0:
-				return {"label": "DOCK AND CHARGE", "fn": func():
-					g.recharge(g.camera.target)
-					_act("dock").call()}
-			if k == "solar" and rs == 1:
-				return {"label": "CLEAN THE PANELS", "role": "qm", "fn": func(): g.ui.task("CLEAN THE SOLAR FIELD", "Dust steals power. Brush the panels clean so they make the most of 43% sunlight.", "CLEAN", 2.4, _act("clean"), "Opportunity was built for 90 days and drove for nearly 15 years.")}
-			if k == "oxy" and rs == 2:
-				return {"label": "MAKE OXYGEN", "role": "eng", "fn": func(): g.ui.task("OXYGEN FROM MARS AIR", "Pull in carbon dioxide, split it, keep the oxygen. Just like NASA's MOXIE.", "RUN", 2.4, _act("moxie"), "MOXIE made about 122 g of oxygen, what a small dog breathes in 10 hours.")}
-			if k == "green" and rs == 3:
-				return {"label": "PLANT SEEDS", "role": "sci", "fn": func(): g.ui.task("THE UV-SAFE GREENHOUSE", "UV-filtering glass keeps the deadly light out. Plant the first crops.", "PLANT", 2.2, _act("plant"))}
-			if k == "vault" and rs == 4:
-				return {"label": "PACK SEEDS", "role": "qm", "fn": func(): g.ui.task("SEEDS AND SAMPLES", "Pack seeds and greenhouse samples for the first rocket ever to leave Mars.", "PACK", 1.6, _act("pack"))}
-			if k == "fuel" and rs == 5:
-				return {"label": "FUEL THE ROCKET", "role": "nav", "fn": func():
-					var ch := [{"label": "Light load", "sub": "Cheaper and lighter", "fn": _act("fuel", {"k": "light"})},
-						{"label": "Medium load", "sub": "Our best estimate", "fn": _act("fuel", {"k": "medium"}), "best": true},
-						{"label": "Full tanks", "sub": "Safe but heavy", "fn": _act("fuel", {"k": "full"})}]
-					g.ui.choice("HOW MUCH FUEL?", "The exact amount is hidden. Mars gravity is about a third of Earth's. Too little fails and costs ozone.", ch)}
-			if k == "vent" and rs >= 2 and not has_opt("J"):
-				return {"label": "INVESTIGATE METHANE", "role": "sci", "fn": func():
-					g.ui.choice("THE MARS MYSTERY", "A strange methane signal. Sterilize the probe first?", [
-						{"label": "Sterilize, then sample", "sub": "Slower, cleaner", "fn": _act("opt", {"k": "J"}), "best": true},
-						{"label": "Sample right away", "sub": "Faster", "fn": func(): g.ui.info("CONTAMINATION!", "An exciting reading... from our own Earth bacteria on the probe. Try again, sterilized.")}], "OPTIONAL J")}
 	return {}
 
 
@@ -653,19 +492,6 @@ static func passing_design() -> Dictionary:
 	return {"motor": "big", "uv": true, "cam": false, "chute": true, "radio": false}
 
 
-## A quick choice with a consequence: the right answer does the job, a wrong one explains why and counts as a mistake.
-func _quiz(tag: String, title: String, text: String, choices: Array, on_right: Callable) -> void:
-	var ch := []
-	for c in choices:
-		ch.append({"label": c["label"], "sub": c.get("sub", ""), "best": c.get("ok", false), "fn": func():
-			if c.get("ok", false):
-				on_right.call()
-			else:
-				g.act("miss", {}, g.acting_role())
-				g.ui.info("NOT QUITE", c["why"] + " Try again: the station is still here.")})
-	g.ui.choice(title, text, ch, tag)
-
-
 func flavor(k: String) -> Dictionary:
 	var s := S()
 	var say := func(lines: Array) -> Callable: return func(): g.ui.say(lines)
@@ -685,12 +511,12 @@ func flavor(k: String) -> Dictionary:
 					g.heal(g.camera.target)
 					g.ui.say([{"who": "ceres", "text": "UV exposure cleared. Keep surface trips short, or wear a suit."}])}
 				"airlock": return {"label": "LOOK THROUGH PERISCOPE", "fn": func(): g.ui.info("UV INDEX: EXTREME", "A gamma-ray burst destroyed the ozone layer. Deadly UV now covers the surface.")}
-				"canopy": return {"label": "REST IN THE SHADE", "fn": func(): g.ui.toast("Safe from UV under the canopy." if s["canopy"] else "The Engineer can build a UV canopy here.")}
-				"hydro": return {"label": "CHECK THE CROPS", "fn": say.call([{"who": "sci", "text": "Fresh food, grown underground. Every bunker can do this now."}])}
+				"canopy": return {"label": "REST IN THE SHADE", "fn": func(): g.ui.toast("A shady spot on the way to the pad. Keep surface trips short.")}
+				"hydro": return {"label": "CHECK THE CROPS", "fn": say.call([{"who": "sci", "text": "Fresh food, grown underground under LED lights."}])}
 		"moon":
 			var m: int = s["ms"]
 			match k:
-				"lc": return {"label": "CHECK STATUS", "fn": say.call([{"who": "ceres", "text": "Ozone meter: %d%%. Optional missions done: %d." % [s["ozone"], s["opt"].size()]}])}
+				"lc": return {"label": "CHECK STATUS", "fn": say.call([{"who": "ceres", "text": "Ozone meter: %d%%." % s["ozone"]}])}
 				"landing": return {"label": "INSPECT THE LANDER", "fn": say.call([{"who": "eng", "text": "The lander that brought us. One-sixth gravity made the touchdown gentle."}])}
 				"tele": return {"label": "LOOK THROUGH TELESCOPE", "fn": func(): g.ui.info("TELESCOPE", "Storm Watch is keeping an eye on the Sun.", "Mirrors left by Apollo show the Moon drifting away by about 3.8 cm a year.")}
 				"science": return {"label": "USE THE MICROSCOPE", "fn": func(): g.ui.info("SCIENCE LAB", "Ice grains from the crater, frozen for millions of years." if m >= 2 else "Samples waiting. First, where is the ice?", "Some south-pole craters never see sunlight.")}
@@ -700,26 +526,8 @@ func flavor(k: String) -> Dictionary:
 				"shelter": return {"label": "ENTER SHELTER", "fn": func(): g.ui.info("RADIATION SHELTER", "Water walls soak up radiation during solar storms.", "Apollo astronauts left 96 bags of their own waste on the Moon.")}
 				"factory": return {"label": "INSPECT THE FACTORY", "fn": say.call([{"who": "eng", "text": "The factory comes online in Act 3, once we have fuel." if m < 5 else "The line is quiet. The satellites are built."}])}
 				"port": return {"label": "INSPECT THE PORT", "fn": func(): g.ui.info("MOON PORT", "From here every launch needs a fraction of the fuel it would from Earth.", "You weigh only one-sixth as much on the Moon.")}
-				"teleop": return {"label": "CHECK THE CONSOLES", "fn": say.call([{"who": "ceres", "text": "These consoles drive robots on Mars. Not yet." if m < 7 else "Four consoles. One for each of you."}])}
-				"purifier": return {"label": "CHECK THE FILTERS", "fn": say.call([{"who": "sci", "text": "Clean water kits are on their way." if has_opt("C") else "Filters ready once the fuel plant runs."}])}
-		"mars":
-			var rs: int = s["rs"]
-			match k:
-				"hangar": return {"label": "DOCK AND CHARGE", "fn": func():
-					g.recharge(g.camera.target)
-					g.ui.toast("Battery full.")}
-				"landing": return {"label": "INSPECT HEAT SHIELD", "fn": func(): g.ui.info("LANDING ZONE", "The heat shield took the fire of entry. Without it, no robots.", "A day on Mars, a sol, lasts 24 hours and 39 minutes.")}
-				"drone": return {"label": "LAUNCH SCOUT DRONE", "fn": func(): g.ui.task("SCOUT DRONE", "Fly a loop and check the dust forecast.", "FLY", 1.4, func(): g.ui.say([{"who": "nav", "text": "Dust is building in the south. A storm is coming." if rs < 3 else "The worst of the dust has passed."}]), "NASA's Ingenuity was planned for 5 flights. It made 72.")}
-				"relay": return {"label": "CHECK THE LINK", "fn": func(): g.ui.info("SIGNAL DELAY", "Messages to and from Mars take minutes. Your robot answers a moment late, so plan ahead.", "A message from Mars takes about 3 to 22 minutes to reach us.")}
-				"atmos": return {"label": "SCAN THE AIR", "fn": func(): g.ui.info("ATMOSPHERE LAB", "Like NASA's MAVEN, we measure how Mars lost most of its air to the solar wind.", "Olympus Mons is about two and a half times as tall as Mount Everest.")}
-				"vent": return {"label": "CHECK THE VENT", "fn": say.call([{"who": "sci", "text": "Still inconclusive. Honest science takes time." if has_opt("J") else "A faint methane plume. The Scientist should look."}])}
-				"solar": return {"label": "CHECK THE PANELS", "fn": say.call([{"who": "qm", "text": "Coated in dust. We are losing power." if rs < 2 else "Clean panels. Still only 43% of Earth's sunlight."}])}
-				"power": return {"label": "CHECK THE RTG", "fn": say.call([{"who": "qm", "text": "The RTG makes power from heat, day and night, dust or no dust."}])}
-				"oxy": return {"label": "CHECK THE PLANT", "fn": say.call([{"who": "eng", "text": "Offline. We need power first." if rs < 2 else "Running. Carbon dioxide in, oxygen out."}])}
-				"green": return {"label": "CHECK THE CROPS", "fn": say.call([{"who": "sci", "text": "Empty beds. We need oxygen and power first." if rs < 3 else "Green shoots under a broken sky."}])}
-				"vault": return {"label": "OPEN THE VAULT", "fn": say.call([{"who": "qm", "text": "Empty. Crops first." if rs < 4 else "Packed and sealed for the trip home."}])}
-				"fuel": return {"label": "CHECK THE TANKS", "fn": say.call([{"who": "nav", "text": "Empty. The seeds come first." if rs < 5 else "Fuelled and ready."}])}
-				"pad": return {"label": "INSPECT THE ROCKET", "fn": say.call([{"who": "nav", "text": "The first rocket ever to lift off from Mars."}])}
+				"teleop": return {"label": "CHECK THE CONSOLES", "fn": say.call([{"who": "ceres", "text": "Remote-control consoles. One day they could drive robots on other worlds."}])}
+				"purifier": return {"label": "CHECK THE FILTERS", "fn": say.call([{"who": "sci", "text": "Filters and a UV-C lamp recycle every drop, like on the space station."}])}
 	return {}
 
 
@@ -728,8 +536,6 @@ func flavor(k: String) -> Dictionary:
 func do_effect(id: String, p: Dictionary, r: String) -> void:
 	var s := S()
 	match id:
-		"miss":
-			s["pen"] += 1
 		"shield":
 			if s["world"] == "moon" and s["ms"] == 5 and not s["sats_chosen"]:
 				var sh := {"n": clampi(int(p.get("n", 4)), 1, 6), "h": clampi(int(p.get("h", 0)), 0, 6), "big": 1 if int(p.get("big", 0)) > 0 else 0}
@@ -743,19 +549,12 @@ func do_effect(id: String, p: Dictionary, r: String) -> void:
 		"mpower":
 			if s["world"] == "moon" and s["ms"] == 2:
 				_moon_power(p)
-		"gpower":
-			if s["world"] == "mars" and s["rs"] == 3 and s["gpower"].is_empty():
-				var gp := {"solar": int(p.get("solar", 0)), "bat": int(p.get("bat", 0)), "rtg": 1 if int(p.get("rtg", 0)) > 0 else 0, "ins": 1 if int(p.get("ins", 0)) > 0 else 0}
-				if not Designers.mars_calc(gp)["ok"]:
-					return
-				s["gpower"] = gp
-				g.say_all([{"who": "qm", "text": "Greenhouse power set: %d solar, %d batteries%s%s." % [gp["solar"], gp["bat"], ", the RTG" if gp["rtg"] else "", ", insulation" if gp["ins"] else ""]}, {"who": "ceres", "text": "Scientist: plant the crops in the Greenhouse."}])
 		"rcont":
 			if not s["report"].is_empty() and s["report"]["id"] == p.get("id"):
 				var key: String = s["report"]["key"]
 				s["report"] = {}
 				if key == "shield":
-					g.say_all([{"who": "nav", "text": "Wait. The Telescope picked something up. An asteroid."}, {"who": "ceres", "text": "Earth's sky now looks like Mars's sky. Let's learn from it. All four: to the Teleop Center."}])
+					_fly_home()
 		"rretry":
 			if not s["report"].is_empty() and s["report"]["id"] == p.get("id"):
 				var R: Dictionary = s["report"]
@@ -806,13 +605,6 @@ func do_effect(id: String, p: Dictionary, r: String) -> void:
 					{"who": "eng", "text": "Lifting heavy satellites against Earth's gravity costs too much fuel."},
 					{"who": "ceres", "text": "Then don't build it here. Build it where leaving is easy."},
 					{"who": "nav", "text": "The Moon. All four of us: suit up in Crew Quarters, then to the Launch Pad."}])
-		"canopy":
-			if not s["canopy"]:
-				s["canopy"] = true
-				_add_opt("B")
-		"hydro":
-			if s["hydro"]:
-				_add_opt("H")
 		"checkin":
 			if s["ms"] == 0:
 				s["ms"] = 1
@@ -840,38 +632,6 @@ func do_effect(id: String, p: Dictionary, r: String) -> void:
 				s["sats"] = n
 				s["sats_chosen"] = true
 				g.say_all([{"who": "eng", "text": "%d satellites. Quartermaster, feed me metal at the factory. Hold your station." % n}])
-		"opt":
-			if p.get("k") in ["C", "D", "G", "J"]:
-				_add_opt(p["k"])
-		"dock":
-			if s["rs"] == 0:
-				s["rs"] = 1
-				g.say_all([{"who": "ceres", "text": "Link established. You are each driving a robot from the Moon."}, {"who": "ceres", "text": "Batteries drain as you move. Dock here to recharge."}, {"who": "qm", "text": "Mars gets less than half of Earth's sunlight. Every watt counts."}])
-		"clean":
-			if s["rs"] == 1:
-				s["rs"] = 2
-				g.say_all([{"who": "qm", "text": "Panels clean. Engineer, the Oxygen Plant has power."}])
-		"moxie":
-			if s["rs"] == 2:
-				s["rs"] = 3
-				g.say_all([{"who": "eng", "text": "Oxygen flowing. Scientist, the greenhouse can breathe."}])
-		"plant":
-			if s["rs"] == 3 and s["storm"].is_empty():
-				s["storm"] = {"kind": "dust", "t": 40.0}
-				g.say_all([{"who": "ceres", "text": "Global dust storm! Solar power is dropping to almost nothing."}, {"who": "qm", "text": "Quartermaster to the RTG in the Power Shed, Engineer to the greenhouse heater. Everyone else: dock in the Hangar!"}])
-		"pack":
-			if s["rs"] == 4:
-				s["rs"] = 5
-				g.say_all([{"who": "sci", "text": "Cargo packed. These seeds grew under a broken sky."}, {"who": "ceres", "text": "Navigator: fuel the rocket."}])
-		"fuel":
-			if s["rs"] == 5:
-				if p.get("k") == "light":
-					s["ozone"] = maxi(0, s["ozone"] - 2)
-					s["pen"] += 1
-					g.say_all([{"who": "nav", "text": "The simulation runs dry before orbit. Wasted a launch window: −2% ozone. More fuel."}])
-				else:
-					s["rs"] = 6
-					g.say_all([{"who": "nav", "text": "Within 10% of what we need. Efficient trajectory!" if p.get("k") == "medium" else "It works, but the extra fuel is heavy and wasteful."}, {"who": "ceres", "text": "All four robots: load up at the Ascent Pad."}])
 		"skip":
 			if s["scene"] == "travel":
 				finish_travel()
@@ -880,6 +640,7 @@ func do_effect(id: String, p: Dictionary, r: String) -> void:
 			if s["scene"] == "ending":
 				s["world"] = "earth"
 				s["step"] = 6
+				s["suits"] = {}
 				set_scene("game")
 				return
 		"again":
@@ -946,38 +707,6 @@ func _retry(R: Dictionary) -> void:
 			s["shield"] = {}
 			s["time"] -= TRIP_DAYS["shield"] * 1440
 			g.say_all([{"who": "ceres", "text": "Simulation reset. Engineer: redesign the shield at the Moon Factory."}])
-		"gpower":
-			s["rs"] = 3
-			s["gpower"] = {}
-			g.say_all([{"who": "ceres", "text": "Rewinding the forecast. Quartermaster: redesign the greenhouse power at the Power Shed."}])
-
-
-func _green_report(crew_held: bool) -> void:
-	var s := S()
-	var gp: Dictionary = s["gpower"] if not s["gpower"].is_empty() else {"solar": 3, "bat": 0, "rtg": 0, "ins": 0}
-	var c := Designers.mars_calc(gp)
-	var days: int = c["days"]
-	var full: bool = days >= Designers.GPOW["days"] and crew_held
-	var gain := 2 if full else 0
-	var pen := 0 if full else (3 if days == 0 else 1)
-	s["ozone"] = clampi(s["ozone"] + gain - pen, 0, 100)
-	var stars: int = ((3 if c["cr"] <= Designers.GPOW["budget"] - 30 else 2) if full else (1 if days > 0 else 0))
-	var N: Dictionary = Designers.NASA
-	var res := ""
-	if full:
-		res = "[color=#63c74d]Full harvest ✓[/color] the heaters stayed on all 3 storm days"
-	elif days == 0:
-		res = "[color=#f6757a]The plants froze on storm day 1 ✗[/color] (the Opportunity ending)"
-	else:
-		res = "[color=#feae34]Partial harvest ![/color] power lasted %d of 3 storm days" % days
-	if not crew_held:
-		res += " · the crew did not reach the RTG and heater in time"
-	post_report({"key": "gpower", "name": "GREENHOUSE POWER", "stars": stars, "gain": gain, "penalty": pen, "retry": "gpower",
-		"chose": "%d solar, %d batteries%s%s (%d cr)" % [gp["solar"], gp["bat"], ", RTG" if gp["rtg"] else "", ", insulation" if gp["ins"] else "", c["cr"]],
-		"result": res,
-		"why": "Your RTG kept making power when the dust blocked the Sun." if gp["rtg"] else ("Batteries bought time, but solar output collapsed in the dust." if gp["bat"] else "Solar output dropped by about 95% in the dust. Nothing else made power."),
-		"real": "Opportunity (solar) was lost in the 2018 dust storm; Perseverance runs on an MMRTG and keeps working in dust.",
-		"data": "In June 2018 the dust opacity (tau) over Opportunity reached [b]%s[/b] (normal is about %s). Its solar power fell from about [b]%d[/b] to [b]%d watt-hours[/b] a day. An MMRTG gives about %d W whatever the weather. [color=#8b9bb4](%s; %s)[/color]" % [str(N["mars"]["tau"]), str(N["mars"]["tau_normal"]), N["mars"]["wh_before"], N["mars"]["wh_after"], N["rtg"]["w"], N["mars"]["src"], N["rtg"]["src"]]})
 
 
 ## A role task was finished (the workshop counts as one): move on when Act 1 prep is done.
@@ -988,9 +717,6 @@ func _after_task() -> void:
 		g.say_all([{"who": "ceres", "text": "Launch prep complete. Readiness review: all four of you, stand on your consoles in Mission Control."}])
 	elif s["world"] == "earth" and s["step"] == 5 and prep_done("e5") and not all_suited():
 		g.say_all([{"who": "ceres", "text": "Trip prep complete. Everyone: spacesuits from the locker in Crew Quarters, then board at the Launch Pad."}])
-	elif s["world"] == "mars" and s["rs"] == 4 and prep_done("m4"):
-		s["rs"] = 6
-		g.say_all([{"who": "ceres", "text": "Departure prep complete. Navigator: find the launch window at the Ascent Pad."}])
 	elif s["world"] == "moon" and s["ms"] == 6 and task_done("l1"):
 		g.say_all([{"who": "ceres", "text": "All four: take your launch seats at the Moon Port."}])
 
@@ -998,13 +724,6 @@ func _after_task() -> void:
 func on_suit(_r: String) -> void:
 	if g.S["world"] == "earth" and g.S["step"] == 5 and all_suited():
 		g.say_all([{"who": "ceres", "text": "All four suits sealed. Now board the shuttle at the Launch Pad."}])
-
-
-func _add_opt(k: String) -> void:
-	if has_opt(k):
-		return
-	g.S["opt"].append(k)
-	g.say_all([{"who": "ceres", "text": "Optional %s complete. Helping humanity changes the ending." % OPTNAME[k]}])
 
 
 func set_scene(sc: String) -> void:
@@ -1072,20 +791,26 @@ func finish_travel() -> void:
 			g.say_all([{"who": "ceres", "text": "Touchdown at the lunar south pole. Anyone: check in at Lunar Control."}, {"who": "qm", "text": "Suits stowed at the Landing Pad. Inside the outpost we work in uniform again."}])
 		"shield":
 			_shield_result()
-		"mars":
-			s["world"] = "mars"
-			s["rs"] = 0
-			s["scene"] = "game"
-			g.say_all([{"who": "ceres", "text": "Robots online. Drive to the Robot Hangar."}])
 		"home":
-			s["rs"] = 7
-			s["ozone"] = mini(100, s["ozone"] + 35)
-			s["hydro"] = true
-			s["world"] = "earth"
-			s["step"] = 6
-			s["scene"] = "ending"
+			_land_on_earth()
 	_scene_t = 0.0
 	g.commit()
+
+
+## After the shield report: all four fly back from the Moon to Earth.
+func _fly_home() -> void:
+	g.say_all([{"who": "ceres", "text": "The shield holds. Our work up here is done."}, {"who": "nav", "text": "Course plotted for Earth. Three days home."}])
+	travel({"kind": "home", "from": "moon", "to": "earth", "title": "HOMECOMING", "sub": "The crew flies back to Earth under a healing sky", "after": "home"})
+
+
+## The capsule lands next to Bunker 4: the shield keeps working while the ozone heals → happy ending.
+func _land_on_earth() -> void:
+	var s := S()
+	s["ozone"] = mini(100, s["ozone"] + 35)
+	s["world"] = "earth"
+	s["step"] = 6
+	s["suits"] = {}
+	s["scene"] = "ending"
 
 
 func _shield_result() -> void:

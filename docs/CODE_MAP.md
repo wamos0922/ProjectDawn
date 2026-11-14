@@ -7,7 +7,7 @@ disagree, the HTML is right. Start the game from `game/dawn/title.tscn` (open it
 
 ```
 title.gd  ──START──▶  dawn.tscn (dawn.gd)
- lobby: pick role,          │ builds 37 rooms (room_view.gd), the crew (crew.gd),
+ lobby: pick role,          │ builds 24 rooms (room_view.gd), the crew (crew.gd),
  solo crew mode             │ the HUD (dawn_ui.gd), the world map (world_map.gd)
  (Network meta)             ▼
                       story.gd  ── decides what happens: objective, holds, what E does at a console
@@ -31,15 +31,15 @@ Solo play is simply "you are the host".
 | `game/dawn/world_map.gd` | The overview map (M) and the corridor walk when you use a door | the map looks wrong, you get stuck between rooms |
 | `game/dawn/room_view.gd` | Draws one room: the HTML picture + doors, hold rings, CERES, highlights | a room looks wrong, a ring does not show |
 | `game/dawn/world_data.gd` | Pure data/geometry: rooms, doors, stations, paths, clock text (no nodes, tested) | a door or station is in the wrong place, pathfinding |
-| `game/dawn/story.gd` | The five acts: objective, holds, what each console does, effects, storms, optional missions | the story does not advance, wrong objective |
+| `game/dawn/story.gd` | The three acts (Earth → Moon → home, see docs/STORY_MOON_ONLY.md): objective, holds, what each console does, effects, storms | the story does not advance, wrong objective |
 | `game/dawn/story_ui.gd` | Full-screen scenes: intro, wake-up, workshop, poll, launch, report, travel, ending | an animation or story screen is wrong |
-| `game/dawn/designers.gd` | NASA numbers, the three designers (shield, Moon power, Mars power) and their rules | a design passes/fails when it should not |
+| `game/dawn/designers.gd` | NASA numbers, the two designers (Moon outpost power, shield) and their rules | a design passes/fails when it should not |
 | `game/dawn/minigames.gd` | The role minigames (UV sensor timing, tuning, bolts, burn, cargo…), and review mode (F8: one-click placeholders) | a minigame crashes or cannot be won |
 | `game/dawn/dawn_ui.gd` | HUD (top bar, objective, crew bar), toasts, dialogue box + portrait, panels | HUD layout, dialogue box, buttons |
 | `game/dawn/pixel.gd` | 320×180 pixel canvas with the HTML drawing helpers (sky, rocket, person, CERES robot) | a drawn animation looks different from HTML |
 | `game/dawn/dawn_theme.gd` | Colours, fonts, button and panel styles (`DawnTheme`) | colours or fonts |
 | `game/player/player.gd` | One crew member body: walking, E to use, online position sync | movement, the E key |
-| `game/player/role_sprites.gd` | Sprite sheets per role (uniform, spacesuit, Mars robot) | a character sprite is wrong |
+| `game/player/role_sprites.gd` | Sprite sheets per role (uniform, spacesuit) | a character sprite is wrong |
 | `game/input_setup.gd` | Key bindings (WASD/arrows + E/Enter) | change controls |
 | `game/camera/room_camera.gd` | Camera that snaps to the room you are in | camera |
 | `tests/run_tests.gd` | Unit tests for the pure rules (geometry, paths, designers) | run after every change |
@@ -75,7 +75,7 @@ HTML sources in `/home/claude/v2` (edit the path `V` at the top), then copy the 
 ## Keys
 
 WASD or arrows walk · E or Enter use · Space/click next line · TAB switch crew · F follow ·
-C autopilot · M world map · J mission details · Esc close · F8 review mode (minigames become one click) · F9/F10/F11 jump to Earth/Moon/Mars (solo debug)
+C autopilot · M world map · J mission details · Esc close · F8 review mode (minigames become one click) · F9/F10 jump to Earth/Moon (solo debug)
 
 ## Checking your change
 
@@ -83,7 +83,7 @@ C autopilot · M world map · J mission details · Esc close · F8 review mode (
 godot --headless --path . -s res://tests/run_tests.gd       # pure rules (25 tests)
 godot --headless --path . -s res://tests/crew_test.gd       # TAB, follow, autopilot, role rule
 godot --headless --path . -s res://tests/door_test.gd       # walk out a door → map trip → next room
-godot --headless --path . -s res://tests/all_doors_test.gd  # every door in all 37 rooms can be walked through
+godot --headless --path . -s res://tests/all_doors_test.gd  # every door in all 24 rooms can be walked through
 godot --headless --path . -s res://tests/minigame_test.gd   # plays each minigame through its buttons
 godot --headless --path . -s res://tests/review_mode_test.gd  # F8 review mode: every minigame is a one-click placeholder
 ```

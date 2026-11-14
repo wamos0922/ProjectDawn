@@ -9,7 +9,7 @@ extends Node2D
 ##                objective blinks yellow with an arrow
 ##   rings        dashed ring on a spot a co-op "hold" needs (green when someone stands on it),
 ##                yellow ring on the main console when the objective is here
-##   CERES        the bunker AI robot in Mission Control / Lunar Control / Robot Hangar
+##   CERES        the bunker AI robot in Mission Control / Lunar Control
 ##   highlights   soft glow under whatever you can use right now, dot on posters you have not read
 
 const WD := preload("res://game/dawn/world_data.gd")
@@ -18,7 +18,7 @@ const RoleSprites := preload("res://game/player/role_sprites.gd")
 
 ## Where CERES stands in each world: the HTML spot (DEFS.<world>.fx), moved 26 px right so the
 ## robot body does not cover the main console's standing spot.
-const CERES_AT := {"earth.mc": Vector2(186, 64), "moon.lc": Vector2(186, 58), "mars.hangar": Vector2(186, 60)}
+const CERES_AT := {"earth.mc": Vector2(186, 64), "moon.lc": Vector2(186, 58)}
 
 var id := ""
 var game                     ## dawn.gd

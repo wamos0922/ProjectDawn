@@ -1,5 +1,8 @@
 # Project Dawn: Gameplay & Game Flow
 
+> **Note (15 Nov 2026):** the Godot game now plays a shorter story (Earth → Moon → home, no Mars, no optional
+> missions). See `docs/STORY_MOON_ONLY.md`. This file keeps the original full design.
+
 How the game actually plays, built on Wam's storyline (`docs/STORY.md`, v2).
 Audience: Sufi (engine), Zaliq (interface), Wam (content), Dino (values).
 All numbers here are **starting game values** for balance; Dino replaces any that should be real.

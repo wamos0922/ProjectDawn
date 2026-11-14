@@ -1,5 +1,5 @@
 extends RefCounted
-## Mission designers (shield satellites, Moon outpost power, Mars greenhouse power), the NASA numbers
+## Mission designers (Moon outpost power, shield satellites), the NASA numbers
 ## that decide pass or fail, and the mission report shown after every mission.
 ## Owner: Sufi (gameplay). Same rules as the HTML demo (web/demo, c11.js). Sources: docs/SOURCES.md.
 
@@ -10,12 +10,10 @@ const NASA := {
 	"ozone": {"normal": 300, "hole": 220, "low": 92, "low_when": "October 2006, over the South Pole", "src": "NASA Ozone Watch / NASA Earth Observatory"},
 	"storm": {"name": "Gannon storm, 10 May 2024", "text": "the first G5 geomagnetic storm in over 20 years. NASA's ICESat-2 dropped into safe mode, the CIRBE CubeSat came down early, and thousands of satellites had to adjust their orbits", "src": "NASA Science"},
 	"moon": {"rim": 85.5, "cold": 37, "src": "LRO (LOLA illumination study; Diviner temperatures)"},
-	"mars": {"tau": 10.8, "tau_normal": 0.5, "wh_before": 645, "wh_after": 22, "src": "NASA JPL Opportunity status reports, June 2018"},
 	"rtg": {"w": 110, "kg": 45, "src": "NASA MMRTG fact sheet"},
 }
 const SHIELD := {"budget": 300, "sat": 40, "hard": 15, "panel": 10, "per": 15, "need": 60}
 const MPOW := {"budget": 150, "mass": 120, "need": 3, "solar": {"cr": 30, "kg": 20, "u": 3}, "cable": {"cr": 25, "kg": 40}, "rtg": {"cr": 90, "kg": 45, "u": 2}, "bat": {"cr": 20, "kg": 25, "u": 2}}
-const GPOW := {"budget": 200, "days": 3, "solar": {"cr": 20, "clear": 1.0, "storm": 0.05}, "bat": {"cr": 25, "u": 3}, "rtg": {"cr": 100, "u": 1}, "ins": {"cr": 15}, "heater": 2, "lights": 1}
 
 var g          ## dawn.gd
 
@@ -77,35 +75,6 @@ static func moon_calc(s: Dictionary) -> Dictionary:
 		hint = "Power design holds. Lock it in."
 	return {"cr": cr, "kg": kg, "at_ice": at_ice, "via_cable": via_cable, "survives": survives, "ok": at_ice >= MPOW["need"] and cr <= MPOW["budget"] and kg <= MPOW["mass"], "hint": hint,
 		"gauges": [["POWER AT ICE", "%d / %d" % [at_ice, MPOW["need"]], at_ice >= MPOW["need"]], ["COST", "%d / %d cr" % [cr, MPOW["budget"]], cr <= MPOW["budget"]], ["MASS", "%d / %d kg" % [kg, MPOW["mass"]], kg <= MPOW["mass"]]]}
-
-
-static func mars_calc(s: Dictionary) -> Dictionary:
-	var cr: int = s["solar"] * GPOW["solar"]["cr"] + s["bat"] * GPOW["bat"]["cr"] + s["rtg"] * GPOW["rtg"]["cr"] + s["ins"] * GPOW["ins"]["cr"]
-	var need: int = GPOW["heater"] - (1 if s["ins"] > 0 else 0) + GPOW["lights"]
-	var clear: float = s["solar"] * GPOW["solar"]["clear"] + s["rtg"] * GPOW["rtg"]["u"]
-	var store: float = s["bat"] * GPOW["bat"]["u"]
-	var days := 0
-	for d in GPOW["days"]:
-		var prod: float = s["solar"] * GPOW["solar"]["storm"] + s["rtg"] * GPOW["rtg"]["u"]
-		var deficit := maxf(0.0, need - prod)
-		if deficit <= store + 1e-9:
-			store -= deficit
-			days += 1
-		else:
-			break
-	var hint := ""
-	if cr > GPOW["budget"]:
-		hint = "Over budget by %d credits." % (cr - GPOW["budget"])
-	elif clear < need:
-		hint = "On a clear day we make %s units. The greenhouse needs %d." % [str(snappedf(clear, 0.01)), need]
-	elif s["rtg"] == 0 and s["bat"] == 0:
-		hint = "All solar. A dust storm blocks most sunlight: Opportunity dropped from %d to %d watt-hours a day in 2018." % [NASA["mars"]["wh_before"], NASA["mars"]["wh_after"]]
-	elif days < GPOW["days"]:
-		hint = "In a %d-day storm this lasts about %d day%s. Think about what still works when the sky goes dark." % [GPOW["days"], days, "" if days == 1 else "s"]
-	else:
-		hint = "This design keeps the heaters on through a 3-day storm. Lock it in."
-	return {"cr": cr, "need": need, "clear": clear, "days": days, "ok": cr <= GPOW["budget"] and clear >= need, "hint": hint,
-		"gauges": [["COST", "%d / %d cr" % [cr, GPOW["budget"]], cr <= GPOW["budget"]], ["CLEAR DAY", "%s / %d units" % [str(snappedf(clear, 0.01)), need], clear >= need], ["STORM DAYS", "%d / %d" % [days, GPOW["days"]], days >= GPOW["days"]]]}
 
 
 # ---------------------------------------------------------------- designer panel
@@ -214,16 +183,6 @@ func moon(on_lock: Callable) -> void:
 		{"key": "rtg", "label": "RTG (nuclear battery)", "sub": "%d cr · %d kg · %d units, works in the dark" % [MPOW["rtg"]["cr"], MPOW["rtg"]["kg"], MPOW["rtg"]["u"]], "min": 0, "max": 2},
 		{"key": "bat", "label": "Battery pack", "sub": "%d cr · %d kg · stores %d units" % [MPOW["bat"]["cr"], MPOW["bat"]["kg"], MPOW["bat"]["u"]], "min": 0, "max": 2}],
 		moon_calc, "BUILD THE POWER SYSTEM", on_lock)
-
-
-func mars(on_lock: Callable) -> void:
-	var st := {"solar": 3, "bat": 0, "rtg": 0, "ins": 0}
-	panel("qm", "POWER THE GREENHOUSE", "Heaters need %d units a day and grow lights %d. CERES forecasts dust. Design the power [color=#2ce8f5]before the storm hits[/color]: it may last %d days." % [GPOW["heater"], GPOW["lights"], GPOW["days"]], st,
-		[{"key": "solar", "label": "Solar panel", "sub": "%d cr · 1 unit in clear sky, %s in a storm" % [GPOW["solar"]["cr"], str(GPOW["solar"]["storm"])], "min": 0, "max": 6},
-		{"key": "bat", "label": "Battery", "sub": "%d cr · stores %d units" % [GPOW["bat"]["cr"], GPOW["bat"]["u"]], "min": 0, "max": 4},
-		{"key": "rtg", "label": "RTG (MMRTG-style)", "sub": "%d cr · 1 unit day and night, storm or not" % GPOW["rtg"]["cr"], "min": 0, "max": 1},
-		{"key": "ins", "label": "Insulation", "sub": "%d cr · heaters need 1 unit less" % GPOW["ins"]["cr"], "min": 0, "max": 1}],
-		mars_calc, "BUILD THE POWER SYSTEM", on_lock)
 
 
 # ---------------------------------------------------------------- mission report (same for every mission)

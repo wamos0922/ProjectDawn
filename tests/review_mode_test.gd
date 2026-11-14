@@ -64,9 +64,9 @@ func _process(_d):
 	# 3. every station minigame is a placeholder and COMPLETE records the task
 	var cases := [["uvcal", "earth", 1, "ozone"], ["tune", "earth", 1, "comms"], ["wind", "earth", 1, "nav"],
 		["perigee", "earth", 5, "nav"], ["cargo", "earth", 5, "power"], ["bolts", "earth", 5, "pad"],
-		["site", "earth", 5, "ozone"], ["burn", "mars", 4, "fuel"], ["bolts2", "mars", 4, "pad"], ["window", "mars", 6, "pad"]]
+		["site", "earth", 5, "ozone"], ["l1", "moon", 6, "port"]]
 	for c in cases:
-		var opened := _task(c[1], c[2], c[3], c[0] == "window")
+		var opened := _task(c[1], c[2], c[3])
 		var b := find("COMPLETE")
 		ok(opened and b != null and find("STOP") == null and find("LOCK IN") == null, "%s: placeholder panel with COMPLETE" % c[0])
 		if b:
@@ -76,14 +76,14 @@ func _process(_d):
 	# 4. the minigames not reached above also use the placeholder
 	var hits := {"n": 0}
 	var win := func(): hits["n"] += 1
-	for call in [func(): g.story.mg.scan("sci", win, func(): pass), func(): g.story.mg.wipe("qm", win),
+	for call in [func(): g.story.mg.scan("sci", win, func(): pass),
 			func(): g.story.mg.wires("qm", "WIRES", "x", win), func(): g.story.mg.pick("sci", "PICK", "x", [], win),
 			func(): g.story.mg.pack("qm", "PACK", "x", [], 10, win), func(): g.story.mg.sliders("eng", "S", "x", [], func(v): return {}, win)]:
 		call.call()
 		var b := find("COMPLETE")
 		if b:
 			b.pressed.emit()
-	ok(hits["n"] == 6, "scan, wipe, wires, pick, pack, sliders: all placeholders win (%d/6)" % hits["n"])
+	ok(hits["n"] == 5, "scan, wires, pick, pack, sliders: all placeholders win (%d/5)" % hits["n"])
 
 	# 5. the Engineer's rocket workshop: COMPLETE locks a design that passes every check
 	g.S["world"] = "earth"; g.S["step"] = 1; g.S["tasks"] = {}; g.S["pen"] = 0
@@ -100,14 +100,11 @@ func _process(_d):
 
 	# 6. question panels: COMPLETE picks the right answer, no penalty
 	var qs := [["moon", "ms", 1, "science", func(): return g.S["ms"] == 2, "WHERE IS THE ICE"],
-		["moon", "ms", 5, "factory", func(): return g.S["sats_chosen"], "HOW MANY SHIELD SATELLITES"],
-		["mars", "rs", 5, "fuel", func(): return g.S["pen"] == 0 and g.S["rs"] != 5, "HOW MUCH FUEL (last act)"],
-		["mars", "rs", 2, "vent", func(): return g.S["opt"].has("J"), "THE MARS MYSTERY (optional J)"],
-		["earth", "step", 4, "canopy", func(): return g.S["canopy"] or g.S["opt"].has("B"), "UV CANOPY quiz (optional B)"]]
+		["moon", "ms", 5, "factory", func(): return g.S["sats_chosen"], "HOW MANY SHIELD SATELLITES"]]
 	for q in qs:
 		g.ui.close_panel()
-		g.S["world"] = q[0]; g.S["ms"] = 0; g.S["rs"] = 0; g.S["step"] = 0; g.S["pen"] = 0
-		g.S["opt"] = []; g.S["canopy"] = false; g.S["sats_chosen"] = false; g.S["storm"] = {}
+		g.S["world"] = q[0]; g.S["ms"] = 0; g.S["step"] = 0; g.S["pen"] = 0
+		g.S["sats_chosen"] = false; g.S["storm"] = {}
 		g.S[q[1]] = q[2]
 		g.commit()
 		var a: Dictionary = g.story._base_action(q[3])
@@ -143,14 +140,14 @@ func _process(_d):
 
 
 ## Put the story where this station has a minigame and press E on it. Returns true if a panel opened.
-func _task(world: String, stage: int, station: String, window := false) -> bool:
+func _task(world: String, stage: int, station: String) -> bool:
 	g.ui.close_panel()
 	g.S["world"] = world
-	g.S["tasks"] = {"pack2": true, "burn": true, "bolts2": true, "seeds": true} if window else {}
+	g.S["tasks"] = {}
 	if world == "earth":
 		g.S["step"] = stage
 	else:
-		g.S["rs"] = stage
+		g.S["ms"] = stage
 	g.commit()
 	var a: Dictionary = g.story.role_task(station)
 	if a.is_empty():

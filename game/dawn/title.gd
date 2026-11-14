@@ -145,7 +145,7 @@ func _title() -> void:
 	chip.add_theme_stylebox_override("panel", DawnTheme.box(Color(0.094, 0.078, 0.145, 0.88), C["slate"], 4, Color(0, 0, 0, 0), 0, Vector4(12, 7, 12, 7)))
 	chip.position = Vector2(32, 662)
 	var cl := Label.new()
-	cl.text = "CO-OP · 1–4 PLAYERS · EARTH · MOON · MARS"
+	cl.text = "CO-OP · 1–4 PLAYERS · EARTH · MOON"
 	cl.add_theme_font_override("font", DawnTheme.title_font())
 	cl.add_theme_font_size_override("font_size", 12)
 	cl.add_theme_color_override("font_color", C["sand"])
@@ -169,7 +169,6 @@ func _credits() -> void:
 		"• Ozone: healthy %d DU, hole below %d DU, record low %d DU (%s). NASA Ozone Watch\n" % [N["ozone"]["normal"], N["ozone"]["hole"], N["ozone"]["low"], N["ozone"]["low_when"]] +
 		"• Solar storm and satellites: %s. NASA Science\n" % N["storm"]["name"] +
 		"• Lunar south pole: Shackleton rim sunlit %s%% of the time, crater floors near %d K. LRO LOLA and Diviner\n" % [str(N["moon"]["rim"]), N["moon"]["cold"]] +
-		"• Mars dust storm: tau %s, Opportunity %d → %d watt-hours a day. NASA JPL\n" % [str(N["mars"]["tau"]), N["mars"]["wh_before"], N["mars"]["wh_after"]] +
 		"• RTG power: about %d W, %d kg. NASA MMRTG fact sheet\n\n" % [N["rtg"]["w"], N["rtg"]["kg"]] +
 		"[color=#feae34]FONTS[/color]\nPress Start 2P and Pixelify Sans (SIL Open Font License, Google Fonts).\n\n" +
 		"[color=#feae34]AI TOOLS USED[/color]\nClaude (Anthropic) and Codex helped write code, pixel art and text. The team chose the design, checked the facts and tested the game.")
