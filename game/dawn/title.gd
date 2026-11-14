@@ -257,22 +257,38 @@ func _host_screen() -> void:
 	_name_field(R)
 	var ips := local_ips()
 	_h(R, "CREW CODE", 11, C["grey"])
-	var code := _h(R, ips[0] if not ips.is_empty() else "127.0.0.1", 24, C["white"])
+	var code := _h(R, "—", 24, C["white"])
 	code.name = "Code"
-	_p(R, "Friends on the same Wi-Fi press JOIN A CREW and type this code." + ("\nOther addresses: " + ", ".join(ips.slice(1)) if ips.size() > 1 else ""), 18)
+	var how := _p(R, "ONLINE: friends anywhere type the room code.\nLAN: friends on the same Wi-Fi type this laptop's address.", 18)
 	_status = _p(R, "", 18, C["cyan"])
-	var start := _btn(R, "OPEN THE CREW  ▸▸", func(): pass)
+	var start := _btn(R, "OPEN ONLINE CREW  ▸▸", func(): pass)
+	var lan := _btn(R, "OPEN LAN CREW (same Wi-Fi)", func(): pass, true)
+	var opened := func(text: String, note: String):
+		code.text = text
+		how.text = note
+		start.text = "START MISSION  ▸▸"
+		lan.visible = false
+	Network.joined.connect(func():
+		if is_instance_valid(code) and Network.is_host() and Network.room_code != "":
+			opened.call(Network.room_code, "Friends press JOIN A CREW and type this room code (works over the internet)."))
 	start.pressed.connect(func():
 		if Network.is_host():
 			Network.set_meta("crew_mode", "autopilot")
 			Network.start_game(GAME)
 			return
+		if Network.multiplayer.multiplayer_peer is Network.RelayPeer:
+			return
+		Network.set_meta("my_name", _name.text)
+		var err: Error = Network.host_online(_name.text)
+		_status.text = "Opening an online crew…" if err == OK else "Could not go online: " + error_string(err))
+	lan.pressed.connect(func():
 		Network.set_meta("my_name", _name.text)
 		var err: Error = Network.host(_name.text)
 		if err != OK:
 			_status.text = "Could not host: %s (is another host running on this laptop?)" % error_string(err)
 			return
-		start.text = "START MISSION  ▸▸"
+		opened.call(ips[0] if not ips.is_empty() else "127.0.0.1",
+			"Friends on the same Wi-Fi type this address." + ("\nOther addresses: " + ", ".join(ips.slice(1)) if ips.size() > 1 else ""))
 		_status.text = "Hosting. Friends can join now. Press START when everyone is in.")
 	_btn(R, "◂ BACK", _title, true)
 	start.grab_focus.call_deferred()
@@ -305,7 +321,7 @@ func _join_screen() -> void:
 			return
 		Network.set_meta("my_name", _name.text)
 		Network.set_meta("last_code", code)
-		var err: Error = Network.join(code, _name.text)
+		var err: Error = Network.join(code, _name.text) if Network.is_lan_code(code) else Network.join_online(code, _name.text)
 		_status.text = ("Connecting to %s …" % code) if err == OK else "Could not join: " + error_string(err))
 	_btn(R, "◂ BACK", _title, true)
 	_addr.grab_focus.call_deferred()
