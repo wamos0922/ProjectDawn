@@ -29,6 +29,7 @@ const ROLES := ["eng", "sci", "nav", "qm"]
 const SPRITE_SCALE := 1.5
 const GAME_MINUTES_PER_SECOND := 4.0
 const INTERACT_RANGE := 18.0
+const DOOR_LANE := 34.0          ## px in front of each door kept free of furniture collision
 const UV_MAX := 12.0
 const COLD_MAX := 30.0
 const BATTERY_MAX := 100.0
@@ -677,7 +678,7 @@ func _build_room(id: String) -> void:
 		var b := pts[(i + 1) % pts.size()]
 		var gap := false
 		for d in view.doors:
-			if ((a + b) / 2.0).distance_to(d["pos"]) < WD.DOOR_WIDTH / 2.0:
+			if Geometry2D.get_closest_point_to_segment(d["pos"], a, b).distance_to(d["pos"]) < WD.DOOR_WIDTH / 2.0:
 				gap = true
 		if not gap:
 			segs.append(a)
@@ -720,12 +721,22 @@ func _build_room(id: String) -> void:
 
 
 ## Furniture from the HTML picture + the screen part of every console (not seats, posters, the locker).
+## Anything standing in front of a door is left walkable, so every door can always be reached
+## (e.g. the Mission Control console right below the Airlock door).
 func _solid_rects(id: String) -> Array:
-	var out: Array = WD.solids(id)
+	var out: Array = []
+	var all: Array = WD.solids(id)
 	for s in _stations[id]:
 		if s.get("seat", false) or s["id"].begins_with("poster") or s["id"] == "locker":
 			continue
-		out.append(Rect2(s["pos"].x - 11, s["pos"].y - 24, 22, 15))
+		all.append(Rect2(s["pos"].x - 11, s["pos"].y - 24, 22, 15))
+	for rect in all:
+		var blocks_door := false
+		for d in WD.doors(id):
+			var lane := Rect2(d["pos"], Vector2.ZERO).expand(d["pos"] - d["dir"] * DOOR_LANE).grow(WD.DOOR_WIDTH / 2.0)
+			blocks_door = blocks_door or lane.intersects(rect)
+		if not blocks_door:
+			out.append(rect)
 	return out
 
 

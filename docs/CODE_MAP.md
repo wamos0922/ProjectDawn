@@ -83,6 +83,7 @@ C autopilot · M world map · J mission details · Esc close · F9/F10/F11 jump 
 godot --headless --path . -s res://tests/run_tests.gd       # pure rules (25 tests)
 godot --headless --path . -s res://tests/crew_test.gd       # TAB, follow, autopilot, role rule
 godot --headless --path . -s res://tests/door_test.gd       # walk out a door → map trip → next room
+godot --headless --path . -s res://tests/all_doors_test.gd  # every door in all 37 rooms can be walked through
 godot --headless --path . -s res://tests/minigame_test.gd   # plays each minigame through its buttons
 ```
 (The two "bolts" minigames have a moving target and time out in the test; that is expected.)
