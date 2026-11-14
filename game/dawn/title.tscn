@@ -1,8 +1,8 @@
-[gd_scene format=3 uid="uid://dp8q7gqtrkvoc"]
+[gd_scene format=3]
 
-[ext_resource type="Script" uid="uid://dtnu8smirplpl" path="res://game/dawn/title.gd" id="1_title"]
+[ext_resource type="Script" path="res://game/dawn/title.gd" id="1_title"]
 
-[node name="Title" type="Control" unique_id=1199890131]
+[node name="Title" type="Control"]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 1280.0
