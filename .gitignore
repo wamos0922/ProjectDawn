@@ -1,0 +1,27 @@
+# Godot 4
+.godot/
+*.translation
+build/
+export/
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+*.tmp
+
+## Below remove s
+# Godot 4
+.godot/
+.import/
+export.cfg
+export_credentials.cfg
+.nomedia
+
+# Export outputs
+*.exe
+# *.html //turn on if want to export to html 
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
