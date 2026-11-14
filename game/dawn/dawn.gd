@@ -699,6 +699,13 @@ func _build_room(id: String) -> void:
 		bar.shape = seg
 		body.add_child(bar)
 		_door_bars[id + ">" + d["to"]] = bar
+	for rect in _solid_rects(id):   # furniture and consoles you walk around (same as the HTML)
+		var box := CollisionShape2D.new()
+		var rs := RectangleShape2D.new()
+		rs.size = rect.size
+		box.shape = rs
+		box.position = rect.get_center()
+		body.add_child(box)
 	add_child(body)
 	for d in view.doors:
 		var to: String = d["to"]
@@ -710,6 +717,16 @@ func _build_room(id: String) -> void:
 	for s in _stations[id]:
 		if s.has("role"):
 			_world_label(view, RoleSprites.NAMES[s["role"]], s["pos"] + Vector2(0, 8), RoleSprites.TAGS[s["role"]], 14)
+
+
+## Furniture from the HTML picture + the screen part of every console (not seats, posters, the locker).
+func _solid_rects(id: String) -> Array:
+	var out: Array = WD.solids(id)
+	for s in _stations[id]:
+		if s.get("seat", false) or s["id"].begins_with("poster") or s["id"] == "locker":
+			continue
+		out.append(Rect2(s["pos"].x - 11, s["pos"].y - 24, 22, 15))
+	return out
 
 
 func _world_label(parent: Node, text: String, center: Vector2, color: Color, size: int) -> Label:

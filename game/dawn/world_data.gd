@@ -8,6 +8,9 @@ extends RefCounted
 ## Shapes are drawn inside the interior box (centre IB_CENTER, half size IB_HALF) in units u,v from -1 to 1.
 
 const FILE := "res://data/worlds.json"
+## Exact room pictures from the HTML demo (tools/export_world_maps.js): door + station positions
+## and the furniture you cannot walk through. The pictures are assets/rooms/int_<world>_<key>.png.
+const INTERIORS_FILE := "res://data/interiors.json"
 const WORLDS := ["earth", "moon", "mars"]
 const ROOM_SIZE := Vector2(320, 180)
 const IB_CENTER := Vector2(160, 102)
@@ -37,6 +40,27 @@ static var _data := {}
 static var _rooms := {}
 static var _doors := {}
 static var _outlines := {}
+static var _html := {}
+
+
+## HTML interior data for a room: {doors: [{to,x,y,ux,uy}], stations: [{id,x,y,role,seat}], solid: [[x,y,w,h]]}.
+static func html(id: String) -> Dictionary:
+	if _html.is_empty() and FileAccess.file_exists(INTERIORS_FILE):
+		_html = JSON.parse_string(FileAccess.get_file_as_string(INTERIORS_FILE))
+	return _html.get(id, {})
+
+
+## Picture of the room (floor, walls, furniture, consoles, posters), exactly as the HTML draws it.
+static func interior_path(id: String) -> String:
+	return "res://assets/rooms/int_%s_%s.png" % [world_of(id), key_of(id)]
+
+
+## Furniture rectangles that block walking (local pixels).
+static func solids(id: String) -> Array:
+	var out := []
+	for b in html(id).get("solid", []):
+		out.append(Rect2(b[0], b[1], b[2], b[3]))
+	return out
 
 
 static func data() -> Dictionary:
@@ -173,6 +197,11 @@ static func doors(id: String) -> Array:
 	for n in neighbours(id):
 		var d: Vector2 = (room(n)["map"] - r["map"]).normalized()
 		var base := atan2(d.y * IB_HALF.y, d.x * IB_HALF.x)
+		var h: Array = html(id).get("doors", []).filter(func(x): return x["to"] == n)
+		if not h.is_empty():          # same spot as the HTML picture
+			var a0 := atan2(float(h[0]["uy"]), float(h[0]["ux"]))
+			out.append({"to": n, "pos": IB_CENTER + Vector2(cos(a0), sin(a0)) * wall_distance(id, a0), "dir": Vector2(cos(a0), sin(a0))})
+			continue
 		for off in [0.0, 0.35, -0.35, 0.7, -0.7, 1.05, -1.05, 1.4, -1.4, 1.75, -1.75]:
 			var a: float = base + off
 			var pos := IB_CENTER + Vector2(cos(a), sin(a)) * wall_distance(id, a)
@@ -241,8 +270,13 @@ static func stations(id: String, posters: Array) -> Array:
 	var mine := posters.filter(func(p): return p["world"] == w and p["room"] == k)
 	for i in mine.size():
 		list.append({"id": "poster%d" % i, "u": 0.55 if i == 0 else -0.55, "v": -1.0, "poster": mine[i]})
+	var hs: Array = html(id).get("stations", [])
 	for s in list:
 		s["pos"] = snap_inside(id, to_local(float(s["u"]), float(s["v"])), 10.0)
+		var hid: String = {"poster0": "poster", "poster1": "poster2"}.get(s["id"], s["id"])
+		for h in hs:
+			if h["id"] == hid:
+				s["pos"] = Vector2(h["x"], h["y"])   # same spot as the HTML picture
 	return list
 
 

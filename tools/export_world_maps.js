@@ -3,6 +3,13 @@
 const fs=require('fs'),vm=require('vm'),zlib=require('zlib');
 const V='/home/claude/v2/';
 let src=fs.readFileSync(V+'c1.js','utf8').replace('__SPRITES__',fs.readFileSync('/home/claude/demo/sprites.json','utf8')).replace('<script>','')+fs.readFileSync(V+'c9.js','utf8')+fs.readFileSync(V+'c2.js','utf8')+fs.readFileSync(V+'c3.js','utf8')+fs.readFileSync(V+'c4.js','utf8');
+const c5=fs.readFileSync(V+'c5.js','utf8');const boot="L.scene='title';SCENES.title.enter();";
+src+=c5.slice(0,c5.indexOf(boot));
+for(const f of ['c6.js','c7.js','c8.js','c10.js','c11.js'])if(fs.existsSync(V+f))src+=fs.readFileSync(V+f,'utf8').replace('__POSTERS__',fs.readFileSync(V+'posters.json','utf8'));
+src=src.replace('PROP[p[0]](g,x,y,w,h,T,rnd);blocks.push([x,y,w,h]);','PROP[p[0]](g,x,y,w,h,T,rnd);blocks.push([x,y,w,h,!!p[5]]);').replace('const res={img,mask,floor,doors,stations:list,rk,wk};','const res={img,mask,floor,doors,stations:list,rk,wk,blocks};');
+src=src.replace('for(const d of doors){const vert=','for(const d of (globalThis.__NODOORS?[]:doors)){const vert=');
+// the build wraps c11 in its own IIFE end; strip any trailing window export so our hook runs inside the main IIFE
+
 const W=320,H=180;
 function parse(c){if(typeof c!=='string')return [0,0,0,0];c=c.trim();
   if(c[0]==='#'){if(c.length===4)c='#'+c[1]+c[1]+c[2]+c[2]+c[3]+c[3];const n=parseInt(c.slice(1,7),16);return [n>>16,(n>>8)&255,n&255,c.length>7?parseInt(c.slice(7,9),16)/255:1];}
@@ -16,13 +23,13 @@ function makeCtx(){const buf=new Float32Array(W*H*4);const g={buf,fillStyle:'#00
   clearRect(){buf.fill(0);},save(){},restore(){},beginPath(){},fill(){},stroke(){},arc(){},moveTo(){},lineTo(){},drawImage(){},fillText(){},setTransform(){},translate(){},scale(){}};return g;}
 const anyStub=new Proxy(function(){},{get:(t,k)=>k===Symbol.toPrimitive?(()=>0):(k==='getContext'?()=>makeCtx():(k==='clientWidth'?1280:anyStub)),apply:()=>anyStub,construct:()=>anyStub,set:()=>true});
 const doc={getElementById:()=>({getContext:()=>makeCtx(),style:{},addEventListener(){},appendChild(){},clientWidth:1280,classList:{add(){},remove(){},toggle(){}}}),
-  createElement:()=>({getContext:()=>makeCtx(),style:{},width:0,height:0,append(){},appendChild(){},addEventListener(){},classList:{add(){},remove(){},toggle(){}},setAttribute(){},insertAdjacentHTML(){}}),
-  documentElement:{style:{setProperty(){}}},body:anyStub,querySelector:()=>null,querySelectorAll:()=>[],addEventListener(){}};
+  createElement:()=>({_g:null,getContext(){return this._g||(this._g=makeCtx());},style:{},width:0,height:0,append(){},appendChild(){},addEventListener(){},classList:{add(){},remove(){},toggle(){}},setAttribute(){},insertAdjacentHTML(){}}),
+  documentElement:{style:{setProperty(){}}},head:{appendChild(){}},body:anyStub,querySelector:()=>null,querySelectorAll:()=>[],addEventListener(){}};
 const ctxObj={document:doc,window:{},matchMedia:()=>({matches:false}),ResizeObserver:function(){this.observe=()=>{}},requestAnimationFrame(){},setTimeout(){},setInterval(){},addEventListener(){},
   localStorage:{getItem:()=>null,setItem(){}},navigator:{},performance:{now:()=>0},Image:function(){},console,Math,JSON,Object,Array,Uint8Array,Float32Array,Set,Map,Promise,location:{search:'',hash:''},URLSearchParams:function(){this.get=()=>null}};
 ctxObj.window=ctxObj;
 // stop before the IIFE end: export what we need
-const hook=`\n;globalThis.__X={world,DEFS,G,TONES,inside,isLocked,toneOf,P};\n`;
+const hook=`\n;globalThis.__X={world,DEFS,G,TONES,inside,isLocked,toneOf,P,interior,IB};\n`;
 src=src+hook+'})();';
 vm.createContext(ctxObj);
 try{vm.runInContext(src,ctxObj,{filename:'demo.js'});}catch(e){console.error('ERR',e.stack.split('\n').slice(0,4).join('\n'));process.exit(1);}
@@ -54,4 +61,11 @@ for(const wk of ['earth','moon','mars']){
     labelY:D.labelY||{},labels:D.labels||[]};
 }
 out.tones={};for(const k in X.TONES)out.tones[k]=X.TONES[k];
+// room interiors: one 320x180 picture per room (doors left out: Godot draws them, open or locked)
+ctxObj.__NODOORS=true;const rooms={};
+for(const wk of ['earth','moon','mars']){X.G.hydro=true;for(const r of X.world(wk).rooms){const it=X.interior(wk,r.k);
+  png(it.img.getContext('2d').buf,`${OUT}/int_${wk}_${r.k}.png`);
+  rooms[wk+'.'+r.k]={doors:it.doors.map(d=>({to:wk+'.'+d.to,x:d.x,y:d.y,ux:d.ux,uy:d.uy})),stations:it.stations.map(s=>({id:s.id,x:s.x,y:s.y,role:s.role||null,seat:!!s.seat})),
+    solid:it.blocks.filter(b=>!b[4]).map(b=>[b[0],b[1]+Math.floor(b[3]*.4),b[2],b[3]-Math.floor(b[3]*.4)])};}}
+fs.writeFileSync(`${OUT}/interiors.json`,JSON.stringify(rooms));
 fs.writeFileSync(`${OUT}/map.json`,JSON.stringify(out,null,1));console.log('ok');
