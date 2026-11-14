@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://d0nccdljpj032"
+
+[deps]
+
+files=["res://data_management/browse/functions.name.translation", "res://data_management/browse/functions.category.translation", "res://data_management/browse/functions.plain.translation", "res://data_management/browse/functions.importance.translation"]
+
+source_file="res://data_management/browse/functions.csv"
+dest_files=["res://data_management/browse/functions.name.translation", "res://data_management/browse/functions.category.translation", "res://data_management/browse/functions.plain.translation", "res://data_management/browse/functions.importance.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

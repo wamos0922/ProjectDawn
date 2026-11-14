@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://beckki1hnxoe6"
+
+[deps]
+
+files=["res://data_management/browse/missions.name.translation", "res://data_management/browse/missions.agency.translation", "res://data_management/browse/missions.year.translation", "res://data_management/browse/missions.body.translation", "res://data_management/browse/missions.role.translation", "res://data_management/browse/missions.source.translation", "res://data_management/browse/missions.retrieved.translation", "res://data_management/browse/missions.flags.translation", "res://data_management/browse/missions.notes.translation"]
+
+source_file="res://data_management/browse/missions.csv"
+dest_files=["res://data_management/browse/missions.name.translation", "res://data_management/browse/missions.agency.translation", "res://data_management/browse/missions.year.translation", "res://data_management/browse/missions.body.translation", "res://data_management/browse/missions.role.translation", "res://data_management/browse/missions.source.translation", "res://data_management/browse/missions.retrieved.translation", "res://data_management/browse/missions.flags.translation", "res://data_management/browse/missions.notes.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true
