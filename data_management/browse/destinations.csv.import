@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://c8g27vt5v6h1i"
+
+[deps]
+
+files=["res://data_management/browse/destinations.name.translation", "res://data_management/browse/destinations.mass.translation", "res://data_management/browse/destinations.diameter.translation", "res://data_management/browse/destinations.density.translation", "res://data_management/browse/destinations.gravity.translation", "res://data_management/browse/destinations.escape.translation", "res://data_management/browse/destinations.rotation.translation", "res://data_management/browse/destinations.day.translation", "res://data_management/browse/destinations.distance.translation", "res://data_management/browse/destinations.perihelion.translation", "res://data_management/browse/destinations.aphelion.translation", "res://data_management/browse/destinations.orbital.translation", "res://data_management/browse/destinations.orbital.translation", "res://data_management/browse/destinations.orbital.translation", "res://data_management/browse/destinations.orbital.translation", "res://data_management/browse/destinations.obliquity.translation", "res://data_management/browse/destinations.mean.translation", "res://data_management/browse/destinations.surface.translation", "res://data_management/browse/destinations.moons.translation", "res://data_management/browse/destinations.has.translation", "res://data_management/browse/destinations.has.translation", "res://data_management/browse/destinations.delay.translation", "res://data_management/browse/destinations.delay.translation", "res://data_management/browse/destinations.source.translation", "res://data_management/browse/destinations.retrieved.translation", "res://data_management/browse/destinations.flags.translation", "res://data_management/browse/destinations.notes.translation"]
+
+source_file="res://data_management/browse/destinations.csv"
+dest_files=["res://data_management/browse/destinations.name.translation", "res://data_management/browse/destinations.mass.translation", "res://data_management/browse/destinations.diameter.translation", "res://data_management/browse/destinations.density.translation", "res://data_management/browse/destinations.gravity.translation", "res://data_management/browse/destinations.escape.translation", "res://data_management/browse/destinations.rotation.translation", "res://data_management/browse/destinations.day.translation", "res://data_management/browse/destinations.distance.translation", "res://data_management/browse/destinations.perihelion.translation", "res://data_management/browse/destinations.aphelion.translation", "res://data_management/browse/destinations.orbital.translation", "res://data_management/browse/destinations.orbital.translation", "res://data_management/browse/destinations.orbital.translation", "res://data_management/browse/destinations.orbital.translation", "res://data_management/browse/destinations.obliquity.translation", "res://data_management/browse/destinations.mean.translation", "res://data_management/browse/destinations.surface.translation", "res://data_management/browse/destinations.moons.translation", "res://data_management/browse/destinations.has.translation", "res://data_management/browse/destinations.has.translation", "res://data_management/browse/destinations.delay.translation", "res://data_management/browse/destinations.delay.translation", "res://data_management/browse/destinations.source.translation", "res://data_management/browse/destinations.retrieved.translation", "res://data_management/browse/destinations.flags.translation", "res://data_management/browse/destinations.notes.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true
