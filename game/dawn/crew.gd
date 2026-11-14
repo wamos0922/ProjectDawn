@@ -34,7 +34,8 @@ func human_roles() -> Dictionary:
 	var out := {}
 	if Network.is_online():
 		for id in Network.players:
-			out[RoleSprites.role_for_slot(Network.players[id]["slot"])] = id
+			var r: String = me_role if id == Network.my_id() else RoleSprites.role_for_slot(Network.players[id]["slot"])
+			out[r] = id
 	else:
 		out[me_role] = 1
 	return out

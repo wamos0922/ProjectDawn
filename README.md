@@ -74,6 +74,9 @@ In **solo mode** one player runs all four roles. In **co-op (2–4 players)** ea
 | Select a part, button or option | Left click |
 | Advance dialogue | Click or Space |
 | Back | Esc |
+| Walk / use (Godot) | WASD or arrows / E or Enter |
+| Switch crew member · crew follow · autopilot | TAB · F · C |
+| World map · mission details | M · J |
 
 ---
 

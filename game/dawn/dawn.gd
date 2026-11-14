@@ -1,10 +1,10 @@
 extends Node2D
 ## Project Dawn: Earth, Moon and Mars, ported from the HTML demo (web/demo). Owner: Sufi (gameplay).
 ##
-## OFFLINE: open game/dawn/dawn.tscn, press F6. F1..F4 = how many people play on this keyboard
-##          (P1 WASD+E, P2 Arrows+/, P3 IJKL+O, P4 Numpad+0). Crew nobody plays is run by CERES autopilot.
-## ONLINE:  game/dawn/title.tscn → HOST A CREW / JOIN A CREW (or game/net/test_network.tscn).
-## TAB or click the objective: mission details. Debug (offline only): F9 Earth · F10 Moon · F11 Mars.
+## START: game/dawn/title.tscn (F6) → PLAY SOLO / HOST A CREW / JOIN A CREW, pick a role, START MISSION.
+## KEYS: WASD or arrows walk · E or Enter use · TAB switch crew member · F crew follow you ·
+##       C CERES autopilot on/off · M world map · J mission details · F9/F10/F11 debug jump (solo only).
+## Who controls which crew member lives in crew.gd; the world map and door trips in world_map.gd.
 ##
 ## The host owns the shared state S (story progress, suits, clock...). Everyone else asks the host
 ## with act(), the host runs story.do_effect() and sends S to everyone (_apply_state).

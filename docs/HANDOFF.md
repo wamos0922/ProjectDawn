@@ -4,6 +4,17 @@ Newest entry at the top. Write one at the end of every AI session. Read the last
 
 ---
 
+## 2026-11-14 · Wam (with Claude) · branch fix/playtest-round1
+Done:
+- Minigame crash on win fixed (Scientist UV sensor and the others with a STOP/LAUNCH button).
+- crew.gd: solo picks a starting role; TAB / crew bar switches crew member, F follow, C CERES autopilot.
+  The F1-F4 shared keyboard mode is gone (it was why autopilot never ran in solo).
+- Lobby: click a role card in SOLO, HOST and JOIN (Network.claim_slot).
+- world_map.gd: M shows the whole map like the HTML; using a door walks the corridor on the map.
+- Rooms now use the HTML's own pictures (tools/export_world_maps.js); furniture blocks walking.
+- CERES is the wake-up robot everywhere (portrait, rooms, map).
+- docs/CODE_MAP.md explains every file. New tests: tests/crew_test.gd, door_test.gd, minigame_test.gd.
+
 ## 2026-11-14 20:30 · Wam (with Claude)
 Done:
 - feat/mission-designers (same as the HTML demo): shield satellite designer (Moon Factory, Engineer), Moon outpost
