@@ -229,6 +229,57 @@ func say_all(lines: Array) -> void:
 		_say.rpc(lines)
 	else:
 		_say(lines)
+		
+func advance_dialogue_all() -> void:
+	if not Network.is_online():
+		ui.advance_local()
+	elif Network.is_host():
+		_advance_dialogue.rpc()
+	else:
+		_request_advance_dialogue.rpc_id(1)
+
+
+@rpc("any_peer", "reliable")
+func _request_advance_dialogue() -> void:
+	if Network.is_host():
+		_advance_dialogue.rpc()
+
+
+@rpc("authority", "call_local", "reliable")
+func _advance_dialogue() -> void:
+	ui.advance_local()
+
+## Start the hangar-door scene on every connected player's screen.
+func request_wake_step(step: int) -> void:
+	if step not in [0, 1, 2, 4]:
+		return
+
+	if not Network.is_online():
+		_wake_step_all(step)
+	elif Network.is_host():
+		_wake_step_all.rpc(step)
+	else:
+		_request_wake_step.rpc_id(1, step)
+
+
+@rpc("any_peer", "reliable")
+func _request_wake_step(step: int) -> void:
+	if not Network.is_host():
+		return
+	if step not in [0, 1, 2, 4]:
+		return
+
+	_wake_step_all.rpc(step)
+
+
+@rpc("authority", "call_local", "reliable")
+func _wake_step_all(step: int) -> void:
+	if step not in [0, 1, 2, 4]:
+		return
+	if story == null or story.sui == null:
+		return
+
+	story.sui._run_wake_step(step)
 
 
 @rpc("authority", "call_local", "reliable")
