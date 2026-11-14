@@ -1,0 +1,1218 @@
+{
+ "earth": {
+  "rooms": [
+   {
+    "k": "pad",
+    "name": "LAUNCH PAD",
+    "shape": [
+     "ell",
+     52,
+     31,
+     20,
+     11
+    ],
+    "tone": "shared",
+    "utone": null,
+    "cx": 52,
+    "cy": 31,
+    "bb": {
+     "x0": 32,
+     "x1": 72,
+     "y0": 20,
+     "y1": 42
+    },
+    "lock": null
+   },
+   {
+    "k": "canopy",
+    "name": "UV CANOPY",
+    "shape": [
+     "ell",
+     120,
+     31,
+     18,
+     8
+    ],
+    "tone": "locked",
+    "utone": "shared",
+    "cx": 120,
+    "cy": 31,
+    "bb": {
+     "x0": 102,
+     "x1": 138,
+     "y0": 23,
+     "y1": 39
+    },
+    "lock": "Optional B · unlocks after the first launch"
+   },
+   {
+    "k": "airlock",
+    "name": "AIRLOCK",
+    "shape": [
+     "rect",
+     150,
+     40,
+     170,
+     58
+    ],
+    "tone": "shared",
+    "utone": null,
+    "cx": 160,
+    "cy": 50,
+    "bb": {
+     "x0": 150,
+     "x1": 170,
+     "y0": 40,
+     "y1": 58
+    },
+    "lock": null
+   },
+   {
+    "k": "mc",
+    "name": "MISSION\nCONTROL",
+    "shape": [
+     "oct",
+     160,
+     108,
+     24
+    ],
+    "tone": "shared",
+    "utone": null,
+    "cx": 160,
+    "cy": 108,
+    "bb": {
+     "x0": 136,
+     "x1": 184,
+     "y0": 89,
+     "y1": 127
+    },
+    "lock": null
+   },
+   {
+    "k": "ozone",
+    "name": "OZONE LAB",
+    "shape": [
+     "ell",
+     54,
+     76,
+     26,
+     12
+    ],
+    "tone": "sci",
+    "utone": null,
+    "cx": 54,
+    "cy": 76,
+    "bb": {
+     "x0": 28,
+     "x1": 80,
+     "y0": 64,
+     "y1": 88
+    },
+    "lock": null
+   },
+   {
+    "k": "shop",
+    "name": "WORKSHOP",
+    "shape": [
+     "rect",
+     16,
+     96,
+     72,
+     128
+    ],
+    "tone": "eng",
+    "utone": null,
+    "cx": 44,
+    "cy": 112,
+    "bb": {
+     "x0": 16,
+     "x1": 72,
+     "y0": 96,
+     "y1": 128
+    },
+    "lock": null
+   },
+   {
+    "k": "hydro",
+    "name": "HYDROPONICS",
+    "shape": [
+     "rect",
+     20,
+     146,
+     62,
+     170
+    ],
+    "tone": "locked",
+    "utone": "sci",
+    "cx": 41,
+    "cy": 158,
+    "bb": {
+     "x0": 20,
+     "x1": 62,
+     "y0": 146,
+     "y1": 170
+    },
+    "lock": "Optional H · unlocks after Mars"
+   },
+   {
+    "k": "med",
+    "name": "MED BAY",
+    "shape": [
+     "ell",
+     100,
+     158,
+     12,
+     10
+    ],
+    "tone": "shared",
+    "utone": null,
+    "cx": 100,
+    "cy": 158,
+    "bb": {
+     "x0": 88,
+     "x1": 112,
+     "y0": 148,
+     "y1": 168
+    },
+    "lock": null
+   },
+   {
+    "k": "crew",
+    "name": "CREW QUARTERS",
+    "shape": [
+     "ell",
+     160,
+     158,
+     24,
+     11
+    ],
+    "tone": "shared",
+    "utone": null,
+    "cx": 160,
+    "cy": 158,
+    "bb": {
+     "x0": 136,
+     "x1": 184,
+     "y0": 147,
+     "y1": 169
+    },
+    "lock": null
+   },
+   {
+    "k": "power",
+    "name": "POWER",
+    "shape": [
+     "rect",
+     244,
+     144,
+     300,
+     172
+    ],
+    "tone": "qm",
+    "utone": null,
+    "cx": 272,
+    "cy": 158,
+    "bb": {
+     "x0": 244,
+     "x1": 300,
+     "y0": 144,
+     "y1": 172
+    },
+    "lock": null
+   },
+   {
+    "k": "nav",
+    "name": "NAVIGATION",
+    "shape": [
+     "trap",
+     240,
+     96,
+     300,
+     126
+    ],
+    "tone": "nav",
+    "utone": null,
+    "cx": 270,
+    "cy": 111,
+    "bb": {
+     "x0": 240,
+     "x1": 300,
+     "y0": 96,
+     "y1": 126
+    },
+    "lock": null
+   },
+   {
+    "k": "comms",
+    "name": "COMMS",
+    "shape": [
+     "hex",
+     268,
+     72,
+     16
+    ],
+    "tone": "qm",
+    "utone": null,
+    "cx": 268,
+    "cy": 72,
+    "bb": {
+     "x0": 252,
+     "x1": 284,
+     "y0": 60,
+     "y1": 84
+    },
+    "lock": null
+   }
+  ],
+  "edges": [
+   {
+    "a": "mc",
+    "b": "airlock",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "mc",
+    "b": "ozone",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "mc",
+    "b": "shop",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "mc",
+    "b": "crew",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "mc",
+    "b": "comms",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "mc",
+    "b": "nav",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "ozone",
+    "b": "shop",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "shop",
+    "b": "med",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "med",
+    "b": "crew",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "crew",
+    "b": "power",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "nav",
+    "b": "power",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "comms",
+    "b": "nav",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "airlock",
+    "b": "pad",
+    "surface": true,
+    "when": false
+   },
+   {
+    "a": "airlock",
+    "b": "canopy",
+    "surface": true,
+    "when": false
+   },
+   {
+    "a": "canopy",
+    "b": "pad",
+    "surface": true,
+    "when": false
+   },
+   {
+    "a": "med",
+    "b": "hydro",
+    "surface": false,
+    "when": true
+   }
+  ],
+  "labelY": {
+   "pad": 15,
+   "canopy": 0,
+   "airlock": -14,
+   "mc": -29,
+   "ozone": -17,
+   "shop": -22,
+   "hydro": -18,
+   "med": -16,
+   "crew": -16,
+   "power": -20,
+   "nav": -21,
+   "comms": -21
+  },
+  "labels": [
+   [
+    "SURFACE · UV ZONE",
+    282,
+    21,
+    "#f6757a"
+   ]
+  ]
+ },
+ "moon": {
+  "rooms": [
+   {
+    "k": "solar",
+    "name": "SOLAR RIDGE",
+    "shape": [
+     "trap",
+     25,
+     22,
+     111,
+     43,
+     1
+    ],
+    "tone": "qm",
+    "utone": null,
+    "cx": 68,
+    "cy": 32,
+    "bb": {
+     "x0": 25,
+     "x1": 111,
+     "y0": 22,
+     "y1": 43
+    },
+    "lock": null
+   },
+   {
+    "k": "landing",
+    "name": "LANDING PAD",
+    "shape": [
+     "ell",
+     156,
+     32,
+     25,
+     10
+    ],
+    "tone": "shared",
+    "utone": null,
+    "cx": 156,
+    "cy": 32,
+    "bb": {
+     "x0": 131,
+     "x1": 181,
+     "y0": 22,
+     "y1": 42
+    },
+    "lock": null
+   },
+   {
+    "k": "tele",
+    "name": "TELESCOPE",
+    "shape": [
+     "ell",
+     214,
+     32,
+     15,
+     12
+    ],
+    "tone": "nav",
+    "utone": null,
+    "cx": 214,
+    "cy": 32,
+    "bb": {
+     "x0": 199,
+     "x1": 229,
+     "y0": 20,
+     "y1": 44
+    },
+    "lock": null
+   },
+   {
+    "k": "port",
+    "name": "MOON PORT",
+    "shape": [
+     "ell",
+     270,
+     36,
+     22,
+     18
+    ],
+    "tone": "shared",
+    "utone": null,
+    "cx": 270,
+    "cy": 36,
+    "bb": {
+     "x0": 248,
+     "x1": 292,
+     "y0": 18,
+     "y1": 54
+    },
+    "lock": null
+   },
+   {
+    "k": "science",
+    "name": "SCIENCE LAB",
+    "shape": [
+     "ell",
+     58,
+     87,
+     31,
+     13
+    ],
+    "tone": "sci",
+    "utone": null,
+    "cx": 58,
+    "cy": 87,
+    "bb": {
+     "x0": 27,
+     "x1": 89,
+     "y0": 74,
+     "y1": 100
+    },
+    "lock": null
+   },
+   {
+    "k": "lc",
+    "name": "LUNAR\nCONTROL",
+    "shape": [
+     "oct",
+     164,
+     87,
+     26
+    ],
+    "tone": "shared",
+    "utone": null,
+    "cx": 164,
+    "cy": 87,
+    "bb": {
+     "x0": 138,
+     "x1": 190,
+     "y0": 66,
+     "y1": 108
+    },
+    "lock": null
+   },
+   {
+    "k": "fuel",
+    "name": "FUEL PLANT",
+    "shape": [
+     "hex",
+     270,
+     87,
+     26
+    ],
+    "tone": "nav",
+    "utone": null,
+    "cx": 270,
+    "cy": 87,
+    "bb": {
+     "x0": 244,
+     "x1": 296,
+     "y0": 67,
+     "y1": 107
+    },
+    "lock": null
+   },
+   {
+    "k": "purifier",
+    "name": "WATER PURIFIER",
+    "shape": [
+     "rect",
+     34,
+     111,
+     82,
+     123
+    ],
+    "tone": "locked",
+    "utone": "sci",
+    "cx": 58,
+    "cy": 117,
+    "bb": {
+     "x0": 34,
+     "x1": 82,
+     "y0": 111,
+     "y1": 123
+    },
+    "lock": "Optional C · unlocks after fuel"
+   },
+   {
+    "k": "mine",
+    "name": "ICE MINE",
+    "shape": [
+     "poly",
+     [
+      [
+       22,
+       136
+      ],
+      [
+       60,
+       130
+      ],
+      [
+       88,
+       138
+      ],
+      [
+       84,
+       164
+      ],
+      [
+       24,
+       162
+      ]
+     ]
+    ],
+    "tone": "eng",
+    "utone": null,
+    "cx": 54,
+    "cy": 148,
+    "bb": {
+     "x0": 22,
+     "x1": 87,
+     "y0": 131,
+     "y1": 163
+    },
+    "lock": null
+   },
+   {
+    "k": "shelter",
+    "name": "RAD SHELTER",
+    "shape": [
+     "ell",
+     133,
+     146,
+     20,
+     16
+    ],
+    "tone": "shared",
+    "utone": null,
+    "cx": 133,
+    "cy": 146,
+    "bb": {
+     "x0": 113,
+     "x1": 153,
+     "y0": 130,
+     "y1": 162
+    },
+    "lock": null
+   },
+   {
+    "k": "teleop",
+    "name": "TELEOP CENTER",
+    "shape": [
+     "hex",
+     199,
+     146,
+     28
+    ],
+    "tone": "shared",
+    "utone": null,
+    "cx": 199,
+    "cy": 146,
+    "bb": {
+     "x0": 171,
+     "x1": 227,
+     "y0": 124,
+     "y1": 168
+    },
+    "lock": null
+   },
+   {
+    "k": "factory",
+    "name": "MOON FACTORY",
+    "shape": [
+     "rect",
+     237,
+     126,
+     303,
+     162
+    ],
+    "tone": "eng",
+    "utone": null,
+    "cx": 270,
+    "cy": 144,
+    "bb": {
+     "x0": 237,
+     "x1": 303,
+     "y0": 126,
+     "y1": 162
+    },
+    "lock": null
+   }
+  ],
+  "edges": [
+   {
+    "a": "solar",
+    "b": "landing",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "landing",
+    "b": "tele",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "tele",
+    "b": "port",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "landing",
+    "b": "lc",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "lc",
+    "b": "science",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "lc",
+    "b": "fuel",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "port",
+    "b": "fuel",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "solar",
+    "b": "science",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "science",
+    "b": "purifier",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "purifier",
+    "b": "mine",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "mine",
+    "b": "shelter",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "lc",
+    "b": "shelter",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "lc",
+    "b": "teleop",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "shelter",
+    "b": "teleop",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "teleop",
+    "b": "factory",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "fuel",
+    "b": "factory",
+    "surface": false,
+    "when": false
+   }
+  ],
+  "labelY": {
+   "fuel": 27,
+   "mine": -21,
+   "factory": 23
+  },
+  "labels": [
+   [
+    "SUNLIT RIM · SOLAR WORKS",
+    214,
+    56,
+    "#f2d16b"
+   ],
+   [
+    "SHADOWED CRATER · −230 °C",
+    56,
+    173,
+    "#c9d3e1"
+   ]
+  ]
+ },
+ "mars": {
+  "rooms": [
+   {
+    "k": "landing",
+    "name": "LANDING ZONE",
+    "shape": [
+     "ell",
+     55,
+     32,
+     38,
+     14
+    ],
+    "tone": "shared",
+    "utone": null,
+    "cx": 55,
+    "cy": 32,
+    "bb": {
+     "x0": 17,
+     "x1": 93,
+     "y0": 18,
+     "y1": 46
+    },
+    "lock": null
+   },
+   {
+    "k": "drone",
+    "name": "DRONE PAD",
+    "shape": [
+     "trap",
+     126,
+     20,
+     182,
+     44,
+     1
+    ],
+    "tone": "nav",
+    "utone": null,
+    "cx": 154,
+    "cy": 32,
+    "bb": {
+     "x0": 126,
+     "x1": 182,
+     "y0": 20,
+     "y1": 44
+    },
+    "lock": null
+   },
+   {
+    "k": "relay",
+    "name": "RELAY",
+    "shape": [
+     "ell",
+     214,
+     32,
+     14,
+     10
+    ],
+    "tone": "qm",
+    "utone": null,
+    "cx": 214,
+    "cy": 32,
+    "bb": {
+     "x0": 200,
+     "x1": 228,
+     "y0": 22,
+     "y1": 42
+    },
+    "lock": null
+   },
+   {
+    "k": "vent",
+    "name": "METHANE VENT",
+    "shape": [
+     "ell",
+     273,
+     32,
+     27,
+     12
+    ],
+    "tone": "locked",
+    "utone": "sci",
+    "cx": 273,
+    "cy": 32,
+    "bb": {
+     "x0": 246,
+     "x1": 300,
+     "y0": 20,
+     "y1": 44
+    },
+    "lock": "Optional J · unlocks after the panels"
+   },
+   {
+    "k": "solar",
+    "name": "SOLAR FIELD",
+    "shape": [
+     "trap",
+     18,
+     75,
+     98,
+     99,
+     1
+    ],
+    "tone": "qm",
+    "utone": null,
+    "cx": 58,
+    "cy": 87,
+    "bb": {
+     "x0": 18,
+     "x1": 98,
+     "y0": 75,
+     "y1": 99
+    },
+    "lock": null
+   },
+   {
+    "k": "hangar",
+    "name": "ROBOT\nHANGAR",
+    "shape": [
+     "oct",
+     154,
+     87,
+     28
+    ],
+    "tone": "shared",
+    "utone": null,
+    "cx": 154,
+    "cy": 87,
+    "bb": {
+     "x0": 126,
+     "x1": 182,
+     "y0": 65,
+     "y1": 109
+    },
+    "lock": null
+   },
+   {
+    "k": "atmos",
+    "name": "ATMOS LAB",
+    "shape": [
+     "ell",
+     221,
+     87,
+     25,
+     12
+    ],
+    "tone": "sci",
+    "utone": null,
+    "cx": 221,
+    "cy": 87,
+    "bb": {
+     "x0": 196,
+     "x1": 246,
+     "y0": 75,
+     "y1": 99
+    },
+    "lock": null
+   },
+   {
+    "k": "fuel",
+    "name": "FUEL PLANT",
+    "shape": [
+     "rect",
+     252,
+     78,
+     294,
+     96
+    ],
+    "tone": "nav",
+    "utone": null,
+    "cx": 273,
+    "cy": 87,
+    "bb": {
+     "x0": 252,
+     "x1": 294,
+     "y0": 78,
+     "y1": 96
+    },
+    "lock": null
+   },
+   {
+    "k": "power",
+    "name": "POWER SHED",
+    "shape": [
+     "rect",
+     35,
+     132,
+     75,
+     156
+    ],
+    "tone": "qm",
+    "utone": null,
+    "cx": 55,
+    "cy": 144,
+    "bb": {
+     "x0": 35,
+     "x1": 75,
+     "y0": 132,
+     "y1": 156
+    },
+    "lock": null
+   },
+   {
+    "k": "green",
+    "name": "GREENHOUSE",
+    "shape": [
+     "ell",
+     111,
+     144,
+     30,
+     22
+    ],
+    "tone": "sci",
+    "utone": null,
+    "cx": 111,
+    "cy": 144,
+    "bb": {
+     "x0": 81,
+     "x1": 141,
+     "y0": 122,
+     "y1": 166
+    },
+    "lock": null
+   },
+   {
+    "k": "oxy",
+    "name": "OXYGEN PLANT",
+    "shape": [
+     "hex",
+     174,
+     144,
+     25
+    ],
+    "tone": "eng",
+    "utone": null,
+    "cx": 174,
+    "cy": 144,
+    "bb": {
+     "x0": 149,
+     "x1": 199,
+     "y0": 124,
+     "y1": 164
+    },
+    "lock": null
+   },
+   {
+    "k": "vault",
+    "name": "SEED VAULT",
+    "shape": [
+     "rect",
+     205,
+     134,
+     239,
+     154
+    ],
+    "tone": "qm",
+    "utone": null,
+    "cx": 222,
+    "cy": 144,
+    "bb": {
+     "x0": 205,
+     "x1": 239,
+     "y0": 134,
+     "y1": 154
+    },
+    "lock": null
+   },
+   {
+    "k": "pad",
+    "name": "ASCENT PAD",
+    "shape": [
+     "ell",
+     273,
+     144,
+     25,
+     19
+    ],
+    "tone": "nav",
+    "utone": null,
+    "cx": 273,
+    "cy": 144,
+    "bb": {
+     "x0": 248,
+     "x1": 298,
+     "y0": 125,
+     "y1": 163
+    },
+    "lock": null
+   }
+  ],
+  "edges": [
+   {
+    "a": "landing",
+    "b": "hangar",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "landing",
+    "b": "solar",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "drone",
+    "b": "hangar",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "drone",
+    "b": "relay",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "relay",
+    "b": "vent",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "hangar",
+    "b": "solar",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "hangar",
+    "b": "atmos",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "atmos",
+    "b": "fuel",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "fuel",
+    "b": "pad",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "hangar",
+    "b": "green",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "hangar",
+    "b": "oxy",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "solar",
+    "b": "power",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "power",
+    "b": "green",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "green",
+    "b": "oxy",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "oxy",
+    "b": "vault",
+    "surface": false,
+    "when": false
+   },
+   {
+    "a": "vault",
+    "b": "pad",
+    "surface": false,
+    "when": false
+   }
+  ],
+  "labelY": {},
+  "labels": [
+   [
+    "BASE PERIMETER",
+    46,
+    170,
+    "#e8b996"
+   ]
+  ]
+ },
+ "tones": {
+  "shared": {
+   "f": "#5a6988",
+   "b": "#c0cbdc",
+   "t": "#3a4466"
+  },
+  "eng": {
+   "f": "#be4a2f",
+   "b": "#f77622",
+   "t": "#b86f50"
+  },
+  "sci": {
+   "f": "#124e89",
+   "b": "#0099db",
+   "t": "#0f3f70"
+  },
+  "nav": {
+   "f": "#68386c",
+   "b": "#b55088",
+   "t": "#552c58"
+  },
+  "qm": {
+   "f": "#b86f50",
+   "b": "#feae34",
+   "t": "#733e39"
+  },
+  "locked": {
+   "f": null,
+   "b": "#8b9bb4",
+   "t": null
+  }
+ }
+}

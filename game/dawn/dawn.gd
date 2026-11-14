@@ -19,6 +19,7 @@ const RoomView := preload("res://game/dawn/room_view.gd")
 const DawnUI := preload("res://game/dawn/dawn_ui.gd")
 const Designers := preload("res://game/dawn/designers.gd")
 const Crew := preload("res://game/dawn/crew.gd")
+const WorldMap := preload("res://game/dawn/world_map.gd")
 const STORY_PATH := "res://game/dawn/story.gd"
 const LOBBY := "res://game/dawn/title.tscn"
 const POSTERS_FILE := "res://data/posters.json"
@@ -41,6 +42,7 @@ const POSTER_THEMES := {
 var S := {}                     ## shared state (host is the boss of it)
 var crew := {}                  ## role -> player node (always all four); same dict as crew_ctl.members
 var crew_ctl                    ## crew.gd: who controls whom, TAB switching, follow, autopilot
+var world_map                   ## world_map.gd: M map + corridor walk between rooms
 var camera: Camera2D
 var ui: CanvasLayer
 var story                       ## story.gd (null until that feature exists)
@@ -81,6 +83,10 @@ func _ready() -> void:
 	ui = DawnUI.new()
 	ui.game = self
 	add_child(ui)
+	world_map = WorldMap.new()
+	world_map.name = "WorldMap"
+	world_map.g = self
+	add_child(world_map)
 	if Network.is_online():
 		Network.players_changed.connect(_rebuild_crew)
 		Network.disconnected.connect(_back_to_lobby)
@@ -262,6 +268,8 @@ func _physics_process(delta: float) -> void:
 
 
 func _check_doors(p) -> void:
+	if p == camera.target and world_map.busy():
+		return
 	var id := WD.room_at(p.position)
 	if id == "":
 		return
@@ -282,13 +290,27 @@ func _check_doors(p) -> void:
 	if c.length() < WD.wall_distance(id, c.angle()) + WD.EXIT_DEPTH:
 		return
 	var to: String = best["to"]
-	place(p, to, WD.entry_point(to, id))
-	if p == camera.target:
-		var r := WD.room(to)
-		ui.toast(r["name"] + " · " + r["info"][0], 2.2)
-		crew_ctl.on_leader_moved(to, WD.entry_point(to, id))
-		if story and story.has_method("on_enter"):
-			story.on_enter(p, to)
+	if p != camera.target:
+		place(p, to, WD.entry_point(to, id))       # crew I am not watching just step through
+		return
+	# my crew member: walk the corridor on the world map, then arrive in the next room
+	p.can_move = false
+	p.velocity = Vector2.ZERO
+	p.position = WD.room_origin(id) + WD.snap_inside(id, local, 3.0)
+	world_map.travel(id, to, p.role, func(): _arrive(p, id, to))
+
+
+## Finish a door trip: put the crew member (and followers) inside the new room.
+func _arrive(p, from: String, to: String) -> void:
+	place(p, to, WD.entry_point(to, from))
+	p.can_move = not ui.panel_open() and not world_map.showing
+	if p != camera.target:
+		return
+	var r := WD.room(to)
+	ui.toast(r["name"] + " · " + r["info"][0], 2.2)
+	crew_ctl.on_leader_moved(to, WD.entry_point(to, from))
+	if story and story.has_method("on_enter"):
+		story.on_enter(p, to)
 
 
 ## UV on Earth's surface, cold and darkness in the Moon's ice mine, robot batteries on Mars.
@@ -480,6 +502,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		crew_ctl.toggle_autopilot()
 	elif k == KEY_J:
 		open_mission_panel()
+	elif k == KEY_M and not ui.panel_open() and not ui.dialogue_open():
+		world_map.toggle()
 	elif k == KEY_ESCAPE and ui.panel_open():
 		ui.close_panel()
 	elif not Network.is_online() and k in [KEY_F9, KEY_F10, KEY_F11]:

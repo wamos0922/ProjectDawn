@@ -371,15 +371,17 @@ func rocket(cx: float, base: float, d: Dictionary, tt: float, flame := false) ->
 
 
 ## A crew member from the sprite sheets, (x, y) = top-left, s = scale.
-func person(role: String, x: float, y: float, dir := "down", frame := 0, s := 1.0, suit := false) -> void:
+## robot = the Mars robot body (Acts 4-5); it is drawn at its own frame size, feet at y + 20 * s.
+func person(role: String, x: float, y: float, dir := "down", frame := 0, s := 1.0, suit := false, robot := false) -> void:
 	var anim := ("walk_" if frame > 0 else "idle_") + ("side" if dir == "left" or dir == "right" else dir)
-	var f: SpriteFrames = RoleSprites.frames(role, suit)
+	var f: SpriteFrames = RoleSprites.frames(role, suit, robot)
 	var tex := f.get_frame_texture(anim, (frame % 4) if frame > 0 else 0)
-	var w := 14 * s
+	var fs := Vector2(RoleSprites.frame_size(robot)) * s
+	var at := Vector2(floorf(x + 7 * s - fs.x / 2.0), floorf(y + 20 * s - fs.y))
 	if dir == "left":
-		draw_texture_rect(tex, Rect2(floorf(x) + w, floorf(y), -w, 20 * s), false)
+		draw_texture_rect(tex, Rect2(at.x + fs.x, at.y, -fs.x, fs.y), false)
 	else:
-		draw_texture_rect(tex, Rect2(floorf(x), floorf(y), w, 20 * s), false)
+		draw_texture_rect(tex, Rect2(at, fs), false)
 
 
 func person_color(body: Color, x: float, y: float, dir := "left", frame := 0) -> void:
