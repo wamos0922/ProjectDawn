@@ -27,6 +27,7 @@ var _addr: LineEdit
 
 
 func _ready() -> void:
+	Sound.music("title")
 	size = Vector2(1280, 720)
 	theme = DawnTheme.get_theme()
 	get_viewport().canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST

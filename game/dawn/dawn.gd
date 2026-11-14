@@ -317,6 +317,7 @@ func _process(delta: float) -> void:
 				_apply_state.rpc(S)
 	crew_ctl.tick(delta)
 	_refresh_hud()
+	_update_sound()
 	_panel_clock_t -= delta
 	if _panel_clock_t <= 0.0:
 		_panel_clock_t = 0.1
@@ -329,6 +330,33 @@ func _process(delta: float) -> void:
 		_dark.visible = here == "moon.mine"
 		if _dark.visible:
 			_dark.global_position = me.global_position + Vector2(0, -14)
+
+
+# ---------------------------------------------------------------- sound (game/audio/sound.gd)
+
+var _storm_was_on := false
+
+
+## Which music fits right now (keys of Sound.MUSIC). First match wins.
+func _music_situation() -> String:
+	if S["scene"] == "ending" or S.get("cut", {}).get("kind", "") == "home":
+		return "ending"
+	if not S["storm"].is_empty():
+		return "storm"
+	if story and story.mg and story.mg.is_open():
+		return "minigame"
+	if world_map.busy():
+		return "corridor"
+	return S["world"]
+
+
+## Every frame: pick the music, and beep once when a storm starts.
+func _update_sound() -> void:
+	Sound.music(_music_situation())
+	var storm_on: bool = not S["storm"].is_empty()
+	if storm_on and not _storm_was_on:
+		Sound.play("alarm")
+	_storm_was_on = storm_on
 
 
 func _physics_process(delta: float) -> void:
@@ -378,6 +406,7 @@ func _arrive(p, from: String, to: String) -> void:
 	if p != camera.target:
 		return
 	var r := WD.room(to)
+	Sound.play("door")
 	ui.toast(r["name"] + " · " + r["info"][0], 2.2)
 	crew_ctl.on_leader_moved(to, WD.entry_point(to, from))
 	if story and story.has_method("on_enter"):
@@ -822,6 +851,8 @@ func _load_posters() -> void:
 func open_poster(ps: Dictionary) -> void:
 	var n := int(ps["n"])
 	var first := not found.has(n)
+	if first:
+		Sound.play("poster")
 	found[n] = true
 	var s := FileAccess.open(SAVE_FILE, FileAccess.WRITE)
 	if s:

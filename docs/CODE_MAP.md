@@ -37,6 +37,7 @@ Solo play is simply "you are the host".
 | `game/dawn/minigames.gd` | The role minigames (UV sensor timing, tuning, bolts, burn, cargo…), and review mode (F8: one-click placeholders) | a minigame crashes or cannot be won |
 | `game/dawn/dawn_ui.gd` | HUD (top bar, objective, crew bar), toasts, dialogue box + portrait, panels | HUD layout, dialogue box, buttons |
 | `game/dawn/pixel.gd` | 320×180 pixel canvas with the HTML drawing helpers (sky, rocket, person, CERES robot) | a drawn animation looks different from HTML |
+| `game/audio/sound.gd` | Autoload `Sound`: music per situation (title, Earth, Moon, corridor, minigame, storm, ending) and one-shot sounds. File paths in `MUSIC` / `SFX` (see docs/SOUND.md) | a sound is wrong, missing or too loud |
 | `game/dawn/dawn_theme.gd` | Colours, fonts, button and panel styles (`DawnTheme`) | colours or fonts |
 | `game/player/player.gd` | One crew member body: walking, E to use, online position sync | movement, the E key |
 | `game/player/role_sprites.gd` | Sprite sheets per role (uniform, spacesuit) | a character sprite is wrong |
@@ -83,6 +84,7 @@ C autopilot · M world map · J mission details · Esc close · F8 review mode (
 godot --headless --path . -s res://tests/run_tests.gd       # pure rules (25 tests)
 godot --headless --path . -s res://tests/crew_test.gd       # TAB, follow, autopilot, role rule
 godot --headless --path . -s res://tests/door_test.gd       # walk out a door → map trip → next room
+godot --headless --path . -s res://tests/sound_test.gd       # music follows the situation, sounds play
 godot --headless --path . -s res://tests/all_doors_test.gd  # every door in all 24 rooms can be walked through
 godot --headless --path . -s res://tests/minigame_test.gd   # plays each minigame through its buttons
 godot --headless --path . -s res://tests/review_mode_test.gd  # F8 review mode: every minigame is a one-click placeholder

@@ -17,6 +17,12 @@ const RoleSprites := preload("res://game/player/role_sprites.gd")
 const P := WD.PAL
 
 var g
+var current: Game                 ## the minigame on screen (or a finished one), for the music
+
+
+## True while a minigame panel is open (dawn.gd plays the "minigame" music then).
+func is_open() -> bool:
+	return current != null and current.alive()
 
 
 ## Something to draw on, redrawn every frame. fn(canvas) does the drawing; input(canvas, event) is optional.
@@ -54,6 +60,7 @@ class Game extends RefCounted:
 		if done:
 			return
 		done = true
+		_sfx("success")
 		msg.text = "[b][color=#63c74d]DONE![/color][/b]" + ("  [color=#fee761]★ %s[/color]" % fact if fact != "" else "")
 		for c in foot.get_children():
 			c.queue_free()
@@ -63,10 +70,17 @@ class Game extends RefCounted:
 		b.grab_focus.call_deferred()
 
 	func fail(text: String) -> void:
+		_sfx("failure")
 		msg.text = "[color=#f6757a]%s[/color]" % text
 
 	func alive() -> bool:
 		return is_instance_valid(box) and box.is_inside_tree()
+
+	## One-shot sound through the Sound autoload (looked up at run time: see _net() below).
+	func _sfx(name: String) -> void:
+		var snd: Node = (Engine.get_main_loop() as SceneTree).root.get_node_or_null("Sound")
+		if snd:
+			snd.play(name)
 
 
 # ---------------------------------------------------------------- review mode (placeholder)
@@ -98,6 +112,7 @@ func _review(role: String, title: String, on_win: Callable) -> bool:
 		return false
 	var M := _open(role, title, "[color=#fee761]REVIEW MODE[/color] · placeholder minigame. The real one is skipped; press COMPLETE to finish this task. [color=#8b9bb4](F8 or Esc > SETTINGS turns review mode off.)[/color]")
 	var b: Button = g.ui.button(M.foot, "COMPLETE  ▸▸", func():
+		M._sfx("success")
 		g.ui.close_panel()
 		on_win.call())
 	M.foot.move_child(b, 0)
@@ -108,6 +123,7 @@ func _review(role: String, title: String, on_win: Callable) -> bool:
 func _open(role: String, title: String, text: String) -> Game:
 	var M := Game.new()
 	M.g = g
+	current = M
 	M.box = g.ui.panel(Color("#262b44"), RoleSprites.TAGS.get(role, P["amber"]), 860, 50)
 	g.ui.rich(M.box, "[color=#%s][b]%s TASK[/b][/color]" % [RoleSprites.TAGS[role].to_html(false), RoleSprites.NAMES[role]], 14)
 	g.ui.rich(M.box, "[b][color=#feae34]%s[/color][/b]" % title, 22)
