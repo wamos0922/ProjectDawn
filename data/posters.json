@@ -1,0 +1,170 @@
+[
+ {
+  "room": "ozone",
+  "world": "earth",
+  "category": "Ozone",
+  "hook": "3 mm",
+  "body": "If you squeezed all of Earth's ozone down to sea-level pressure, the whole layer would be only about 3 mm thick, roughly two stacked coins.",
+  "source": "NASA Ozone Watch"
+ },
+ {
+  "room": "ozone",
+  "world": "earth",
+  "category": "Ozone",
+  "hook": "2066",
+  "body": "The real ozone hole is healing. After the 1987 Montreal Protocol banned the chemicals causing it, the Antarctic ozone hole is expected to recover around 2066.",
+  "source": "NASA and WMO ozone assessments"
+ },
+ {
+  "room": "shop",
+  "world": "earth",
+  "category": "Small satellites",
+  "hook": "A phone in orbit",
+  "body": "NASA's PhoneSat used an ordinary smartphone as its brain, and its parts cost only a few thousand dollars.",
+  "source": "NASA PhoneSat"
+ },
+ {
+  "room": "shop",
+  "world": "earth",
+  "category": "Small satellites",
+  "hook": "10 cm",
+  "body": "One CubeSat unit is a 10 cm cube, about the size of a Rubik's Cube.",
+  "source": "NASA CubeSat Launch Initiative"
+ },
+ {
+  "room": "mc",
+  "world": "earth",
+  "category": "Apollo",
+  "hook": "4 KB",
+  "body": "The Apollo guidance computer had about 4 KB of working memory, far less than a single photo on your phone.",
+  "source": "Apollo Guidance Computer"
+ },
+ {
+  "room": "crew",
+  "world": "earth",
+  "category": "NASA spinoff",
+  "hook": "Memory foam",
+  "body": "Memory foam was invented for NASA to make aircraft seats safer.",
+  "source": "NASA Spinoff"
+ },
+ {
+  "room": "crew",
+  "world": "earth",
+  "category": "NASA spinoff",
+  "hook": "Your phone camera",
+  "body": "The camera sensor in most phones grew out of work at NASA's Jet Propulsion Laboratory.",
+  "source": "NASA Spinoff · JPL"
+ },
+ {
+  "room": "med",
+  "world": "earth",
+  "category": "NASA spinoff",
+  "hook": "Star thermometer",
+  "body": "Infrared ear thermometers use technology NASA developed to measure the temperature of stars.",
+  "source": "NASA Spinoff"
+ },
+ {
+  "room": "lc",
+  "world": "moon",
+  "category": "Dawn mission",
+  "hook": "2 worlds",
+  "body": "Our AI is named after Ceres. NASA's Dawn spacecraft was the first to orbit two different worlds: the asteroid Vesta, then the dwarf planet Ceres.",
+  "source": "NASA Dawn mission"
+ },
+ {
+  "room": "science",
+  "world": "moon",
+  "category": "Moon science",
+  "hook": "Colder than Pluto",
+  "body": "Some craters at the lunar south pole never see sunlight, and they are among the coldest places NASA has measured in the solar system.",
+  "source": "NASA Lunar Reconnaissance Orbiter"
+ },
+ {
+  "room": "landing",
+  "world": "moon",
+  "category": "Apollo",
+  "hook": "Millions of years",
+  "body": "With no wind or rain to erase them, the Apollo astronauts' footprints could last for millions of years.",
+  "source": "NASA Apollo program"
+ },
+ {
+  "room": "tele",
+  "world": "moon",
+  "category": "Moon science",
+  "hook": "3.8 cm a year",
+  "body": "Mirrors left by Apollo astronauts show the Moon is drifting away from Earth by about 3.8 cm a year, about as fast as your fingernails grow.",
+  "source": "Apollo Lunar Laser Ranging"
+ },
+ {
+  "room": "shelter",
+  "world": "moon",
+  "category": "Apollo",
+  "hook": "96 bags",
+  "body": "Apollo astronauts left 96 bags of their own waste on the Moon.",
+  "source": "NASA Apollo program"
+ },
+ {
+  "room": "port",
+  "world": "moon",
+  "category": "Moon science",
+  "hook": "1/6",
+  "body": "You weigh only one-sixth as much on the Moon, which is exactly why launching from there is cheaper.",
+  "source": "NASA Moon facts"
+ },
+ {
+  "room": "hangar",
+  "world": "mars",
+  "category": "Mars robots",
+  "hook": "5 → 72",
+  "body": "NASA's Ingenuity helicopter was planned for 5 test flights. It made 72.",
+  "source": "NASA Ingenuity Mars Helicopter"
+ },
+ {
+  "room": "solar",
+  "world": "mars",
+  "category": "Mars robots",
+  "hook": "90 days → 15 years",
+  "body": "The Opportunity rover was built for a 90-day mission and kept driving for nearly 15 years, until a 2018 dust storm covered its solar panels.",
+  "source": "NASA Opportunity rover"
+ },
+ {
+  "room": "oxy",
+  "world": "mars",
+  "category": "Mars robots",
+  "hook": "122 g",
+  "body": "NASA's MOXIE made about 122 g of oxygen from Mars's air, about what a small dog breathes in 10 hours.",
+  "source": "MOXIE on Perseverance"
+ },
+ {
+  "room": "atmos",
+  "world": "mars",
+  "category": "Mars science",
+  "hook": "Blue sunsets",
+  "body": "Sunsets on Mars are blue.",
+  "source": "NASA Curiosity rover"
+ },
+ {
+  "room": "relay",
+  "world": "mars",
+  "category": "Mars science",
+  "hook": "3–22 min",
+  "body": "A message from Mars takes between about 3 and 22 minutes to reach us, depending on where the two planets are.",
+  "source": "NASA Mars Exploration"
+ },
+ {
+  "room": "drone",
+  "world": "mars",
+  "category": "Mars science",
+  "hook": "2.5× Everest",
+  "body": "Mars's volcano Olympus Mons is about two and a half times as tall as Mount Everest.",
+  "source": "NASA Mars facts"
+ },
+ {
+  "room": "landing",
+  "world": "mars",
+  "category": "Mars science",
+  "hook": "24 h 39 min",
+  "body": "A day on Mars, called a sol, lasts 24 hours and 39 minutes.",
+  "source": "NASA Mars facts"
+ }
+]

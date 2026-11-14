@@ -1,0 +1,1955 @@
+{
+ "earth": {
+  "arrive": "crew",
+  "rooms": {
+   "pad": {
+    "name": "LAUNCH PAD",
+    "shape": "ell",
+    "tone": "shared",
+    "map": [
+     52,
+     31
+    ],
+    "cell": [
+     0,
+     0
+    ],
+    "info": [
+     "Launches from Earth",
+     "One CubeSat unit is a 10 cm cube, about the size of a Rubik's Cube."
+    ],
+    "props": [
+     [
+      "rocket",
+      0,
+      -0.15,
+      24,
+      50
+     ]
+    ],
+    "surface": true
+   },
+   "canopy": {
+    "name": "UV CANOPY",
+    "shape": "ell",
+    "tone": "shared",
+    "map": [
+     120,
+     31
+    ],
+    "cell": [
+     1,
+     0
+    ],
+    "info": [
+     "Optional B · shade on the surface",
+     "UV light is what sunscreen protects you from."
+    ],
+    "props": [
+     [
+      "rug",
+      -0.4,
+      0,
+      60,
+      30
+     ],
+     [
+      "rug",
+      0.4,
+      0,
+      60,
+      30
+     ]
+    ],
+    "locked": "Optional B · unlocks after the first launch",
+    "unlock": "launched",
+    "surface": true
+   },
+   "airlock": {
+    "name": "AIRLOCK",
+    "shape": "rect",
+    "tone": "shared",
+    "map": [
+     160,
+     50
+    ],
+    "cell": [
+     2,
+     0
+    ],
+    "info": [
+     "UV timer starts outside",
+     "The real ozone layer is recovering since the 1987 Montreal Protocol."
+    ],
+    "props": [
+     [
+      "rack",
+      -0.6,
+      -0.2,
+      14,
+      30
+     ],
+     [
+      "rack",
+      0.6,
+      -0.2,
+      14,
+      30
+     ],
+     [
+      "rug",
+      0,
+      0.3,
+      40,
+      14
+     ]
+    ]
+   },
+   "mc": {
+    "name": "MISSION CONTROL",
+    "shape": "oct",
+    "tone": "shared",
+    "map": [
+     160,
+     108
+    ],
+    "cell": [
+     1,
+     1
+    ],
+    "info": [
+     "Hub · readiness reviews need all 4 crew",
+     "The Apollo guidance computer had about 4 KB of working memory."
+    ],
+    "props": [
+     [
+      "table",
+      0,
+      0.05,
+      46,
+      18
+     ],
+     [
+      "screen",
+      -0.55,
+      -0.55,
+      30,
+      14
+     ],
+     [
+      "screen",
+      0.55,
+      -0.55,
+      30,
+      14
+     ]
+    ]
+   },
+   "ozone": {
+    "name": "OZONE LAB",
+    "shape": "ell",
+    "tone": "sci",
+    "map": [
+     54,
+     76
+    ],
+    "cell": [
+     0,
+     1
+    ],
+    "info": [
+     "Scientist station · the ozone meter lives here",
+     "The ozone hole is healing: recovery over Antarctica is expected around 2066."
+    ],
+    "props": [
+     [
+      "scope",
+      -0.5,
+      -0.2,
+      14,
+      26
+     ],
+     [
+      "rack",
+      0.55,
+      -0.2,
+      18,
+      26
+     ],
+     [
+      "bench",
+      0,
+      0.45,
+      50,
+      12
+     ],
+     [
+      "tank",
+      -0.6,
+      0.4,
+      12,
+      18
+     ]
+    ]
+   },
+   "shop": {
+    "name": "WORKSHOP",
+    "shape": "rect",
+    "tone": "eng",
+    "map": [
+     44,
+     112
+    ],
+    "cell": [
+     0,
+     2
+    ],
+    "info": [
+     "Engineer station",
+     "NASA's PhoneSat used an ordinary smartphone as its brain."
+    ],
+    "props": [
+     [
+      "bench",
+      -0.55,
+      -0.35,
+      46,
+      12
+     ],
+     [
+      "rocket",
+      0.55,
+      -0.05,
+      22,
+      46
+     ],
+     [
+      "crate",
+      -0.6,
+      0.45,
+      18,
+      14
+     ],
+     [
+      "crate",
+      -0.35,
+      0.5,
+      14,
+      12
+     ],
+     [
+      "rack",
+      0.05,
+      0.45,
+      22,
+      20
+     ]
+    ]
+   },
+   "hydro": {
+    "name": "HYDROPONICS",
+    "shape": "rect",
+    "tone": "sci",
+    "map": [
+     41,
+     158
+    ],
+    "cell": [
+     0,
+     3
+    ],
+    "info": [
+     "Optional H · food for the bunkers",
+     "Plants have been grown on the International Space Station."
+    ],
+    "props": [
+     [
+      "plant",
+      -0.5,
+      -0.2,
+      40,
+      16
+     ],
+     [
+      "plant",
+      0.3,
+      -0.2,
+      40,
+      16
+     ],
+     [
+      "plant",
+      -0.5,
+      0.35,
+      40,
+      16
+     ],
+     [
+      "plant",
+      0.3,
+      0.35,
+      40,
+      16
+     ]
+    ],
+    "locked": "Optional H · unlocks after Mars",
+    "unlock": "hydro"
+   },
+   "med": {
+    "name": "MED BAY",
+    "shape": "ell",
+    "tone": "shared",
+    "map": [
+     100,
+     158
+    ],
+    "cell": [
+     1,
+     3
+    ],
+    "info": [
+     "Where UV burns send you",
+     "Infrared ear thermometers use NASA tech made to measure stars."
+    ],
+    "props": [
+     [
+      "bed",
+      -0.5,
+      0,
+      30,
+      16
+     ],
+     [
+      "bed",
+      0.5,
+      0,
+      30,
+      16
+     ],
+     [
+      "rack",
+      0,
+      0.5,
+      20,
+      16
+     ]
+    ]
+   },
+   "crew": {
+    "name": "CREW QUARTERS",
+    "shape": "ell",
+    "tone": "shared",
+    "map": [
+     160,
+     158
+    ],
+    "cell": [
+     2,
+     3
+    ],
+    "info": [
+     "Where the crew sleeps",
+     "Memory foam was invented for NASA to make aircraft seats safer."
+    ],
+    "props": [
+     [
+      "capsule",
+      -0.75,
+      -0.1,
+      22,
+      40
+     ],
+     [
+      "capsule",
+      -0.45,
+      -0.1,
+      22,
+      40
+     ],
+     [
+      "capsule",
+      0.45,
+      -0.1,
+      22,
+      40
+     ],
+     [
+      "capsule",
+      0.75,
+      -0.1,
+      22,
+      40
+     ],
+     [
+      "table",
+      0,
+      0.5,
+      30,
+      10
+     ]
+    ]
+   },
+   "power": {
+    "name": "POWER",
+    "shape": "rect",
+    "tone": "qm",
+    "map": [
+     272,
+     158
+    ],
+    "cell": [
+     3,
+     3
+    ],
+    "info": [
+     "Quartermaster station · power and budget",
+     "Memory foam was invented for NASA to make aircraft seats safer."
+    ],
+    "props": [
+     [
+      "rtg",
+      -0.55,
+      -0.2,
+      26,
+      18
+     ],
+     [
+      "tank",
+      0.55,
+      -0.25,
+      12,
+      22
+     ],
+     [
+      "tank",
+      0.75,
+      -0.25,
+      12,
+      22
+     ],
+     [
+      "crate",
+      -0.5,
+      0.45,
+      18,
+      14
+     ],
+     [
+      "rack",
+      0.3,
+      0.45,
+      26,
+      16
+     ]
+    ]
+   },
+   "nav": {
+    "name": "NAVIGATION",
+    "shape": "trap",
+    "tone": "nav",
+    "map": [
+     270,
+     111
+    ],
+    "cell": [
+     2,
+     2
+    ],
+    "info": [
+     "Navigator station · launchers and fuel",
+     "A day on Mars lasts 24 hours and 39 minutes."
+    ],
+    "props": [
+     [
+      "table",
+      0,
+      0.2,
+      50,
+      20
+     ],
+     [
+      "screen",
+      -0.55,
+      -0.4,
+      28,
+      14
+     ],
+     [
+      "screen",
+      0.55,
+      -0.4,
+      28,
+      14
+     ]
+    ]
+   },
+   "comms": {
+    "name": "COMMS",
+    "shape": "hex",
+    "tone": "qm",
+    "map": [
+     268,
+     72
+    ],
+    "cell": [
+     2,
+     1
+    ],
+    "info": [
+     "Quartermaster station · radio and downlink",
+     "The camera sensor in most phones grew out of work at NASA's JPL."
+    ],
+    "props": [
+     [
+      "rack",
+      -0.55,
+      0,
+      18,
+      30
+     ],
+     [
+      "rack",
+      0.55,
+      0,
+      18,
+      30
+     ],
+     [
+      "dish",
+      0,
+      0.5,
+      22,
+      22
+     ]
+    ]
+   }
+  },
+  "edges": [
+   [
+    "mc",
+    "airlock"
+   ],
+   [
+    "mc",
+    "ozone"
+   ],
+   [
+    "mc",
+    "shop"
+   ],
+   [
+    "mc",
+    "crew"
+   ],
+   [
+    "mc",
+    "comms"
+   ],
+   [
+    "mc",
+    "nav"
+   ],
+   [
+    "ozone",
+    "shop"
+   ],
+   [
+    "shop",
+    "med"
+   ],
+   [
+    "med",
+    "crew"
+   ],
+   [
+    "crew",
+    "power"
+   ],
+   [
+    "nav",
+    "power"
+   ],
+   [
+    "comms",
+    "nav"
+   ],
+   [
+    "airlock",
+    "pad"
+   ],
+   [
+    "airlock",
+    "canopy"
+   ],
+   [
+    "canopy",
+    "pad"
+   ],
+   [
+    "med",
+    "hydro"
+   ]
+  ],
+  "stations": {
+   "mc": [
+    {
+     "id": "main",
+     "u": -0.25,
+     "v": -0.3
+    },
+    {
+     "id": "c_eng",
+     "role": "eng",
+     "u": -0.62,
+     "v": 0.45,
+     "seat": false
+    },
+    {
+     "id": "c_sci",
+     "role": "sci",
+     "u": -0.22,
+     "v": 0.7,
+     "seat": false
+    },
+    {
+     "id": "c_nav",
+     "role": "nav",
+     "u": 0.22,
+     "v": 0.7,
+     "seat": false
+    },
+    {
+     "id": "c_qm",
+     "role": "qm",
+     "u": 0.62,
+     "v": 0.45,
+     "seat": false
+    }
+   ],
+   "pad": [
+    {
+     "id": "main",
+     "u": -0.55,
+     "v": -0.35
+    },
+    {
+     "id": "s_eng",
+     "role": "eng",
+     "u": -0.62,
+     "v": 0.5,
+     "seat": true
+    },
+    {
+     "id": "s_sci",
+     "role": "sci",
+     "u": -0.22,
+     "v": 0.75,
+     "seat": true
+    },
+    {
+     "id": "s_nav",
+     "role": "nav",
+     "u": 0.22,
+     "v": 0.75,
+     "seat": true
+    },
+    {
+     "id": "s_qm",
+     "role": "qm",
+     "u": 0.62,
+     "v": 0.5,
+     "seat": true
+    }
+   ],
+   "crew": [
+    {
+     "id": "locker",
+     "u": -0.15,
+     "v": 0.95
+    }
+   ]
+  }
+ },
+ "moon": {
+  "arrive": "landing",
+  "rooms": {
+   "solar": {
+    "name": "SOLAR RIDGE",
+    "shape": "trap",
+    "tone": "qm",
+    "map": [
+     68,
+     32
+    ],
+    "cell": [
+     0,
+     5
+    ],
+    "info": [
+     "Quartermaster station · sunlit rim",
+     "The Moon has no air, so sunlight arrives at full strength."
+    ],
+    "props": [
+     [
+      "panels",
+      -0.35,
+      0.25,
+      50,
+      16
+     ],
+     [
+      "panels",
+      0.35,
+      0.25,
+      50,
+      16
+     ],
+     [
+      "rack",
+      0.65,
+      -0.2,
+      14,
+      20
+     ]
+    ],
+    "flip": true
+   },
+   "landing": {
+    "name": "LANDING PAD",
+    "shape": "ell",
+    "tone": "shared",
+    "map": [
+     156,
+     32
+    ],
+    "cell": [
+     1,
+     5
+    ],
+    "info": [
+     "Arrival from Earth",
+     "With no wind or rain, Apollo footprints could last millions of years."
+    ],
+    "props": [
+     [
+      "tank",
+      -0.6,
+      0,
+      14,
+      24
+     ],
+     [
+      "crate",
+      0.55,
+      0.2,
+      18,
+      14
+     ],
+     [
+      "rug",
+      0,
+      0.3,
+      40,
+      12
+     ]
+    ]
+   },
+   "tele": {
+    "name": "TELESCOPE",
+    "shape": "ell",
+    "tone": "nav",
+    "map": [
+     214,
+     32
+    ],
+    "cell": [
+     2,
+     5
+    ],
+    "info": [
+     "Navigator · watches the sky",
+     "The Moon drifts away from Earth about 3.8 cm a year."
+    ],
+    "props": [
+     [
+      "scope",
+      0,
+      0.1,
+      16,
+      34
+     ],
+     [
+      "rack",
+      -0.6,
+      0.2,
+      14,
+      20
+     ]
+    ]
+   },
+   "port": {
+    "name": "MOON PORT",
+    "shape": "ell",
+    "tone": "shared",
+    "map": [
+     270,
+     36
+    ],
+    "cell": [
+     3,
+     5
+    ],
+    "info": [
+     "Launch site from Act 3",
+     "You weigh one-sixth as much on the Moon."
+    ],
+    "props": [
+     [
+      "rocket",
+      0,
+      -0.25,
+      24,
+      46
+     ],
+     [
+      "tank",
+      -0.7,
+      -0.2,
+      12,
+      22
+     ],
+     [
+      "tank",
+      0.7,
+      -0.2,
+      12,
+      22
+     ]
+    ]
+   },
+   "science": {
+    "name": "SCIENCE LAB",
+    "shape": "ell",
+    "tone": "sci",
+    "map": [
+     58,
+     87
+    ],
+    "cell": [
+     0,
+     6
+    ],
+    "info": [
+     "Scientist station",
+     "Some craters near the south pole are colder than Pluto's surface."
+    ],
+    "props": [
+     [
+      "scope",
+      -0.55,
+      -0.1,
+      14,
+      26
+     ],
+     [
+      "bench",
+      0.4,
+      0.3,
+      44,
+      12
+     ],
+     [
+      "ice",
+      -0.2,
+      0.45,
+      12,
+      10
+     ],
+     [
+      "rack",
+      0.6,
+      -0.3,
+      16,
+      24
+     ]
+    ]
+   },
+   "lc": {
+    "name": "LUNAR CONTROL",
+    "shape": "oct",
+    "tone": "shared",
+    "map": [
+     164,
+     87
+    ],
+    "cell": [
+     1,
+     6
+    ],
+    "info": [
+     "Hub · CERES lives here now",
+     "NASA's Dawn was the first spacecraft to orbit two worlds: Vesta and Ceres."
+    ],
+    "props": [
+     [
+      "table",
+      0,
+      0.15,
+      46,
+      18
+     ],
+     [
+      "screen",
+      -0.55,
+      -0.5,
+      30,
+      14
+     ],
+     [
+      "screen",
+      0.55,
+      -0.5,
+      30,
+      14
+     ]
+    ]
+   },
+   "fuel": {
+    "name": "FUEL PLANT",
+    "shape": "hex",
+    "tone": "nav",
+    "map": [
+     270,
+     87
+    ],
+    "cell": [
+     3,
+     6
+    ],
+    "info": [
+     "Navigator station · ice into fuel",
+     "Liquid hydrogen and oxygen powered the Space Shuttle's main engines."
+    ],
+    "props": [
+     [
+      "tank",
+      -0.45,
+      -0.1,
+      16,
+      30
+     ],
+     [
+      "tank",
+      0.45,
+      -0.1,
+      16,
+      30
+     ],
+     [
+      "pipes",
+      0,
+      0.45,
+      60,
+      8
+     ]
+    ]
+   },
+   "purifier": {
+    "name": "WATER PURIFIER",
+    "shape": "rect",
+    "tone": "sci",
+    "map": [
+     58,
+     117
+    ],
+    "cell": [
+     0,
+     7
+    ],
+    "info": [
+     "Optional C · clean water",
+     "Space stations recycle most of their water."
+    ],
+    "props": [
+     [
+      "pipes",
+      0,
+      0.2,
+      70,
+      8
+     ],
+     [
+      "tank",
+      -0.6,
+      -0.2,
+      12,
+      20
+     ],
+     [
+      "tank",
+      0.6,
+      -0.2,
+      12,
+      20
+     ]
+    ],
+    "locked": "Optional C · unlocks after fuel",
+    "unlock": "fuel_made"
+   },
+   "mine": {
+    "name": "ICE MINE",
+    "shape": "poly",
+    "tone": "eng",
+    "map": [
+     54,
+     148
+    ],
+    "cell": [
+     0,
+     8
+    ],
+    "info": [
+     "Engineer + Scientist · dark and freezing",
+     "Water ice can be split into rocket fuel: hydrogen and oxygen."
+    ],
+    "props": [
+     [
+      "drill",
+      -0.55,
+      -0.4,
+      20,
+      30
+     ],
+     [
+      "ice",
+      0.55,
+      0.4,
+      14,
+      10
+     ],
+     [
+      "ice",
+      -0.2,
+      0.6,
+      12,
+      8
+     ],
+     [
+      "ice",
+      0.65,
+      -0.3,
+      10,
+      8
+     ]
+    ],
+    "poly": [
+     [
+      -1.0,
+      -0.647
+     ],
+     [
+      0.152,
+      -1.0
+     ],
+     [
+      1.0,
+      -0.529
+     ],
+     [
+      0.879,
+      1.0
+     ],
+     [
+      -0.939,
+      0.882
+     ]
+    ]
+   },
+   "shelter": {
+    "name": "RAD SHELTER",
+    "shape": "ell",
+    "tone": "shared",
+    "map": [
+     133,
+     146
+    ],
+    "cell": [
+     1,
+     8
+    ],
+    "info": [
+     "All 4 crew here in a solar storm",
+     "Apollo astronauts left 96 bags of waste on the Moon."
+    ],
+    "props": [
+     [
+      "tank",
+      -0.65,
+      0,
+      14,
+      26
+     ],
+     [
+      "tank",
+      0.65,
+      0,
+      14,
+      26
+     ],
+     [
+      "bed",
+      0,
+      0.45,
+      30,
+      14
+     ]
+    ]
+   },
+   "teleop": {
+    "name": "TELEOP CENTER",
+    "shape": "hex",
+    "tone": "shared",
+    "map": [
+     199,
+     146
+    ],
+    "cell": [
+     2,
+     8
+    ],
+    "info": [
+     "Doorway to Mars · 4 consoles",
+     "Robots on Mars are driven from Earth with a signal delay."
+    ],
+    "props": [
+     [
+      "screen",
+      0,
+      -0.62,
+      60,
+      14
+     ]
+    ]
+   },
+   "factory": {
+    "name": "MOON FACTORY",
+    "shape": "rect",
+    "tone": "eng",
+    "map": [
+     270,
+     144
+    ],
+    "cell": [
+     3,
+     8
+    ],
+    "info": [
+     "Engineer + Quartermaster",
+     "Lunar soil holds oxygen, silicon, iron and aluminium."
+    ],
+    "props": [
+     [
+      "pipes",
+      0,
+      0.6,
+      90,
+      8
+     ],
+     [
+      "crate",
+      -0.75,
+      -0.3,
+      16,
+      14
+     ],
+     [
+      "crate",
+      0.75,
+      -0.3,
+      16,
+      14
+     ]
+    ]
+   }
+  },
+  "edges": [
+   [
+    "solar",
+    "landing"
+   ],
+   [
+    "landing",
+    "tele"
+   ],
+   [
+    "tele",
+    "port"
+   ],
+   [
+    "landing",
+    "lc"
+   ],
+   [
+    "lc",
+    "science"
+   ],
+   [
+    "lc",
+    "fuel"
+   ],
+   [
+    "port",
+    "fuel"
+   ],
+   [
+    "solar",
+    "science"
+   ],
+   [
+    "science",
+    "purifier"
+   ],
+   [
+    "purifier",
+    "mine"
+   ],
+   [
+    "mine",
+    "shelter"
+   ],
+   [
+    "lc",
+    "shelter"
+   ],
+   [
+    "lc",
+    "teleop"
+   ],
+   [
+    "shelter",
+    "teleop"
+   ],
+   [
+    "teleop",
+    "factory"
+   ],
+   [
+    "fuel",
+    "factory"
+   ]
+  ],
+  "stations": {
+   "mine": [
+    {
+     "id": "main",
+     "u": 0,
+     "v": -0.6
+    },
+    {
+     "id": "drill",
+     "role": "eng",
+     "u": 0.4,
+     "v": 0.1
+    },
+    {
+     "id": "lamp",
+     "role": "sci",
+     "u": -0.35,
+     "v": 0.25
+    }
+   ],
+   "factory": [
+    {
+     "id": "main",
+     "u": 0,
+     "v": -0.55
+    },
+    {
+     "id": "asm",
+     "role": "eng",
+     "u": -0.45,
+     "v": 0.15
+    },
+    {
+     "id": "feed",
+     "role": "qm",
+     "u": 0.45,
+     "v": 0.15
+    }
+   ],
+   "port": [
+    {
+     "id": "main",
+     "u": -0.5,
+     "v": -0.5
+    },
+    {
+     "id": "s_eng",
+     "role": "eng",
+     "u": -0.62,
+     "v": 0.45,
+     "seat": true
+    },
+    {
+     "id": "s_sci",
+     "role": "sci",
+     "u": -0.22,
+     "v": 0.7,
+     "seat": true
+    },
+    {
+     "id": "s_nav",
+     "role": "nav",
+     "u": 0.22,
+     "v": 0.7,
+     "seat": true
+    },
+    {
+     "id": "s_qm",
+     "role": "qm",
+     "u": 0.62,
+     "v": 0.45,
+     "seat": true
+    }
+   ],
+   "teleop": [
+    {
+     "id": "main",
+     "u": -0.55,
+     "v": -0.3
+    },
+    {
+     "id": "c_eng",
+     "role": "eng",
+     "u": -0.62,
+     "v": 0.35,
+     "seat": false
+    },
+    {
+     "id": "c_sci",
+     "role": "sci",
+     "u": -0.22,
+     "v": 0.6,
+     "seat": false
+    },
+    {
+     "id": "c_nav",
+     "role": "nav",
+     "u": 0.22,
+     "v": 0.6,
+     "seat": false
+    },
+    {
+     "id": "c_qm",
+     "role": "qm",
+     "u": 0.62,
+     "v": 0.35,
+     "seat": false
+    }
+   ]
+  }
+ },
+ "mars": {
+  "arrive": "landing",
+  "rooms": {
+   "landing": {
+    "name": "LANDING ZONE",
+    "shape": "ell",
+    "tone": "shared",
+    "map": [
+     55,
+     32
+    ],
+    "cell": [
+     0,
+     10
+    ],
+    "info": [
+     "Where the robots arrived",
+     "A Mars day lasts 24 h 39 min."
+    ],
+    "props": [
+     [
+      "tank",
+      -0.55,
+      0.1,
+      16,
+      14
+     ],
+     [
+      "crate",
+      0.5,
+      0.25,
+      18,
+      12
+     ]
+    ]
+   },
+   "drone": {
+    "name": "DRONE PAD",
+    "shape": "trap",
+    "tone": "nav",
+    "map": [
+     154,
+     32
+    ],
+    "cell": [
+     1,
+     10
+    ],
+    "info": [
+     "Navigator robot · scout drone",
+     "Sunsets on Mars are blue."
+    ],
+    "props": [
+     [
+      "rug",
+      0,
+      0.2,
+      50,
+      18
+     ],
+     [
+      "crate",
+      -0.65,
+      -0.3,
+      14,
+      12
+     ]
+    ],
+    "flip": true
+   },
+   "relay": {
+    "name": "RELAY",
+    "shape": "ell",
+    "tone": "qm",
+    "map": [
+     214,
+     32
+    ],
+    "cell": [
+     2,
+     10
+    ],
+    "info": [
+     "Link to the Moon",
+     "Mars messages take 3 to 22 minutes to reach us."
+    ],
+    "props": [
+     [
+      "dish",
+      0,
+      0.15,
+      30,
+      30
+     ]
+    ]
+   },
+   "vent": {
+    "name": "METHANE VENT",
+    "shape": "ell",
+    "tone": "sci",
+    "map": [
+     273,
+     32
+    ],
+    "cell": [
+     3,
+     10
+    ],
+    "info": [
+     "Optional J · the Mars mystery",
+     "Curiosity has measured methane spikes nobody can yet explain."
+    ],
+    "props": [
+     [
+      "rug",
+      0,
+      0.2,
+      60,
+      20
+     ]
+    ],
+    "locked": "Optional J · unlocks after the panels",
+    "unlock": "panels_clean"
+   },
+   "solar": {
+    "name": "SOLAR FIELD",
+    "shape": "trap",
+    "tone": "qm",
+    "map": [
+     58,
+     87
+    ],
+    "cell": [
+     0,
+     11
+    ],
+    "info": [
+     "Quartermaster robot · 43% sunlight",
+     "Opportunity drove for nearly 15 years."
+    ],
+    "props": [
+     [
+      "panels",
+      -0.4,
+      0.3,
+      50,
+      16
+     ],
+     [
+      "panels",
+      0.4,
+      0.3,
+      50,
+      16
+     ]
+    ],
+    "flip": true
+   },
+   "hangar": {
+    "name": "ROBOT HANGAR",
+    "shape": "oct",
+    "tone": "shared",
+    "map": [
+     154,
+     87
+    ],
+    "cell": [
+     1,
+     11
+    ],
+    "info": [
+     "Hub · recharge here",
+     "Ingenuity was planned for 5 flights and made 72."
+    ],
+    "props": [
+     [
+      "rack",
+      -0.7,
+      -0.3,
+      16,
+      28
+     ],
+     [
+      "rack",
+      0.7,
+      -0.3,
+      16,
+      28
+     ],
+     [
+      "rug",
+      0,
+      0.35,
+      50,
+      14
+     ]
+    ]
+   },
+   "atmos": {
+    "name": "ATMOS LAB",
+    "shape": "ell",
+    "tone": "sci",
+    "map": [
+     221,
+     87
+    ],
+    "cell": [
+     2,
+     11
+    ],
+    "info": [
+     "Scientist robot · MAVEN-style",
+     "Olympus Mons is about 2.5× as tall as Everest."
+    ],
+    "props": [
+     [
+      "scope",
+      -0.5,
+      0,
+      14,
+      28
+     ],
+     [
+      "rack",
+      0.55,
+      0,
+      18,
+      26
+     ],
+     [
+      "bench",
+      0,
+      0.5,
+      40,
+      10
+     ]
+    ]
+   },
+   "fuel": {
+    "name": "FUEL PLANT",
+    "shape": "rect",
+    "tone": "nav",
+    "map": [
+     273,
+     87
+    ],
+    "cell": [
+     3,
+     11
+    ],
+    "info": [
+     "Navigator robot · fuel made on Mars",
+     "Martian air is about 95% carbon dioxide."
+    ],
+    "props": [
+     [
+      "tank",
+      -0.5,
+      -0.1,
+      16,
+      30
+     ],
+     [
+      "tank",
+      0.5,
+      -0.1,
+      16,
+      30
+     ],
+     [
+      "pipes",
+      0,
+      0.5,
+      60,
+      8
+     ]
+    ]
+   },
+   "power": {
+    "name": "POWER SHED",
+    "shape": "rect",
+    "tone": "qm",
+    "map": [
+     55,
+     144
+    ],
+    "cell": [
+     0,
+     12
+    ],
+    "info": [
+     "Quartermaster robot · RTG",
+     "An RTG turns the heat of decaying plutonium into electricity."
+    ],
+    "props": [
+     [
+      "tank",
+      0.6,
+      -0.2,
+      14,
+      24
+     ],
+     [
+      "crate",
+      0.6,
+      0.45,
+      18,
+      14
+     ]
+    ]
+   },
+   "green": {
+    "name": "GREENHOUSE",
+    "shape": "ell",
+    "tone": "sci",
+    "map": [
+     111,
+     144
+    ],
+    "cell": [
+     1,
+     12
+    ],
+    "info": [
+     "Scientist robot · main objective 4.2",
+     "Sunsets on Mars are blue."
+    ],
+    "props": [
+     [
+      "plant",
+      -0.5,
+      -0.1,
+      36,
+      16
+     ],
+     [
+      "plant",
+      -0.5,
+      0.4,
+      36,
+      16
+     ],
+     [
+      "plant",
+      0.05,
+      0.45,
+      30,
+      16
+     ],
+     [
+      "dome",
+      0.55,
+      -0.35,
+      22,
+      22
+     ]
+    ]
+   },
+   "oxy": {
+    "name": "OXYGEN PLANT",
+    "shape": "hex",
+    "tone": "eng",
+    "map": [
+     174,
+     144
+    ],
+    "cell": [
+     2,
+     12
+    ],
+    "info": [
+     "Engineer robot · MOXIE-style",
+     "MOXIE made about 122 g of oxygen on Mars."
+    ],
+    "props": [
+     [
+      "tank",
+      -0.45,
+      -0.1,
+      16,
+      30
+     ],
+     [
+      "pipes",
+      0.2,
+      0.45,
+      60,
+      8
+     ],
+     [
+      "tank",
+      0.55,
+      -0.1,
+      14,
+      26
+     ]
+    ]
+   },
+   "vault": {
+    "name": "SEED VAULT",
+    "shape": "rect",
+    "tone": "qm",
+    "map": [
+     222,
+     144
+    ],
+    "cell": [
+     3,
+     12
+    ],
+    "info": [
+     "Quartermaster robot · cargo",
+     "Earth has a real seed vault in Svalbard, Norway."
+    ],
+    "props": [
+     [
+      "crate",
+      -0.6,
+      -0.2,
+      18,
+      14
+     ],
+     [
+      "crate",
+      -0.3,
+      0.4,
+      18,
+      14
+     ],
+     [
+      "crate",
+      0.5,
+      -0.25,
+      18,
+      14
+     ],
+     [
+      "crate",
+      0.6,
+      0.4,
+      18,
+      14
+     ]
+    ]
+   },
+   "pad": {
+    "name": "ASCENT PAD",
+    "shape": "ell",
+    "tone": "nav",
+    "map": [
+     273,
+     144
+    ],
+    "cell": [
+     3,
+     13
+    ],
+    "info": [
+     "All 4 robots · main objective 5.1",
+     "No rocket has ever launched from Mars. Yet."
+    ],
+    "props": [
+     [
+      "rocket",
+      0.6,
+      -0.3,
+      24,
+      46
+     ]
+    ]
+   }
+  },
+  "edges": [
+   [
+    "landing",
+    "hangar"
+   ],
+   [
+    "landing",
+    "solar"
+   ],
+   [
+    "drone",
+    "hangar"
+   ],
+   [
+    "drone",
+    "relay"
+   ],
+   [
+    "relay",
+    "vent"
+   ],
+   [
+    "hangar",
+    "solar"
+   ],
+   [
+    "hangar",
+    "atmos"
+   ],
+   [
+    "atmos",
+    "fuel"
+   ],
+   [
+    "fuel",
+    "pad"
+   ],
+   [
+    "hangar",
+    "green"
+   ],
+   [
+    "hangar",
+    "oxy"
+   ],
+   [
+    "solar",
+    "power"
+   ],
+   [
+    "power",
+    "green"
+   ],
+   [
+    "green",
+    "oxy"
+   ],
+   [
+    "oxy",
+    "vault"
+   ],
+   [
+    "vault",
+    "pad"
+   ]
+  ],
+  "stations": {
+   "power": [
+    {
+     "id": "main",
+     "u": 0,
+     "v": -0.55
+    },
+    {
+     "id": "rtg",
+     "role": "qm",
+     "u": -0.4,
+     "v": 0.2
+    }
+   ],
+   "green": [
+    {
+     "id": "main",
+     "u": -0.1,
+     "v": -0.55
+    },
+    {
+     "id": "heat",
+     "role": "eng",
+     "u": 0.45,
+     "v": 0.25
+    }
+   ],
+   "pad": [
+    {
+     "id": "main",
+     "u": -0.5,
+     "v": -0.45
+    },
+    {
+     "id": "s_eng",
+     "role": "eng",
+     "u": -0.62,
+     "v": 0.45,
+     "seat": true
+    },
+    {
+     "id": "s_sci",
+     "role": "sci",
+     "u": -0.22,
+     "v": 0.7,
+     "seat": true
+    },
+    {
+     "id": "s_nav",
+     "role": "nav",
+     "u": 0.22,
+     "v": 0.7,
+     "seat": true
+    },
+    {
+     "id": "s_qm",
+     "role": "qm",
+     "u": 0.62,
+     "v": 0.45,
+     "seat": true
+    }
+   ]
+  }
+ },
+ "_doc": "Rooms of the three worlds, ported from the HTML demo (web/demo). Owner of the format: Sufi. shape: rect/ell/oct/hex/trap/poly in a 320x180 room; cell = grid cell in the Godot world; map = position on the demo overview map (aims the doors); props = [kind, u, v, w, h]; stations: u,v in -1..1, role = only that role can use it, seat = one of the 4 hold spots; info = [subtitle, fact]."
+}
