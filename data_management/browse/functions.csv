@@ -1,0 +1,13 @@
+id,name,category,plain_text,importance
+ice_finder,Ice Finder,science,Finds frozen water hidden in soil or under the surface.,"Water ice means drinking water, rocket fuel and oxygen for future bases."
+ozone_mapper,Ozone Mapper,science,Maps the ozone layer by measuring how much ultraviolet light the air absorbs.,"Ozone shields life from UV, so it shows how safe a world's surface is."
+air_sniffer,Air Sniffer,science,Measures which gases are in an atmosphere and how they change with height.,"Air makeup decides if a world can be breathed, and how it loses gas to space."
+chemistry_lab,Chemistry Lab,science,"Analyzes rock, soil or gas samples to find which elements and minerals are in them.",Chemistry tells us if a place ever had water and if it could host life.
+radiation_meter,Radiation Meter,science,Counts harmful particles from the Sun and deep space.,Astronauts and electronics need to know how much radiation they will face.
+oxygen_maker,Oxygen Maker,technology,Turns carbon dioxide from the air into breathable oxygen.,Making oxygen on site means crews do not have to carry all of it from Earth.
+camera,Camera,imaging,"Takes pictures in visible light of the ground, sky or the spacecraft itself.","Pictures pick landing sites, spot hazards and show the public what we found."
+heat_mapper,Heat Mapper,science,Measures surface temperature using infrared light.,Temperature shows where ice can survive and where a base could stay safe.
+shadow_imager,Shadow Imager,imaging,Sees into permanently dark craters using faint starlight or ultraviolet light.,"Ice hides in places the Sun never reaches, so we need a way to look inside."
+terrain_mapper,Terrain Mapper,science,"Measures heights to build 3D maps of hills, craters and valleys.",Maps make safe landing and driving routes.
+drill,Rock Grinder,technology,Grinds or digs into a rock so instruments can study fresh material.,"Weathered surfaces hide the real chemistry, so you must get below them."
+seismic_probe,Interior Probe Kit,science,Listens for quakes and measures heat flow to learn what a planet is like inside.,The inside tells us how a planet formed and whether it is still active.
