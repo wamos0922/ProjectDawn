@@ -636,33 +636,114 @@ func _refresh_hud() -> void:
 			ui.hint.text = "[%s] %s%s" % [key, a["label"], who]
 
 
+# ---------------------------------------------------------------- mission details panel (J)
+## Tables: NOW/WHERE, ozone bar, time/posters/optional, one row per crew member, shared jobs.
+## Built once when J is pressed (a snapshot). The clock is kept running by _refresh_panel_clock().
+
+const MP_AMBER := "#feae34"
+const MP_GREY := "#8b9bb4"
+const MP_GREEN := "#63c74d"
+const MP_HEAD := "#1b1e33"        ## table header cell background
+const MP_ROW := "#262b44"         ## table body cell background
+const MP_YOU := "#3a4466"         ## the row of the crew member you control
+const MP_LINE := "#3a4466"        ## table cell border
+
 func open_mission_panel() -> void:
 	if ui.panel_open():
 		ui.close_panel()
 		return
-	var box: VBoxContainer = ui.panel(Color("#262b44"), WD.PAL["amber"], 820, 50)
-	var ob := objective()
-	var w: String = S["world"]
-	var place_name: String = {"earth": "EARTH · BUNKER 4", "moon": "MOON · SHACKLETON OUTPOST", "mars": "MARS · JEZERO BASE"}[w]
-	var bb := "[b][color=#feae34]MISSION DETAILS[/color][/b]\n"
-	bb += "[color=#feae34]THE BIG GOAL[/color]\nHelp the ozone layer heal itself, and keep everyone alive until it does.\n"
-	bb += "[b]OZONE %d%%[/b]  [color=#8b9bb4](healed at 100%%)[/color]\n\n" % S["ozone"]
-	bb += "[color=#feae34]ACT %d · %s[/color]\n%s\n" % [act_number(), place_name, ob["text"]]
-	if ob.get("room", "") != "":
-		bb += "[color=#8b9bb4]Where:[/color] [b]%s[/b]  [color=#8b9bb4](follow the blinking yellow door)[/color]\n" % WD.room(ob["room"])["name"]
-	bb += "\n[color=#feae34]WHO DOES WHAT[/color]\n"
 	var work: Array = story.work_list() if story and story.has_method("work_list") else []
+	var box: VBoxContainer = ui.panel(Color("#262b44"), WD.PAL["amber"], 860, 36)
+	box.add_theme_constant_override("separation", 10)
+	ui.title(box, "MISSION DETAILS", Color(MP_AMBER), 20)
+	ui.rich(box, _mission_top_bb(), 16)
+	# ozone row: label + bar + number
+	var orow: HBoxContainer = ui.row(box)
+	var o_name: Label = ui.title(orow, "OZONE", Color(MP_AMBER), 12)
+	o_name.autowrap_mode = TextServer.AUTOWRAP_OFF
+	var bar := ProgressBar.new()
+	bar.max_value = 100.0
+	bar.value = S["ozone"]
+	bar.show_percentage = false
+	bar.custom_minimum_size = Vector2(0, 16)
+	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	orow.add_child(bar)
+	var o_val: Label = ui.title(orow, "%d%%  ·  %d DU" % [S["ozone"], Designers.du(S["ozone"])], Color.WHITE, 12)
+	o_val.autowrap_mode = TextServer.AUTOWRAP_OFF
+	ui.rich(box, _mission_bottom_bb(work), 16)
+	ui.button(box, "CLOSE", ui.close_panel)
+
+
+## Table header cell.
+func _mp_th(text: String) -> String:
+	return "[cell bg=%s border=%s padding=8,5,8,5][color=%s]%s[/color][/cell]" % [MP_HEAD, MP_LINE, MP_GREY, text]
+
+
+## Table body cell. Same font as the header so every cell in a row lines up.
+func _mp_td(text: String, bg := MP_ROW) -> String:
+	return "[cell bg=%s border=%s padding=8,5,8,5]%s[/cell]" % [bg, MP_LINE, text]
+
+
+## Top block: which act and place, what to do now, and where.
+func _mission_top_bb() -> String:
+	var ob := objective()
+	var place_name: String = {"earth": "EARTH · BUNKER 4", "moon": "MOON · SHACKLETON OUTPOST", "mars": "MARS · JEZERO BASE"}[S["world"]]
+	var bb := "[color=%s][b]ACT %d · %s[/b][/color]\n" % [MP_AMBER, act_number(), place_name]
+	bb += "[table=2]"
+	bb += _mp_th("NOW") + _mp_td("[color=#ffffff]%s[/color]" % ob["text"])
+	if ob.get("room", "") != "":
+		var rn := String(WD.room(ob["room"]).get("name", "")).replace("\n", " ")
+		bb += _mp_th("WHERE") + _mp_td("[color=#ffffff]%s[/color]  [color=%s](follow the blinking yellow door)[/color]" % [rn, MP_GREY])
+	bb += "[/table]"
+	return bb
+
+
+## Bottom block: progress numbers, one table row per crew member, shared jobs, big goal, keys.
+func _mission_bottom_bb(work: Array) -> String:
+	var bb := "[table=3]"
+	bb += _mp_th("TIME") + _mp_th("POSTERS FOUND") + _mp_th("OPTIONAL MISSIONS")
+	bb += _mp_td(WD.clock_text(game_minutes())) + _mp_td("%d / 21" % found.size()) + _mp_td("%d" % S["opt"].size())
+	bb += "[/table]\n"
+	bb += "\n[color=%s][b]CREW[/b][/color]\n" % MP_AMBER
+	bb += "[table=4]"
+	bb += _mp_th("ROLE") + _mp_th("CONTROL") + _mp_th("LOCATION") + _mp_th("JOB")
+	var shared := []
+	for j in work:
+		if j["role"] == "" and not shared.has(_mission_job_text(j)):
+			shared.append(_mission_job_text(j))
 	for r in ROLES:
 		var p = crew.get(r)
 		var here := WD.room_at(p.position) if is_instance_valid(p) else ""
-		var jobs := work.filter(func(j): return j["role"] == r or j["role"] == "")
-		var job_txt := "; ".join(jobs.map(func(j): return "%s · %s" % [j["what"], WD.room(j["room"]).get("name", "")])) if not jobs.is_empty() else "Nothing waiting. Help the others."
-		var tag := " (you)" if p == camera.target else ((" (autopilot)" if crew_ctl.autopilot else " (waiting)") if is_ai(r) else " (online player)")
-		bb += "[color=#%s][b]%s%s[/b][/color] · in %s · %s\n" % [RoleSprites.TAGS[r].to_html(false), RoleSprites.NAMES[r], tag, WD.room(here).get("name", "?"), job_txt]
-	bb += "\n[color=#feae34]PROGRESS[/color]\n%s · Posters found: %d/21 · Optional missions: %d\n" % [WD.clock_text(game_minutes()), found.size(), S["opt"].size()]
-	bb += "[color=#8b9bb4]J or Esc closes this panel. TAB switch crew · F crew follow you · C CERES autopilot (%s)[/color]" % ("on" if crew_ctl.autopilot else "off")
-	ui.rich(box, bb, 16)
-	ui.button(box, "CLOSE", ui.close_panel)
+		var where_txt := String(WD.room(here).get("name", "?")).replace("\n", " ")
+		var mine := work.filter(func(j): return j["role"] == r).map(_mission_job_text)
+		var job_txt := "\n".join(mine) if not mine.is_empty() else ("[color=%s]Free · take a shared job[/color]" % MP_GREY if not shared.is_empty() else "[color=%s]Nothing waiting[/color]" % MP_GREY)
+		var control := "[color=%s]AUTOPILOT[/color]" % MP_GREY
+		if p == camera.target:
+			control = "[color=%s]YOU[/color]" % MP_GREEN
+		elif not is_ai(r):
+			control = "[color=#2ce8f5]ONLINE PLAYER[/color]"
+		elif not crew_ctl.autopilot:
+			control = "[color=%s]WAITING[/color]" % MP_GREY
+		var bg := MP_YOU if p == camera.target else MP_ROW
+		var role_txt := "[color=#%s]%s[/color]" % [RoleSprites.TAGS[r].to_html(false), RoleSprites.NAMES[r]]
+		bb += _mp_td(role_txt, bg) + _mp_td(control, bg) + _mp_td(where_txt, bg) + _mp_td(job_txt, bg)
+	bb += "[/table]\n"
+	if not shared.is_empty():
+		bb += "[color=%s][b]ANYONE CAN[/b][/color]  %s\n" % [MP_AMBER, "   ·   ".join(shared)]
+	bb += "\n[font_size=16][color=%s]BIG GOAL · Help the ozone layer heal itself (100%% = healed), and keep everyone alive until it does.\n" % MP_GREY
+	bb += "J or Esc closes this panel · TAB switch crew · F crew follow you · C CERES autopilot (%s)[/color][/font_size]" % ("on" if crew_ctl.autopilot else "off")
+	return bb
+
+
+## "OPEN MISSION BOARD · MISSION CONTROL", with a green DONE for finished jobs.
+func _mission_job_text(j: Dictionary) -> String:
+	var what := String(j["what"])
+	var done := what.ends_with(" (done)")
+	what = what.trim_suffix(" (done)")
+	var rn := String(WD.room(j["room"]).get("name", "")).replace("\n", " ")
+	var s := what if rn == "" else "%s · %s" % [what, rn]
+	return s + ("  [color=%s][b]DONE[/b][/color]" % MP_GREEN if done else "")
 
 
 # ---------------------------------------------------------------- posters
