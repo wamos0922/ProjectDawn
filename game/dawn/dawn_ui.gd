@@ -295,10 +295,14 @@ func dialogue_open() -> bool:
 
 
 func advance() -> void:
+	game.advance_dialogue_all()
+
+
+func advance_local() -> void:
 	if not _dlg.visible:
 		return
 	if _dlg_text.visible_characters >= 0 and _dlg_text.visible_characters < _full.length():
-		_dlg_text.visible_characters = -1          # first press shows the whole line
+		_dlg_text.visible_characters = -1
 		_dlg_cont.visible = true
 		return
 	_queue.pop_front()
@@ -460,7 +464,23 @@ func task(t: String, text: String, btn: String, secs: float, on_done: Callable, 
 
 
 ## choices: [{label, sub, fn}]
+## Review mode (F8): if one choice is marked "best", show a placeholder with COMPLETE that picks it.
 func choice(t: String, text: String, choices: Array, tag := "") -> void:
+	var best := choices.filter(func(c): return c.get("best", false))
+	if not best.is_empty() and game and game.Minigames.review_mode():
+		var pb := panel()
+		if tag != "":
+			title(pb, tag, Color("#f6757a"), 11)
+		title(pb, t)
+		rich(pb, "[color=#fee761]REVIEW MODE[/color] · placeholder question. COMPLETE picks the right answer: [b]%s[/b]. [color=#8b9bb4](F8 turns review mode off.)[/color]" % best[0]["label"], 19)
+		var pr := row(pb)
+		var fn_best: Callable = best[0]["fn"]
+		var go := button(pr, "COMPLETE  ▸▸", func():
+			close_panel()
+			fn_best.call())
+		button(pr, "LATER", close_panel, false)
+		go.grab_focus.call_deferred()
+		return
 	var box := panel()
 	if tag != "":
 		title(box, tag, Color("#f6757a"), 11)

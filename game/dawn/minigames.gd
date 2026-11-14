@@ -8,6 +8,10 @@ extends RefCounted
 ##   wind    pick a launch hour                        scan     neutron scan for ice
 ##   wires   match cable colours                        wipe     brush dust off solar panels
 ##   pack    fit cargo under a mass limit               pick     choose the right picture card
+##
+## REVIEW MODE (for the team, to play through the acts fast): F8 in game, or Esc > SETTINGS.
+## While it is on, every minigame opens a placeholder panel with one COMPLETE button that wins
+## at once (same on_win, so the task is recorded exactly like a real win). Per computer.
 
 const WD := preload("res://game/dawn/world_data.gd")
 const RoleSprites := preload("res://game/player/role_sprites.gd")
@@ -66,6 +70,42 @@ class Game extends RefCounted:
 		return is_instance_valid(box) and box.is_inside_tree()
 
 
+# ---------------------------------------------------------------- review mode (placeholder)
+
+const REVIEW_META := "review_mode"
+
+
+## Stored on the Network autoload so it survives scene changes (looked up at run time, so
+## scripts that load this file before autoloads exist, like tests/run_tests.gd, still compile).
+static func _net() -> Node:
+	var tree := Engine.get_main_loop() as SceneTree
+	return tree.root.get_node_or_null("Network") if tree else null
+
+
+static func review_mode() -> bool:
+	var n := _net()
+	return n != null and bool(n.get_meta(REVIEW_META, false))
+
+
+static func set_review_mode(on: bool) -> void:
+	var n := _net()
+	if n:
+		n.set_meta(REVIEW_META, on)
+
+
+## In review mode: show the placeholder instead of the real minigame and return true.
+func _review(role: String, title: String, on_win: Callable) -> bool:
+	if not review_mode():
+		return false
+	var M := _open(role, title, "[color=#fee761]REVIEW MODE[/color] · placeholder minigame. The real one is skipped; press COMPLETE to finish this task. [color=#8b9bb4](F8 or Esc > SETTINGS turns review mode off.)[/color]")
+	var b: Button = g.ui.button(M.foot, "COMPLETE  ▸▸", func():
+		g.ui.close_panel()
+		on_win.call())
+	M.foot.move_child(b, 0)
+	b.grab_focus.call_deferred()
+	return true
+
+
 func _open(role: String, title: String, text: String) -> Game:
 	var M := Game.new()
 	M.g = g
@@ -101,6 +141,8 @@ func _foot_button(M: Game, text: String, fn: Callable) -> Button:
 # 1) TIMING ------------------------------------------------------------------
 ## bands: [{a, b, c (Color), label}], target: [a, b] in 0..1
 func timing(role: String, title: String, text: String, target: Array, on_win: Callable, opts := {}) -> void:
+	if _review(role, title, on_win):
+		return
 	var M := _open(role, title, text)
 	var bands: Array = opts.get("bands", [])
 	var hits: int = opts.get("hits", 3)
@@ -158,6 +200,8 @@ func _rt(bb: String, size := 16) -> RichTextLabel:
 # 2) SLIDERS -----------------------------------------------------------------
 ## sliders: [{label, min, max, step, val, unit}], evaluate(vals) -> {ok, meter, read, why}
 func sliders(role: String, title: String, text: String, sl: Array, evaluate: Callable, on_win: Callable, fact := "", btn := "LOCK IN") -> void:
+	if _review(role, title, on_win):
+		return
 	var M := _open(role, title, text)
 	var vals := sl.map(func(s): return float(s["val"]))
 	var read := _rt("", 18)
@@ -212,6 +256,8 @@ func sliders(role: String, title: String, text: String, sl: Array, evaluate: Cal
 
 # 3) FUEL BURN -----------------------------------------------------------------
 func fuel(role: String, title: String, text: String, need: int, on_win: Callable, fact := "") -> void:
+	if _review(role, title, on_win):
+		return
 	var M := _open(role, title, text)
 	var st := {"lo": 100, "hi": 700}
 	var row := HBoxContainer.new()
@@ -256,6 +302,8 @@ func fuel(role: String, title: String, text: String, need: int, on_win: Callable
 # 4) ORBIT ---------------------------------------------------------------------
 ## mode "perigee": launch when the Moon is closest · mode "phase": launch when Earth is ~75° behind Mars
 func orbit(role: String, title: String, text: String, mode: String, on_win: Callable, fact := "") -> void:
+	if _review(role, title, on_win):
+		return
 	var M := _open(role, title, text)
 	var st := {"th": randf() * TAU, "te": randf() * TAU, "tm": randf() * TAU, "ok": false, "km": 0}
 	var read := _rt("", 18)
@@ -328,6 +376,8 @@ static func _thousands(n: int) -> String:
 
 # 5) WIND ----------------------------------------------------------------------
 func wind(role: String, on_win: Callable) -> void:
+	if _review(role, "PICK THE LAUNCH HOUR", on_win):
+		return
 	var M := _open(role, "PICK THE LAUNCH WINDOW", "Rockets scrub launches in strong wind. Pick an hour in daylight (06–18) with wind under 20 km/h and no UV storm forecast.")
 	var hrs := []
 	var good := 0
@@ -364,6 +414,8 @@ func wind(role: String, on_win: Callable) -> void:
 
 # 6) NEUTRON SCAN --------------------------------------------------------------
 func scan(role: String, on_win: Callable, on_fail: Callable) -> void:
+	if _review(role, "NEUTRON SCAN FOR ICE", on_win):
+		return
 	var M := _open(role, "NEUTRON SCAN", "Hydrogen soaks up neutrons, so the ice is where the count is LOWEST. You have 6 scans. Shadowed cells are darker.")
 	var ice := Vector2i(randi() % 2, 1 + randi() % 3)
 	var st := {"left": 6}
@@ -409,6 +461,8 @@ func scan(role: String, on_win: Callable, on_fail: Callable) -> void:
 
 # 7) WIRES ---------------------------------------------------------------------
 func wires(role: String, title: String, text: String, on_win: Callable) -> void:
+	if _review(role, title, on_win):
+		return
 	var M := _open(role, title, text)
 	var cols := [P["red"], P["yellow"], P["sky"], P["pink"]]
 	var right := [0, 1, 2, 3]
@@ -472,6 +526,8 @@ func wires(role: String, title: String, text: String, on_win: Callable) -> void:
 
 # 8) WIPE ----------------------------------------------------------------------
 func wipe(role: String, on_win: Callable) -> void:
+	if _review(role, "CLEAN THE SOLAR PANELS", on_win):
+		return
 	var M := _open(role, "CLEAN THE PANELS", "Drag across the panels (or press BRUSH) to sweep the dust off. Dusty panels make far less power.")
 	var dust := []
 	for i in 9 * 20:
@@ -520,6 +576,8 @@ func wipe(role: String, on_win: Callable) -> void:
 # 9) PACK ----------------------------------------------------------------------
 ## items: [{n, kg, req}]
 func pack(role: String, title: String, text: String, items: Array, cap: int, on_win: Callable, opts := {}) -> void:
+	if _review(role, title, on_win):
+		return
 	var M := _open(role, title, text)
 	var min_kg: int = opts.get("min", 0)
 	var sel := {}
@@ -572,6 +630,8 @@ func pack(role: String, title: String, text: String, items: Array, cap: int, on_
 # 10) PICK ---------------------------------------------------------------------
 ## cards: [{label, sub, draw (fn(canvas, rect)), ok, why}]
 func pick(role: String, title: String, text: String, cards: Array, on_win: Callable, opts := {}) -> void:
+	if _review(role, title, on_win):
+		return
 	var M := _open(role, title, text)
 	var multi: int = opts.get("multi", 1)
 	var st := {"got": 0}

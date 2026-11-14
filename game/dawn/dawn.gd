@@ -21,6 +21,7 @@ const Designers := preload("res://game/dawn/designers.gd")
 const Crew := preload("res://game/dawn/crew.gd")
 const WorldMap := preload("res://game/dawn/world_map.gd")
 const EscMenu := preload("res://game/dawn/esc_menu.gd")
+const Minigames := preload("res://game/dawn/minigames.gd")
 const STORY_PATH := "res://game/dawn/story.gd"
 const LOBBY := "res://game/dawn/title.tscn"
 const POSTERS_FILE := "res://data/posters.json"
@@ -175,6 +176,9 @@ func _req_act(id: String, p: Dictionary, role: String) -> void:
 	if not Network.is_host():
 		return
 	var sender := multiplayer.get_remote_sender_id()
+	if id in ["skip_intro", "wake_start"]:
+		_do_act(id, p, role)
+		return
 	if crew_ctl.owner_peer(role) != sender and crew_ctl.is_person(role):
 		return                      # you may act for your own role or for a role nobody plays
 	_do_act(id, p, role)
@@ -187,6 +191,12 @@ func _do_act(id: String, p: Dictionary, role: String) -> void:
 		S["suits"][role] = bool(p.get("on", false))
 		if story and story.has_method("on_suit"):
 			story.on_suit(role)
+		commit()
+	elif id == "skip_intro":
+		S["intro_skipped"] = true
+		commit()
+	elif id == "wake_start":
+		S["wake_started"] = true
 		commit()
 	elif story:
 		story.do_effect(id, p, role)
@@ -207,6 +217,10 @@ func _apply_state(s: Dictionary) -> void:
 	var old_world := _shown_world
 	var old_scene := _shown_scene
 	S = s
+	if S.get("intro_skipped", false) and story and story.sui:
+		story.sui.skip_intro_for_all()
+	if S.get("wake_started", false) and story and story.sui:
+		story.sui.start_wake_for_all()
 	_shown_world = S["world"]
 	_shown_scene = S["scene"]
 	for r in crew:
@@ -236,6 +250,57 @@ func say_all(lines: Array) -> void:
 		_say.rpc(lines)
 	else:
 		_say(lines)
+		
+func advance_dialogue_all() -> void:
+	if not Network.is_online():
+		ui.advance_local()
+	elif Network.is_host():
+		_advance_dialogue.rpc()
+	else:
+		_request_advance_dialogue.rpc_id(1)
+
+
+@rpc("any_peer", "reliable")
+func _request_advance_dialogue() -> void:
+	if Network.is_host():
+		_advance_dialogue.rpc()
+
+
+@rpc("authority", "call_local", "reliable")
+func _advance_dialogue() -> void:
+	ui.advance_local()
+
+## Start the hangar-door scene on every connected player's screen.
+func request_wake_step(step: int) -> void:
+	if step not in [0, 1, 2, 4]:
+		return
+
+	if not Network.is_online():
+		_wake_step_all(step)
+	elif Network.is_host():
+		_wake_step_all.rpc(step)
+	else:
+		_request_wake_step.rpc_id(1, step)
+
+
+@rpc("any_peer", "reliable")
+func _request_wake_step(step: int) -> void:
+	if not Network.is_host():
+		return
+	if step not in [0, 1, 2, 4]:
+		return
+
+	_wake_step_all.rpc(step)
+
+
+@rpc("authority", "call_local", "reliable")
+func _wake_step_all(step: int) -> void:
+	if step not in [0, 1, 2, 4]:
+		return
+	if story == null or story.sui == null:
+		return
+
+	story.sui._run_wake_step(step)
 
 
 @rpc("authority", "call_local", "reliable")
@@ -523,10 +588,19 @@ func _unhandled_input(event: InputEvent) -> void:
 		ui.close_panel()
 	elif k == KEY_ESCAPE and not ui.dialogue_open():
 		esc_menu.open()
+	elif k == KEY_F8:
+		toggle_review_mode()
 	elif not Network.is_online() and k in [KEY_F9, KEY_F10, KEY_F11]:
 		S["world"] = {KEY_F9: "earth", KEY_F10: "moon", KEY_F11: "mars"}[k]
 		commit()
 		ui.toast("Debug: jumped to " + S["world"].to_upper())
+
+
+## Review mode (team testing): every minigame becomes a one-click placeholder. Per computer.
+func toggle_review_mode() -> void:
+	var on := not Minigames.review_mode()
+	Minigames.set_review_mode(on)
+	ui.toast("REVIEW MODE ON: minigames are one-click placeholders (F8 to turn off)" if on else "Review mode off: real minigames", 3.0)
 
 
 # ---------------------------------------------------------------- locks
