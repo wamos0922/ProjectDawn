@@ -440,7 +440,7 @@ func role_task(k: String) -> Dictionary:
 	if w == "earth":
 		var st: int = s["step"]
 		if (st == 1 or st == 2) and k == "shop":
-			return {"label": "REBUILD THE ROCKET" if task_done("build") else "BUILD THE ROCKET", "role": "eng", "fn": sui.workshop}
+			return {"label": "REBUILD THE ROCKET" if task_done("build") else "BUILD THE ROCKET", "role": "eng", "fn": _workshop}
 		if st == 1 and k == "ozone" and not task_done("uvcal"):
 			return {"label": "CALIBRATE UV SENSOR", "role": "sci", "fn": func(): mg.timing("sci", "CALIBRATE THE UV SENSOR", "Stop the scanner inside the UV-B band three times. UV-B is the part of sunlight the ozone layer should block, and it causes sunburn.", [0.3, 0.475], _send("uvcal"), {"bands": UVB, "fact": "Ozone absorbs almost all UV-C and most UV-B."})}
 		if st == 1 and k == "nav" and not task_done("wind"):
@@ -541,7 +541,7 @@ func _base_action(k: String) -> Dictionary:
 			if k == "mc" and st == 0:
 				return {"label": "OPEN MISSION BOARD", "fn": sui.mission_board}
 			if k == "shop" and (st == 1 or st == 2):
-				return {"label": "BUILD THE ROCKET", "role": "eng", "fn": sui.workshop}
+				return {"label": "BUILD THE ROCKET", "role": "eng", "fn": _workshop}
 			if k == "mc" and st == 2:
 				return {"label": "READINESS REVIEW", "fn": func(): g.ui.toast("All four crew must stand on their own consoles in this room at the same time.", 3.2)}
 			if k == "pad" and st == 3:
@@ -569,7 +569,7 @@ func _base_action(k: String) -> Dictionary:
 			if k == "science" and m == 1:
 				return {"label": "SCAN FOR ICE", "role": "sci", "fn": func():
 					var ch := [{"label": "Sunlit crater rim", "sub": "Warm sunlight all day", "fn": _act("scan", {"ok": 0})},
-						{"label": "Shadowed crater floor", "sub": "Never sees the Sun", "fn": _act("scan", {"ok": 1})},
+						{"label": "Shadowed crater floor", "sub": "Never sees the Sun", "fn": _act("scan", {"ok": 1}), "best": true},
 						{"label": "Open lava plain", "sub": "Flat and sunny", "fn": _act("scan", {"ok": 0})}]
 					ch.shuffle()
 					g.ui.choice("WHERE IS THE ICE?", "Three spots on the orbiter map. Pick the one where water ice can survive. Wrong picks cost ozone.", ch)}
@@ -583,7 +583,7 @@ func _base_action(k: String) -> Dictionary:
 				return {"label": "PLAN THE SHIELD", "role": "eng", "fn": func():
 					g.ui.choice("HOW MANY SHIELD SATELLITES?", "More satellites block more UV but take longer to build.", [
 						{"label": "2 satellites", "sub": "Fast · about 20% cover", "fn": _act("sats", {"n": 2})},
-						{"label": "4 satellites", "sub": "Balanced · about 30% cover", "fn": _act("sats", {"n": 4})},
+						{"label": "4 satellites", "sub": "Balanced · about 30% cover", "fn": _act("sats", {"n": 4}), "best": true},
 						{"label": "6 satellites", "sub": "Slow · about 40% cover", "fn": _act("sats", {"n": 6})}])}
 			if k == "tele" and m >= 7 and not has_opt("G"):
 				return {"label": "TRACK THE ASTEROID", "role": "nav", "fn": func(): _quiz("OPTIONAL G", "PLANETARY DEFENSE", "An asteroid is heading for Earth. How do we stop it?", [
@@ -619,23 +619,45 @@ func _base_action(k: String) -> Dictionary:
 			if k == "fuel" and rs == 5:
 				return {"label": "FUEL THE ROCKET", "role": "nav", "fn": func():
 					var ch := [{"label": "Light load", "sub": "Cheaper and lighter", "fn": _act("fuel", {"k": "light"})},
-						{"label": "Medium load", "sub": "Our best estimate", "fn": _act("fuel", {"k": "medium"})},
+						{"label": "Medium load", "sub": "Our best estimate", "fn": _act("fuel", {"k": "medium"}), "best": true},
 						{"label": "Full tanks", "sub": "Safe but heavy", "fn": _act("fuel", {"k": "full"})}]
 					g.ui.choice("HOW MUCH FUEL?", "The exact amount is hidden. Mars gravity is about a third of Earth's. Too little fails and costs ozone.", ch)}
 			if k == "vent" and rs >= 2 and not has_opt("J"):
 				return {"label": "INVESTIGATE METHANE", "role": "sci", "fn": func():
 					g.ui.choice("THE MARS MYSTERY", "A strange methane signal. Sterilize the probe first?", [
-						{"label": "Sterilize, then sample", "sub": "Slower, cleaner", "fn": _act("opt", {"k": "J"})},
+						{"label": "Sterilize, then sample", "sub": "Slower, cleaner", "fn": _act("opt", {"k": "J"}), "best": true},
 						{"label": "Sample right away", "sub": "Faster", "fn": func(): g.ui.info("CONTAMINATION!", "An exciting reading... from our own Earth bacteria on the probe. Try again, sterilized.")}], "OPTIONAL J")}
 	return {}
 
 
 ## Things to look at when there is nothing to do in a room (no state changes).
+## Engineer's rocket workshop. Review mode (F8): a placeholder whose COMPLETE locks the first
+## rocket design that meets every requirement.
+func _workshop() -> void:
+	if not Minigames.review_mode():
+		sui.workshop()
+		return
+	var d := passing_design()
+	g.ui.choice("BUILD THE ROCKET", "Engineer's workshop.", [
+		{"label": "Lock a working design", "sub": "%s motor%s" % [d["motor"], "".join(["uv", "cam", "chute", "radio"].filter(func(k): return d[k]).map(func(k): return ", " + k))],
+			"best": true, "fn": func(): g.act("design", {"d": d}, "eng")}], "ENGINEER TASK")
+
+
+## The first rocket design (small motor first, fewest parts first) that passes every check.
+static func passing_design() -> Dictionary:
+	for motor in ["small", "big"]:
+		for mask in 16:
+			var d := {"motor": motor, "uv": mask & 1 != 0, "cam": mask & 2 != 0, "chute": mask & 4 != 0, "radio": mask & 8 != 0}
+			if calc(d)["all"]:
+				return d
+	return {"motor": "big", "uv": true, "cam": false, "chute": true, "radio": false}
+
+
 ## A quick choice with a consequence: the right answer does the job, a wrong one explains why and counts as a mistake.
 func _quiz(tag: String, title: String, text: String, choices: Array, on_right: Callable) -> void:
 	var ch := []
 	for c in choices:
-		ch.append({"label": c["label"], "sub": c.get("sub", ""), "fn": func():
+		ch.append({"label": c["label"], "sub": c.get("sub", ""), "best": c.get("ok", false), "fn": func():
 			if c.get("ok", false):
 				on_right.call()
 			else:
