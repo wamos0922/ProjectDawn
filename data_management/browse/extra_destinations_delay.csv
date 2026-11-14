@@ -1,0 +1,2 @@
+id,delay_min_minutes,delay_max_minutes,source_url,flags
+mars,4.4,21.0,https://nssdc.gsfc.nasa.gov/planetary/factsheet/,delay_min_minutes=DERIVED;delay_max_minutes=DERIVED

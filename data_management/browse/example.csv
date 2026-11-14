@@ -1,0 +1,2 @@
+id,name,mass_kg,power_w,data_rate_mbps,source_url,retrieved,flags,notes
+camera_visible,Visible camera,1.2,5,10,https://example.org/page,2026-11-14,mass_kg=REAL;power_w=REAL;data_rate_mbps=REAL,

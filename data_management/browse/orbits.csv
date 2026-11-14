@@ -1,0 +1,7 @@
+id,name,body,altitude_km,period_min,source_url,retrieved,flags,notes
+leo_400,Low Earth Orbit,earth,400,92.6,https://nssdc.gsfc.nasa.gov/planetary/factsheet/,2026-11-14,altitude_km=PROTOTYPE;period_min=DERIVED,
+meo_20200,Medium Earth Orbit,earth,20200,718.8,https://nssdc.gsfc.nasa.gov/planetary/factsheet/,2026-11-14,altitude_km=PROTOTYPE;period_min=DERIVED,
+geo_35786,Geostationary Orbit,earth,35786,1436.4,https://nssdc.gsfc.nasa.gov/planetary/factsheet/,2026-11-14,altitude_km=PROTOTYPE;period_min=DERIVED,
+lunar_100,Low Lunar Orbit,moon,100,118.2,https://nssdc.gsfc.nasa.gov/planetary/factsheet/,2026-11-14,altitude_km=PROTOTYPE;period_min=DERIVED,
+mars_400,Low Mars Orbit,mars,400,118.3,https://nssdc.gsfc.nasa.gov/planetary/factsheet/,2026-11-14,altitude_km=PROTOTYPE;period_min=DERIVED,
+suborbital_150,Suborbital,earth,150,,https://www.nasa.gov/wp-content/uploads/2023/09/sounding-rocket-program-handbook.pdf,2026-11-14,altitude_km=PROTOTYPE;period_min=DERIVED,
