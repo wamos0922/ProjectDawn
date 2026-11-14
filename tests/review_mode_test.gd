@@ -85,7 +85,48 @@ func _process(_d):
 			b.pressed.emit()
 	ok(hits["n"] == 6, "scan, wipe, wires, pick, pack, sliders: all placeholders win (%d/6)" % hits["n"])
 
-	# 5. Esc > SETTINGS shows the switch, and it turns review mode off
+	# 5. the Engineer's rocket workshop: COMPLETE locks a design that passes every check
+	g.S["world"] = "earth"; g.S["step"] = 1; g.S["tasks"] = {}; g.S["pen"] = 0
+	g.commit()
+	var shop: Dictionary = g.story.role_task("shop")
+	ok(not shop.is_empty() and shop.get("role") == "eng", "workshop is the Engineer's task")
+	if not shop.is_empty():
+		shop["fn"].call()
+	var wb := find("COMPLETE")
+	ok(wb != null, "workshop: placeholder with COMPLETE")
+	if wb:
+		wb.pressed.emit()
+	ok(g.S["tasks"].get("build", false) and g.story.calc(g.S["design"])["all"], "workshop: one click locks a rocket that passes every check")
+
+	# 6. question panels: COMPLETE picks the right answer, no penalty
+	var qs := [["moon", "ms", 1, "science", func(): return g.S["ms"] == 2, "WHERE IS THE ICE"],
+		["moon", "ms", 5, "factory", func(): return g.S["sats_chosen"], "HOW MANY SHIELD SATELLITES"],
+		["mars", "rs", 5, "fuel", func(): return g.S["pen"] == 0 and g.S["rs"] != 5, "HOW MUCH FUEL (last act)"],
+		["mars", "rs", 2, "vent", func(): return g.S["opt"].has("J"), "THE MARS MYSTERY (optional J)"],
+		["earth", "step", 4, "canopy", func(): return g.S["canopy"] or g.S["opt"].has("B"), "UV CANOPY quiz (optional B)"]]
+	for q in qs:
+		g.ui.close_panel()
+		g.S["world"] = q[0]; g.S["ms"] = 0; g.S["rs"] = 0; g.S["step"] = 0; g.S["pen"] = 0
+		g.S["opt"] = []; g.S["canopy"] = false; g.S["sats_chosen"] = false; g.S["storm"] = {}
+		g.S[q[1]] = q[2]
+		g.commit()
+		var a: Dictionary = g.story._base_action(q[3])
+		if a.is_empty():
+			ok(false, "%s: station action found" % q[5])
+			continue
+		a["fn"].call()
+		var qb := find("COMPLETE")
+		ok(qb != null and find("LATER") != null, "%s: placeholder with COMPLETE" % q[5])
+		if qb:
+			qb.pressed.emit()
+		ok(q[4].call() and g.S["pen"] == 0, "%s: right answer picked, no penalty" % q[5])
+
+	# 7. a story choice with no right answer (radiation burst) still shows the real buttons
+	g.ui.choice("TEST", "x", [{"label": "A", "fn": func(): pass}, {"label": "B", "fn": func(): pass}])
+	ok(find("COMPLETE") == null and find("A") != null, "choice without a right answer is unchanged")
+	g.ui.close_panel()
+
+	# 8. Esc > SETTINGS shows the switch, and it turns review mode off
 	g.esc_menu._settings()
 	var sw := find("REVIEW MODE: ON")
 	ok(sw != null, "Esc > SETTINGS shows REVIEW MODE: ON")

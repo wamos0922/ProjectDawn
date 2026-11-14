@@ -12,8 +12,12 @@ Done:
     (Network meta "review_mode"). Off by default: the real minigames are unchanged.
   - minigames.gd: _review() at the top of all 10 minigames (timing, sliders, fuel, orbit, wind, scan,
     wires, wipe, pack, pick). esc_menu.gd: the SETTINGS switch + F8 in CONTROLS.
-  - Not affected (they are not minigames): designers, choices, press-and-wait tasks, holds.
-- Test: tests/review_mode_test.gd (25 checks). All other suites pass.
+  - Also covered: the Engineer's rocket workshop (COMPLETE locks the first design that passes every
+    check) and question panels with a right answer (ice spot, shield satellites, Mars fuel, Mars mystery,
+    all optional quizzes): COMPLETE picks the right one (choices marked "best": true in story.gd).
+  - Not affected: the shield/power designers, story choices with no right answer (radiation burst),
+    press-and-wait tasks, holds.
+- Test: tests/review_mode_test.gd (39 checks). All other suites pass.
 
 ## 2026-11-14 · Wam (with Claude) · branch fix/playtest-round1
 Done:
