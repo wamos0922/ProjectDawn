@@ -176,7 +176,7 @@ func intro() -> void:
 	var skip := Button.new()
 	skip.text = "SKIP INTRO"
 	skip.theme_type_variation = "GhostButton"
-	skip.pressed.connect(_intro_done)
+	skip.pressed.connect(_request_skip_intro)
 	foot.add_child(skip)
 	var sp := Control.new()
 	sp.custom_minimum_size = Vector2(14, 0)
@@ -228,7 +228,13 @@ func _intro_next() -> void:
 	else:
 		_intro_show()
 
-
+func _request_skip_intro() -> void:
+	g.act("skip_intro", {}, g.acting_role())
+	
+func skip_intro_for_all() -> void:
+	if _intro_box != null:
+		_intro_done()
+		
 func _intro_done() -> void:
 	_intro_box = null
 	_close()
@@ -401,6 +407,12 @@ func wake() -> void:
 func _wake_start() -> void:
 	if _wk.is_empty() or _wk["phase"] != "black":
 		return
+	g.act("wake_start", {}, g.acting_role())
+
+
+func start_wake_for_all() -> void:
+	if _wk.is_empty() or _wk["phase"] != "black":
+		return
 	_wk["start"].queue_free()
 	_wk["phase"] = "wake"
 	_wk["alarm"] = true
@@ -502,27 +514,29 @@ func _wake_tick(delta: float) -> void:
 		if W8["wake_t"] >= 2.4:
 			W8["phase"] = "play"
 			W8["obj"].visible = true
+
 	W8["obj_l"].text = "▸ " + (WTXT[W8["step"]] if W8["step"] < WTXT.size() else "")
 	var p: Dictionary = W8["pl"]
+
+# Automatically walk to objectives that have a defined target.
 	if W8["phase"] == "play" and not g.ui.dialogue_open():
-		var dv := Input.get_vector("p1_left", "p1_right", "p1_up", "p1_down") + Input.get_vector("p2_left", "p2_right", "p2_up", "p2_down")
-		if dv != Vector2.ZERO:
+		var target = WOBJ.get(W8["step"])
+		if target != null:
+			p["tx"] = float(target["ax"])
+			p["ty"] = float(target["ay"])
+			p["sp"] = 58.0
+			p["arrive"] = Callable()
+		else:
 			p["tx"] = null
-			var n = dv.normalized() * p["sp"] * delta
-			p["x"] = clampf(p["x"] + n.x, 10, 310)
-			p["y"] = clampf(p["y"] + n.y, 108, 166)
-			p["m"] = true
-			if absf(dv.x) >= absf(dv.y):
-				p["d"] = "right" if dv.x > 0 else "left"
-			else:
-				p["d"] = "down" if dv.y > 0 else "up"
-		elif p.get("tx") == null:
 			p["m"] = false
+
 	if W8["phase"] == "play" or p.get("tx") != null:
 		_move(p, delta)
+
 	_move(W8["ce"], delta)
-	for o in W8["others"]:
-		_move(o, delta)
+	for crew_member in W8["others"]:
+		_move(crew_member, delta)
+
 	var ce: Dictionary = W8["ce"]
 	if ce["follow"] and W8["phase"] == "play":
 		var fx: float = p["x"] + (20 if p["d"] == "left" else -20)
@@ -531,12 +545,20 @@ func _wake_tick(delta: float) -> void:
 			ce["tx"] = clampf(fx, 10, 310)
 			ce["ty"] = clampf(fy, 108, 166)
 			ce["sp"] = 46.0
+
 	if W8["door_opening"] and W8["door_p"] < 1:
 		W8["door_p"] = minf(1.0, W8["door_p"] + delta / 1.6)
 	if W8["fading"] and W8["fade"] < 1:
 		W8["fade"] = minf(1.0, W8["fade"] + delta / 1.5)
+
 	var ob = WOBJ.get(W8["step"])
-	var near: bool = ob != null and W8["phase"] == "play" and W8["view"] == "" and absf(p["x"] - ob["ax"]) <= 16 and absf(p["y"] - ob["ay"]) <= 26
+	var near: bool = (
+		ob != null
+		and W8["phase"] == "play"
+		and W8["view"] == ""
+		and absf(p["x"] - ob["ax"]) <= 16
+		and absf(p["y"] - ob["ay"]) <= 26
+	)
 	var pr: Button = W8["prompt"]
 	pr.visible = near
 	if near:
@@ -548,18 +570,39 @@ func _wake_interact() -> void:
 	var W8 := _wk
 	if W8.is_empty():
 		return
+
 	var o = WOBJ.get(W8["step"])
 	if o == null or W8["phase"] != "play" or g.ui.dialogue_open():
 		return
+
 	var p: Dictionary = W8["pl"]
 	if not (absf(p["x"] - o["ax"]) <= 16 and absf(p["y"] - o["ay"]) <= 26):
 		return
+
 	W8["prompt"].visible = false
-	match W8["step"]:
-		0: _w_alarm()
-		1: _w_view("peri", "UV INDEX: EXTREME", [{"who": "ceres", "text": "A gamma-ray burst destroyed the ozone layer. Deadly UV now covers the surface."}], 2)
-		2: _w_view("net", "NETWORK: OFFLINE", [{"who": "ceres", "text": "Every bunker is alone. Nobody can go outside to fix the towers."}], 3)
-		4: _w_door()
+	g.request_wake_step(int(W8["step"]))
+	
+func _run_wake_step(step: int) -> void:
+	if _wk.is_empty():
+		return
+	if _wk["phase"] != "play" or _wk["step"] != step:
+		return
+	if g.ui.dialogue_open():
+		return
+
+	match step:
+		0:
+			_w_alarm()
+		1:
+			_w_view("peri", "UV INDEX: EXTREME",
+				[{"who": "ceres", "text": "A gamma-ray burst destroyed the ozone layer. Deadly UV now covers the surface."}],
+				2)
+		2:
+			_w_view("net", "NETWORK: OFFLINE",
+				[{"who": "ceres", "text": "Every bunker is alone. Nobody can go outside to fix the towers."}],
+				3)
+		4:
+			_w_door()
 
 
 func _w_alarm() -> void:

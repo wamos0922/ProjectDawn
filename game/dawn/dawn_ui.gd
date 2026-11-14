@@ -295,10 +295,14 @@ func dialogue_open() -> bool:
 
 
 func advance() -> void:
+	game.advance_dialogue_all()
+
+
+func advance_local() -> void:
 	if not _dlg.visible:
 		return
 	if _dlg_text.visible_characters >= 0 and _dlg_text.visible_characters < _full.length():
-		_dlg_text.visible_characters = -1          # first press shows the whole line
+		_dlg_text.visible_characters = -1
 		_dlg_cont.visible = true
 		return
 	_queue.pop_front()
