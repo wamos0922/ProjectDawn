@@ -10,7 +10,7 @@ extends RefCounted
 
 const ROLES := ["eng", "sci", "nav", "qm"]
 const NAMES := {"eng": "ENGINEER", "sci": "SCIENTIST", "nav": "NAVIGATOR", "qm": "QUARTERMASTER"}
-const TAGS := {"eng": Color("#f77622"), "sci": Color("#0099db"), "nav": Color("#b55088"), "qm": Color("#feae34")}
+const TAGS := {"eng": Color("#f77622"), "sci": Color("#e8ecf2"), "nav": Color("#4b6cb7"), "qm": Color("#feae34")}
 const FRAME := Vector2i(14, 20)
 const ROBOT_FRAME := Vector2i(16, 16)
 const ROWS := {"down": 0, "up": 1, "side": 2}
