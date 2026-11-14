@@ -160,6 +160,7 @@ func step(input: Vector2, delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if can_move and not ai and is_multiplayer_authority() and event.is_action_pressed(InputSetup.action(player_index, "interact")):
+		get_viewport().set_input_as_handled()     # one key press = one action (no double dialogue skip)
 		interact_requested.emit(self)
 		get_viewport().set_input_as_handled()
 
