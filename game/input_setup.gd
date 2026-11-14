@@ -16,6 +16,9 @@ const BINDINGS := {
 	3: {"up": KEY_KP_8, "down": KEY_KP_5, "left": KEY_KP_4, "right": KEY_KP_6, "interact": KEY_KP_0},
 }
 
+## Extra keys for player 1, so one person can use WASD or the arrow keys (like the HTML).
+const P1_EXTRA := {"up": KEY_UP, "down": KEY_DOWN, "left": KEY_LEFT, "right": KEY_RIGHT, "interact": KEY_ENTER}
+
 ## Labels for the HUD / tutorial.
 const LABELS := {0: "WASD + E", 1: "Arrows + /", 2: "IJKL + O", 3: "Numpad 8456 + 0"}
 
@@ -33,6 +36,12 @@ static func ensure() -> void:
 			if InputMap.has_action(name):
 				continue
 			InputMap.add_action(name, 0.2)
-			var ev := InputEventKey.new()
-			ev.physical_keycode = BINDINGS[p][verb]
-			InputMap.action_add_event(name, ev)
+			_add_key(name, BINDINGS[p][verb])
+			if p == 0:
+				_add_key(name, P1_EXTRA[verb])
+
+
+static func _add_key(action_name: String, key: int) -> void:
+	var ev := InputEventKey.new()
+	ev.physical_keycode = key
+	InputMap.action_add_event(action_name, ev)

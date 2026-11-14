@@ -317,15 +317,34 @@ func planet(kind: String, x: float, y: float, sz := 32.0) -> void:
 		r.call(10, 11, 8, 3, "burnt"); r.call(14, 19, 9, 2, "burnt"); r.call(13, 5, 6, 2, "white")
 
 
+## CERES, the bunker AI, as one robot everywhere (wake-up scene, dialogue portrait, rooms, map).
+## (cx, cy) = centre, r = size like the demo's drawCeres radius (5 map · 7 rooms · 11 portrait).
 func ceres(cx: float, cy: float, r: float, tt: float) -> void:
-	disc(cx, cy, r + 1, "ink")
-	disc(cx, cy, r, "grey")
-	disc(cx - 1, cy - 1, r - 2, "light")
+	var sc := maxf(0.5, roundf(r / 8.0 * 2.0) / 2.0)
 	var blink := int(tt * 1.3) % 5 == 0 and fmod(tt * 1.3, 1.0) < .25
-	R(cx - ceilf(r * .6), cy - 1, ceilf(r * 1.2), 3, "ink")
-	R(cx - ceilf(r * .45), cy, ceilf(r * .9), 1, "slate" if blink else "cyan")
-	R(cx, cy - r - 3, 1, 2, "steel")
-	R(cx - 1, cy - r - 4, 3, 1, "cyan" if int(tt * 3) % 2 else "sky")
+	cbot(cx, cy + 11.5 * sc, false, false, not blink, sc)
+
+
+## The CBOT robot body from the demo's Wake-Up scene (16 x 23 px at scale 1).
+## (fx, fy) = feet centre. flip = facing right. step = walking frame. screen_on = face lit.
+func cbot(fx: float, fy: float, flip: bool, step: bool, screen_on: bool, sc := 1.0) -> void:
+	var ox := roundf(fx - 8 * sc)
+	var oy := roundf(fy - (23 + (1 if step else 0)) * sc)
+	var parts := [[Color(0, 0, 0, .35), "3 22 12 1"], [Color("#101010"), "0 3 2 5"], [Color("#7a6048"), "0 4 1 3"], [Color("#101010"), "1 0 14 11"], [Color("#b8a47a"), "2 1 12 9"],
+		[Color("#8a7650"), "2 1 2 9"], [Color("#f0efb8"), "4 2 9 7"], [Color("#101010"), "6 11 5 1"], [Color("#101010"), "4 12 10 7"], [Color("#b8a47a"), "5 13 8 5"],
+		[Color("#f0efb8"), "7 14 4 3"], [Color("#d8d6a0"), "7 14 4 1"]]
+	if screen_on:
+		parts.append_array([[Color("#2e6b5c"), "5 3 7 5"], [Color("#1f4f44"), "5 3 7 1"], [Color("#f5e66a"), "6 4 1 2|10 4 1 2|6 6 1 1|10 6 1 1|7 7 3 1"]])
+	else:
+		parts.append([Color("#10231f"), "5 3 7 5"])
+	parts.append([Color("#101010"), "5 19 1 1|12 19 1 2|4 20 2 1|12 21 2 1" if step else "5 19 1 2|12 19 1 2|4 21 2 1|12 21 2 1"])
+	for part in parts:
+		for seg in String(part[1]).split("|"):
+			var q := seg.split(" ")
+			var x := float(q[0])
+			var w := float(q[2])
+			var lx := (16 - x - w) if flip else x
+			R(ox + lx * sc, oy + float(q[1]) * sc, maxf(1.0, w * sc), maxf(1.0, float(q[3]) * sc), part[0])
 
 
 ## drawRocket from the demo: (cx, base) = bottom centre of the motor.
@@ -371,15 +390,17 @@ func rocket(cx: float, base: float, d: Dictionary, tt: float, flame := false) ->
 
 
 ## A crew member from the sprite sheets, (x, y) = top-left, s = scale.
-func person(role: String, x: float, y: float, dir := "down", frame := 0, s := 1.0, suit := false) -> void:
+## robot = the Mars robot body (Acts 4-5); it is drawn at its own frame size, feet at y + 20 * s.
+func person(role: String, x: float, y: float, dir := "down", frame := 0, s := 1.0, suit := false, robot := false) -> void:
 	var anim := ("walk_" if frame > 0 else "idle_") + ("side" if dir == "left" or dir == "right" else dir)
-	var f: SpriteFrames = RoleSprites.frames(role, suit)
+	var f: SpriteFrames = RoleSprites.frames(role, suit, robot)
 	var tex := f.get_frame_texture(anim, (frame % 4) if frame > 0 else 0)
-	var w := 14 * s
+	var fs := Vector2(RoleSprites.frame_size(robot)) * s
+	var at := Vector2(floorf(x + 7 * s - fs.x / 2.0), floorf(y + 20 * s - fs.y))
 	if dir == "left":
-		draw_texture_rect(tex, Rect2(floorf(x) + w, floorf(y), -w, 20 * s), false)
+		draw_texture_rect(tex, Rect2(at.x + fs.x, at.y, -fs.x, fs.y), false)
 	else:
-		draw_texture_rect(tex, Rect2(floorf(x), floorf(y), w, 20 * s), false)
+		draw_texture_rect(tex, Rect2(at, fs), false)
 
 
 func person_color(body: Color, x: float, y: float, dir := "left", frame := 0) -> void:

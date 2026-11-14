@@ -681,25 +681,9 @@ func _paint_wake(pc: Pixel, t: float, _dt: float) -> void:
 		pc.R(0, 0, 320, 180, Color(0.965, 0.776, 0.42, W8["fade"]))
 
 
+## The wake-up robot = CERES (same drawing as the dialogue portrait, see pixel.gd cbot()).
 func _cbot(pc: Pixel, e: Dictionary, t: float) -> void:
-	var f: bool = e["m"] and int(t * 8) % 2 == 1
-	var ox := roundf(e["x"] - 8)
-	var oy := roundf(e["y"]) - 23 - (1 if f else 0)
-	var flip: bool = e["dir"] > 0
-	var parts := [[Color(0, 0, 0, .35), "3 22 12 1"], [Color("#101010"), "0 3 2 5"], [Color("#7a6048"), "0 4 1 3"], [Color("#101010"), "1 0 14 11"], [Color("#b8a47a"), "2 1 12 9"],
-		[Color("#8a7650"), "2 1 2 9"], [Color("#f0efb8"), "4 2 9 7"], [Color("#101010"), "6 11 5 1"], [Color("#101010"), "4 12 10 7"], [Color("#b8a47a"), "5 13 8 5"],
-		[Color("#f0efb8"), "7 14 4 3"], [Color("#d8d6a0"), "7 14 4 1"]]
-	if e["screen_on"]:
-		parts.append_array([[Color("#2e6b5c"), "5 3 7 5"], [Color("#1f4f44"), "5 3 7 1"], [Color("#f5e66a"), "6 4 1 2|10 4 1 2|6 6 1 1|10 6 1 1|7 7 3 1"]])
-	else:
-		parts.append([Color("#10231f"), "5 3 7 5"])
-	parts.append([Color("#101010"), "5 19 1 1|12 19 1 2|4 20 2 1|12 21 2 1" if f else "5 19 1 2|12 19 1 2|4 21 2 1|12 21 2 1"])
-	for part in parts:
-		for s in String(part[1]).split("|"):
-			var r := s.split(" ")
-			var x := float(r[0])
-			var w := float(r[2])
-			pc.R(ox + 16 - x - w if flip else ox + x, oy + float(r[1]), w, float(r[3]), part[0])
+	pc.cbot(roundf(e["x"]), roundf(e["y"]), e["dir"] > 0, e["m"] and int(t * 8) % 2 == 1, e["screen_on"])
 
 
 func _wake_room(pc: Pixel, t: float) -> void:

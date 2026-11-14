@@ -12,6 +12,7 @@ extends Node
 ##   Network.players   { peer_id: {"name": "Sufi", "slot": 0}, ... }   same on every device
 ##   Network.is_host() / Network.my_id() / Network.my_slot()
 ##
+##   Network.claim_slot(2)                -> ask for another free slot (= role) in the lobby
 ##   Network.start_game("res://game/test_map.tscn")   host only: everyone loads that scene
 ##
 ## Signals: players_changed, joined (you are in), join_failed(reason), disconnected(reason)
@@ -117,7 +118,38 @@ static func clean_name(raw: String) -> String:
 	return n if n != "" else "Player"
 
 
+## Pick a slot (role) in the lobby. The host checks it is still free.
+func claim_slot(slot: int) -> void:
+	if not is_online():
+		return
+	if is_host():
+		_claim(1, slot)
+	else:
+		_req_claim.rpc_id(1, slot)
+
+
+static func slot_taken(current: Dictionary, slot: int, by: int) -> bool:
+	for id in current:
+		if id != by and current[id]["slot"] == slot:
+			return true
+	return false
+
+
 # ---------------------------------------------------------------- host side
+
+@rpc("any_peer", "reliable")
+func _req_claim(slot: int) -> void:
+	if multiplayer.is_server():
+		_claim(multiplayer.get_remote_sender_id(), slot)
+
+
+func _claim(id: int, slot: int) -> void:
+	if not players.has(id) or slot < 0 or slot >= MAX_PLAYERS or slot_taken(players, slot, id):
+		return
+	players[id]["slot"] = slot
+	_sync_players.rpc(players)
+	players_changed.emit()
+
 
 func _on_peer_connected(_id: int) -> void:
 	pass   # host waits for the newcomer to send its name (_register)
