@@ -1,5 +1,5 @@
 extends RefCounted
-## The three worlds (Earth · Bunker 4, Moon · Shackleton Outpost, Mars · Jezero Base):
+## The two worlds (Earth · Bunker 4, Moon · Shackleton Outpost):
 ## rooms, doors, furniture and stations, loaded from data/worlds.json. Owner: Sufi (gameplay).
 ## Pure data + geometry, no nodes, so tests can call everything.
 ##
@@ -11,7 +11,7 @@ const FILE := "res://data/worlds.json"
 ## Exact room pictures from the HTML demo (tools/export_world_maps.js): door + station positions
 ## and the furniture you cannot walk through. The pictures are assets/rooms/int_<world>_<key>.png.
 const INTERIORS_FILE := "res://data/interiors.json"
-const WORLDS := ["earth", "moon", "mars"]
+const WORLDS := ["earth", "moon"]
 const ROOM_SIZE := Vector2(320, 180)
 const IB_CENTER := Vector2(160, 102)
 const IB_HALF := Vector2(134, 64)
@@ -34,7 +34,7 @@ const TONES := {
 	"sci": {"f": "blue", "b": "sky", "t": "blue"}, "nav": {"f": "plum", "b": "pink", "t": "plum"},
 	"qm": {"f": "clay", "b": "amber", "t": "brown"},
 }
-const VOID := {"earth": Color("#120f1d"), "moon": Color("#0b0c10"), "mars": Color("#2a120c")}
+const VOID := {"earth": Color("#120f1d"), "moon": Color("#0b0c10")}
 
 static var _data := {}
 static var _rooms := {}

@@ -312,9 +312,6 @@ func planet(kind: String, x: float, y: float, sz := 32.0) -> void:
 	elif kind == "moon":
 		d.call(16, 16, 11, "grey")
 		r.call(11, 10, 3, 3, "steel"); r.call(18, 17, 4, 3, "steel"); r.call(13, 20, 2, 2, "steel"); r.call(14, 24, 4, 2, "ink")
-	elif kind == "mars":
-		d.call(16, 16, 11, "rust")
-		r.call(10, 11, 8, 3, "burnt"); r.call(14, 19, 9, 2, "burnt"); r.call(13, 5, 6, 2, "white")
 
 
 ## CERES, the bunker AI, as one robot everywhere (wake-up scene, dialogue portrait, rooms, map).
@@ -390,12 +387,11 @@ func rocket(cx: float, base: float, d: Dictionary, tt: float, flame := false) ->
 
 
 ## A crew member from the sprite sheets, (x, y) = top-left, s = scale.
-## robot = the Mars robot body (Acts 4-5); it is drawn at its own frame size, feet at y + 20 * s.
-func person(role: String, x: float, y: float, dir := "down", frame := 0, s := 1.0, suit := false, robot := false) -> void:
+func person(role: String, x: float, y: float, dir := "down", frame := 0, s := 1.0, suit := false) -> void:
 	var anim := ("walk_" if frame > 0 else "idle_") + ("side" if dir == "left" or dir == "right" else dir)
-	var f: SpriteFrames = RoleSprites.frames(role, suit, robot)
+	var f: SpriteFrames = RoleSprites.frames(role, suit)
 	var tex := f.get_frame_texture(anim, (frame % 4) if frame > 0 else 0)
-	var fs := Vector2(RoleSprites.frame_size(robot)) * s
+	var fs := Vector2(RoleSprites.FRAME) * s
 	var at := Vector2(floorf(x + 7 * s - fs.x / 2.0), floorf(y + 20 * s - fs.y))
 	if dir == "left":
 		draw_texture_rect(tex, Rect2(at.x + fs.x, at.y, -fs.x, fs.y), false)

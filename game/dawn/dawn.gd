@@ -1,9 +1,9 @@
 extends Node2D
-## Project Dawn: Earth, Moon and Mars, ported from the HTML demo (web/demo). Owner: Sufi (gameplay).
+## Project Dawn: Earth and the Moon, ported from the HTML demo (web/demo). Owner: Sufi (gameplay).
 ##
 ## START: game/dawn/title.tscn (F6) → PLAY SOLO / HOST A CREW / JOIN A CREW, pick a role, START MISSION.
 ## KEYS: WASD or arrows walk · E or Enter use · TAB switch crew member · F crew follow you ·
-##       C CERES autopilot on/off · M world map · J mission details · F9/F10/F11 debug jump (solo only).
+##       C CERES autopilot on/off · M world map · J mission details · F9/F10 debug jump to Earth/Moon (solo only).
 ## Who controls which crew member lives in crew.gd; the world map and door trips in world_map.gd.
 ##
 ## The host owns the shared state S (story progress, suits, clock...). Everyone else asks the host
@@ -34,12 +34,10 @@ const INTERACT_RANGE := 18.0
 const DOOR_LANE := 34.0          ## px in front of each door kept free of furniture collision
 const UV_MAX := 12.0
 const COLD_MAX := 30.0
-const BATTERY_MAX := 100.0
 
 const POSTER_THEMES := {
 	"earth": {"bg": Color("#0F1B2D"), "acc": Color("#F2D16B"), "chip": Color("#7CC6E8"), "planet": Color("#2D6CB5"), "name": "EARTH · BUNKER 4"},
 	"moon": {"bg": Color("#17191F"), "acc": Color("#F2D16B"), "chip": Color("#E8ECF2"), "planet": Color("#B9BEC8"), "name": "MOON · SHACKLETON OUTPOST"},
-	"mars": {"bg": Color("#24130E"), "acc": Color("#F4A261"), "chip": Color("#F4A261"), "planet": Color("#C1592F"), "name": "MARS · JEZERO BASE"},
 }
 
 var S := {}                     ## shared state (host is the boss of it)
@@ -56,7 +54,7 @@ var found := {}
 var _views := {}
 var _stations := {}
 var _door_bars := {}            ## "room>to" -> CollisionShape2D that closes a locked door
-var _hz := {}                   ## role -> {uv, cold, bat}
+var _hz := {}                   ## role -> {uv, cold}
 var _push_t := 0.0
 var _clock_seen := {"v": 0.0, "at": 0}
 var _panel_clock_t := 0.0 
@@ -108,10 +106,10 @@ func _ready() -> void:
 
 
 static func fresh_state() -> Dictionary:
-	return {"world": "earth", "time": 360.0, "ozone": 8, "suits": {}, "step": 0, "ms": 0, "rs": 0,
-		"opt": [], "pen": 0, "storm": {}, "hold": {}, "design": {"motor": "small", "uv": true, "cam": true, "chute": false, "radio": false},
-		"sats": 4, "sats_chosen": false, "canopy": false, "hydro": false, "tasks": {}, "scene": "game", "cut": {}, "event": "", "result": {},
-		"report": {}, "stars": {}, "shield": {}, "mpower": {}, "gpower": {}}
+	return {"world": "earth", "time": 360.0, "ozone": 8, "suits": {}, "step": 0, "ms": 0,
+		"pen": 0, "storm": {}, "hold": {}, "design": {"motor": "small", "uv": true, "cam": true, "chute": false, "radio": false},
+		"sats": 4, "sats_chosen": false, "tasks": {}, "scene": "game", "cut": {}, "event": "", "result": {},
+		"report": {}, "stars": {}, "shield": {}, "mpower": {}}
 
 
 # ---------------------------------------------------------------- crew
@@ -120,7 +118,7 @@ func _rebuild_crew() -> void:
 	crew_ctl.rebuild()
 	for r in ROLES:
 		if not _hz.has(r):
-			_hz[r] = {"uv": UV_MAX, "cold": COLD_MAX, "bat": BATTERY_MAX}
+			_hz[r] = {"uv": UV_MAX, "cold": COLD_MAX}
 
 
 ## The crew member this screen controls (and the camera follows).
@@ -230,15 +228,11 @@ func _apply_state(s: Dictionary) -> void:
 		var want: bool = S["suits"].get(r, false)
 		if p.suited != want:
 			p.suited = want
-		var rb: bool = S["world"] == "mars"
-		if p.robot != rb:
-			p.robot = rb
-			p.max_speed = 60.0 if rb else 70.0
 	if S["world"] != old_world:
 		var arrive := WD.arrive(S["world"])
 		for p in local_crew():
 			place(p, arrive, WD.IB_CENTER + Vector2(-24 + ROLES.find(p.role) * 16, 10))
-			_hz[p.role] = {"uv": UV_MAX, "cold": COLD_MAX, "bat": BATTERY_MAX}
+			_hz[p.role] = {"uv": UV_MAX, "cold": COLD_MAX}
 	refresh_locks()
 	if story and story.has_method("on_state"):
 		story.on_state(old_scene, old_world)
@@ -390,7 +384,7 @@ func _arrive(p, from: String, to: String) -> void:
 		story.on_enter(p, to)
 
 
-## UV on Earth's surface, cold and darkness in the Moon's ice mine, robot batteries on Mars.
+## UV on Earth's surface, cold and darkness in the Moon's ice mine.
 func _hazards(p, delta: float) -> void:
 	var id := WD.room_at(p.position)
 	var h: Dictionary = _hz[p.role]
@@ -399,7 +393,7 @@ func _hazards(p, delta: float) -> void:
 	var w: String = S["world"]
 	if w == "earth":
 		var on: bool = id != "" and WD.room(id).get("surface", false) and uv_active()
-		var safe: bool = p.suited or (id == "earth.canopy" and S["canopy"])
+		var safe: bool = p.suited
 		if on and not safe:
 			h["uv"] -= delta
 			if h["uv"] <= 0.0:
@@ -422,25 +416,8 @@ func _hazards(p, delta: float) -> void:
 				_hazard_msg(p, "Too cold! CERES guides you back to Lunar Control. Crater work has to be fast.")
 		else:
 			h["cold"] = minf(COLD_MAX, h["cold"] + delta * 5.0)
-	elif w == "mars":
-		var dust: bool = S["storm"].get("kind", "") == "dust"
-		if p.is_moving:
-			h["bat"] -= delta * (2.4 if dust else 1.0)
-		if id == "mars.hangar":
-			h["bat"] = minf(BATTERY_MAX, h["bat"] + delta * 30.0)
-		if h["bat"] <= 0.0:
-			h["bat"] = 60.0
-			place(p, "mars.hangar")
-			_hazard_msg(p, "Battery flat! CERES tows your robot back to the Hangar.")
-		show_label = "BATTERY"
-		show_frac = h["bat"] / BATTERY_MAX
 	if p == camera.target:
 		ui.meter(show_label, show_frac)
-
-
-func recharge(p) -> void:
-	if is_instance_valid(p):
-		_hz[p.role]["bat"] = BATTERY_MAX
 
 
 func heal(p) -> void:
@@ -590,8 +567,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		esc_menu.open()
 	elif k == KEY_F8:
 		toggle_review_mode()
-	elif not Network.is_online() and k in [KEY_F9, KEY_F10, KEY_F11]:
-		S["world"] = {KEY_F9: "earth", KEY_F10: "moon", KEY_F11: "mars"}[k]
+	elif not Network.is_online() and k in [KEY_F9, KEY_F10]:
+		S["world"] = {KEY_F9: "earth", KEY_F10: "moon"}[k]
 		commit()
 		ui.toast("Debug: jumped to " + S["world"].to_upper())
 
@@ -605,16 +582,11 @@ func toggle_review_mode() -> void:
 
 # ---------------------------------------------------------------- locks
 
+## A room with "unlock" in data/worlds.json stays closed (door bar + LOCKED on the map) until
+## its rule here is met. The Earth + Moon story has no locked rooms; add a rule when one is needed:
+##   "unlock": "fuel_made"  →  match r["unlock"]: "fuel_made": return S["ms"] < 5
 func is_locked(id: String) -> bool:
-	var r := WD.room(id)
-	if not r.has("unlock"):
-		return false
-	match r["unlock"]:
-		"launched": return S["step"] < 4
-		"hydro": return not S["hydro"]
-		"fuel_made": return S["ms"] < 5
-		"panels_clean": return S["rs"] < 2
-	return true
+	return WD.room(id).has("unlock")
 
 
 func locked_map() -> Dictionary:
@@ -672,12 +644,22 @@ func _refresh_panel_clock() -> void:
 		if fresh != rt.text:
 			rt.text = fresh
 
+## Three mission reports give up to 3 stars each: rocket, outpost power, shield.
+const MAX_STARS := 9
+
+
+func mission_stars() -> int:
+	var total := 0
+	for k in S.get("stars", {}):
+		total += int(S["stars"][k])
+	return total
+
+
+## Act 1 Earth (rocket) · Act 2 Moon (ice and fuel) · Act 3 Moon (the shield, then home).
 func act_number() -> int:
 	if S["world"] == "earth":
-		return 1 if S["step"] < 5 else (2 if S["step"] == 5 else 5)
-	if S["world"] == "moon":
-		return 2 if S["ms"] < 5 else (3 if S["ms"] < 7 else 4)
-	return 4 if S["rs"] < 4 else 5
+		return 1 if S["step"] < 5 else (2 if S["step"] == 5 else 3)
+	return 2 if S["ms"] < 5 else 3
 
 
 func _refresh_hud() -> void:
@@ -711,7 +693,7 @@ func _refresh_hud() -> void:
 
 
 # ---------------------------------------------------------------- mission details panel (J)
-## Tables: NOW/WHERE, ozone bar, time/posters/optional, one row per crew member, shared jobs.
+## Tables: NOW/WHERE, ozone bar, time/posters/stars, one row per crew member, shared jobs.
 ## Built once when J is pressed (a snapshot). The clock is kept running by _refresh_panel_clock().
 
 const MP_AMBER := "#feae34"
@@ -762,7 +744,7 @@ func _mp_td(text: String, bg := MP_ROW) -> String:
 ## Top block: which act and place, what to do now, and where.
 func _mission_top_bb() -> String:
 	var ob := objective()
-	var place_name: String = {"earth": "EARTH · BUNKER 4", "moon": "MOON · SHACKLETON OUTPOST", "mars": "MARS · JEZERO BASE"}[S["world"]]
+	var place_name: String = {"earth": "EARTH · BUNKER 4", "moon": "MOON · SHACKLETON OUTPOST"}[S["world"]]
 	var bb := "[color=%s][b]ACT %d · %s[/b][/color]\n" % [MP_AMBER, act_number(), place_name]
 	bb += "[table=2]"
 	bb += _mp_th("NOW") + _mp_td("[color=#ffffff]%s[/color]" % ob["text"])
@@ -776,8 +758,8 @@ func _mission_top_bb() -> String:
 ## Bottom block: progress numbers, one table row per crew member, shared jobs, big goal, keys.
 func _mission_bottom_bb(work: Array) -> String:
 	var bb := "[table=3]"
-	bb += _mp_th("TIME") + _mp_th("POSTERS FOUND") + _mp_th("OPTIONAL MISSIONS")
-	bb += _mp_td(WD.clock_text(game_minutes())) + _mp_td("%d / 21" % found.size()) + _mp_td("%d" % S["opt"].size())
+	bb += _mp_th("TIME") + _mp_th("POSTERS FOUND") + _mp_th("MISSION STARS")
+	bb += _mp_td(WD.clock_text(game_minutes())) + _mp_td("%d / %d" % [found.size(), posters.size()]) + _mp_td("%d / %d" % [mission_stars(), MAX_STARS])
 	bb += "[/table]\n"
 	bb += "\n[color=%s][b]CREW[/b][/color]\n" % MP_AMBER
 	bb += "[table=4]"
@@ -833,7 +815,8 @@ func _load_posters() -> void:
 		var list = JSON.parse_string(s.get_as_text())
 		if list is Array:
 			for n in list:
-				found[int(n)] = true
+				if int(n) >= 1 and int(n) <= posters.size():   # old saves may list posters that no longer exist
+					found[int(n)] = true
 
 
 func open_poster(ps: Dictionary) -> void:
@@ -845,11 +828,11 @@ func open_poster(ps: Dictionary) -> void:
 		s.store_string(JSON.stringify(found.keys()))
 	var th: Dictionary = POSTER_THEMES[ps["world"]]
 	var box: VBoxContainer = ui.panel(th["bg"], th["acc"], 640)
-	ui.rich(box, "[color=#%s][b]%s[/b][/color]      [color=#%s]FUN FACT %d/21[/color]" % [th["chip"].to_html(false), String(ps["category"]).to_upper(), th["acc"].to_html(false), n], 16)
+	ui.rich(box, "[color=#%s][b]%s[/b][/color]      [color=#%s]FUN FACT %d/%d[/color]" % [th["chip"].to_html(false), String(ps["category"]).to_upper(), th["acc"].to_html(false), n, posters.size()], 16)
 	ui.rich(box, "[color=#%s][b]%s[/b][/color]" % [th["acc"].to_html(false), ps["hook"]], 44)
 	ui.rich(box, "[color=#e8ecf2]%s[/color]" % ps["body"], 20)
 	ui.rich(box, "[color=#8b9bb4]%s · Source: %s[/color]" % [th["name"], ps["source"]], 14)
-	ui.button(box, ("FOUND %d/21" % found.size()) if first else "OK", ui.close_panel).grab_focus.call_deferred()
+	ui.button(box, ("FOUND %d/%d" % [found.size(), posters.size()]) if first else "OK", ui.close_panel).grab_focus.call_deferred()
 
 
 # ---------------------------------------------------------------- building the world

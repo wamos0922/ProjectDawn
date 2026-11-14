@@ -28,7 +28,7 @@ func _physics_process(_d):
 		job = jobs.pop_back()
 		var w := WD.world_of(job["from"])
 		for r in g.ROLES: g.S["suits"][r] = true
-		g.S["step"] = 9; g.S["ms"] = 9; g.S["rs"] = 9; g.S["hydro"] = true; g.S["storm"] = {}
+		g.S["step"] = 9; g.S["ms"] = 9; g.S["storm"] = {}
 		g.S["world"] = w; g.commit()
 		var d = WD.door_to(job["from"], job["to"])
 		g.place(p, job["from"], d["pos"] - d["dir"] * 30)

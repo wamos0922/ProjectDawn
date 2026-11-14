@@ -4,6 +4,19 @@ Newest entry at the top. Write one at the end of every AI session. Read the last
 
 ---
 
+## 2026-11-15 · Wam (with Claude) · branch feat/moon-only-story (local, not pushed)
+Done:
+- Story cut to Earth → Moon → home: after the shield report the crew flies home (HOMECOMING), the
+  capsule lands by Bunker 4 and the ending is always happy (title from mission stars, max 9).
+- Removed Acts 4–5 (Mars), the teleop hold, all optional missions (B C D G H J), the 13 Mars rooms,
+  7 Mars posters, Mars map/room pictures, robot sprites, the greenhouse designer and the Mars-only minigames.
+- Optional-room locks removed: UV Canopy, Hydroponics and Water Purifier are open rooms now.
+- New doc: docs/STORY_MOON_ONLY.md (the whole new flow + what was removed). STORY.md/GAMEPLAY.md got a note.
+- Tests: run_tests 25 ✓, review_mode_test 29 ✓, crew_test ✓, door_test ✓, all_doors_test 0 failed,
+  scripted play-through reaches the ending.
+Next:
+- Team review of the shorter story, then push the branch and open a PR.
+
 ## 2026-11-15 · Sufi (with Claude) · branch feat/review-mode
 Done:
 - Review mode for team testing: every minigame becomes a placeholder panel with one COMPLETE button.

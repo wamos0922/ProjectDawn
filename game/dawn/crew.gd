@@ -97,9 +97,8 @@ func rebuild() -> void:
 		p.color_index = i
 		p.player_index = 0                    # everyone uses WASD / arrows + E on their own screen
 		p.ai = r != me_role
-		p.robot = g.S["world"] == "mars"
 		p.suited = g.S["suits"].get(r, false)
-		p.max_speed = 60.0 if p.robot else 70.0
+		p.max_speed = 70.0
 		p.set_multiplayer_authority(owner_peer(r))
 		p.position = keep.get(r, WD.room_origin(arrive) + WD.IB_CENTER + Vector2(-24 + i * 16, 10))
 		p.interact_requested.connect(g._on_interact)
