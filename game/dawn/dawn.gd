@@ -56,6 +56,7 @@ var _door_bars := {}            ## "room>to" -> CollisionShape2D that closes a l
 var _hz := {}                   ## role -> {uv, cold, bat}
 var _push_t := 0.0
 var _clock_seen := {"v": 0.0, "at": 0}
+var _panel_clock_t := 0.0 
 var _dark: Sprite2D
 var _shown_world := "earth"     ## world/scene this screen is showing (to spot changes in S)
 var _shown_scene := "game"
@@ -251,6 +252,10 @@ func _process(delta: float) -> void:
 				_apply_state.rpc(S)
 	crew_ctl.tick(delta)
 	_refresh_hud()
+	_panel_clock_t -= delta
+	if _panel_clock_t <= 0.0:
+		_panel_clock_t = 0.1
+		_refresh_panel_clock()
 	var me = camera.target
 	if is_instance_valid(me):
 		var here := WD.room_at(me.position)
@@ -557,6 +562,29 @@ func game_minutes() -> float:
 		t += minf(2.0, (Time.get_ticks_msec() - _clock_seen["at"]) / 1000.0) * GAME_MINUTES_PER_SECOND
 	return t
 
+## While the Mission Details panel (J) is open, keep its clock in step with the top HUD.
+## The panel text is built once; this only swaps the "DAY n · hh:mm" part, using the same
+## WD.clock_text(game_minutes()) as the HUD. Does nothing if another panel (or none) is open.
+func _refresh_panel_clock() -> void:
+	if not ui.panel_open() or not is_instance_valid(ui._panel):
+		return
+	var texts: Array = []
+	var is_mission := false
+	for n in ui._panel.find_children("*", "", true, false):
+		if n is Label and n.text == "MISSION DETAILS":
+			is_mission = true
+		elif n is RichTextLabel:
+			texts.append(n)
+			if n.text.contains("MISSION DETAILS"):
+				is_mission = true
+	if not is_mission:
+		return
+	var re := RegEx.create_from_string("DAY \\d+ · \\d\\d:\\d\\d")
+	var now := WD.clock_text(game_minutes())
+	for rt in texts:
+		var fresh: String = re.sub(rt.text, now)
+		if fresh != rt.text:
+			rt.text = fresh
 
 func act_number() -> int:
 	if S["world"] == "earth":
