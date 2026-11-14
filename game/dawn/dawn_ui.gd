@@ -66,8 +66,8 @@ func _ready() -> void:
 	top.add_theme_color_override("font_color", DawnTheme.C["sand"])
 	chip.add_child(top)
 	obj = Button.new()
-	obj.position = Vector2(420, 8)
-	obj.size = Vector2(848, 44)
+	obj.position = Vector2(448, 8)
+	obj.size = Vector2(598, 44)
 	obj.add_theme_font_override("font", DawnTheme.body_font())
 	obj.add_theme_font_size_override("font_size", 18)
 	obj.add_theme_stylebox_override("normal", DawnTheme.box(Color(0.094, 0.078, 0.145, 0.88), DawnTheme.C["amber"], 4, Color(0, 0, 0, 0), 0, Vector4(12, 4, 12, 4)))
@@ -77,16 +77,17 @@ func _ready() -> void:
 		obj.add_theme_color_override(k, DawnTheme.C["white"])
 	obj.clip_text = true
 	obj.focus_mode = Control.FOCUS_NONE
-	obj.tooltip_text = "Mission details (TAB)"
+	obj.tooltip_text = "Mission details (J)"
 	obj.pressed.connect(func(): game.open_mission_panel())
 	root.add_child(obj)
 	hold_bar = ProgressBar.new()
-	hold_bar.position = Vector2(420, 54)
-	hold_bar.size = Vector2(848, 10)
+	hold_bar.position = Vector2(448, 54)
+	hold_bar.size = Vector2(598, 10)
 	hold_bar.show_percentage = false
 	hold_bar.max_value = 1.0
 	hold_bar.visible = false
 	root.add_child(hold_bar)
+	_build_crewbar()
 	room_label = _label(Vector2(16, 52), 12, DawnTheme.C["grey"], true)
 	hint = _label(Vector2(16, 74), 20, DawnTheme.C["yellow"])
 	meter_box = HBoxContainer.new()
@@ -114,6 +115,58 @@ func _ready() -> void:
 	_toast.visible = false
 	root.add_child(_toast)
 	_build_dialogue()
+
+
+# ---------------------------------------------------------------- crew bar (top right, like the HTML)
+## Four squares, one per crew member: click one (or press TAB) to control them.
+## Yellow outline = you. Green dot = played by someone online.
+
+var _crew_buttons := {}           ## role -> Button
+var _crew_state := ""             ## last drawn state, so buttons only restyle when it changes
+
+
+func _build_crewbar() -> void:
+	var bar := HBoxContainer.new()
+	bar.position = Vector2(1060, 6)
+	bar.add_theme_constant_override("separation", 6)
+	root.add_child(bar)
+	for r in RoleSprites.TAGS:
+		var b := Button.new()
+		b.custom_minimum_size = Vector2(48, 48)
+		b.focus_mode = Control.FOCUS_NONE
+		b.text = RoleSprites.NAMES[r][0]
+		b.add_theme_font_override("font", DawnTheme.title_font())
+		b.add_theme_font_size_override("font_size", 14)
+		for k in ["font_color", "font_hover_color", "font_pressed_color"]:
+			b.add_theme_color_override(k, DawnTheme.C["ink"])
+		b.pressed.connect(func(): game.crew_ctl.switch_to(r))
+		var dot := ColorRect.new()
+		dot.name = "Online"
+		dot.color = DawnTheme.C["green"]
+		dot.size = Vector2(12, 12)
+		dot.position = Vector2(40, -4)
+		dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(dot)
+		bar.add_child(b)
+		_crew_buttons[r] = b
+
+
+## me = role I control; online = roles other people play; where = role -> room name.
+func update_crewbar(me: String, online: Array, where: Dictionary, autopilot: bool) -> void:
+	var key := "%s|%s|%s|%s" % [me, online, where, autopilot]
+	if key == _crew_state:
+		return
+	_crew_state = key
+	for r in _crew_buttons:
+		var b: Button = _crew_buttons[r]
+		var mine: bool = r == me
+		var edge: Color = DawnTheme.C["yellow"] if mine else DawnTheme.C["ink"]
+		var st := DawnTheme.box(RoleSprites.TAGS[r], edge, 4 if mine else 3, Color(0, 0, 0, 0), 0, Vector4(0, 0, 0, 0))
+		for k in ["normal", "hover", "pressed"]:
+			b.add_theme_stylebox_override(k, st)
+		b.get_node("Online").visible = online.has(r)
+		var who := " (you)" if mine else (" (online player)" if online.has(r) else (" (CERES autopilot)" if autopilot else " (waiting)"))
+		b.tooltip_text = "%s%s · %s" % [RoleSprites.NAMES[r], who, where.get(r, "?")]
 
 
 func _process(delta: float) -> void:

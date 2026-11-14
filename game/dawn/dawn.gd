@@ -18,6 +18,7 @@ const WD := preload("res://game/dawn/world_data.gd")
 const RoomView := preload("res://game/dawn/room_view.gd")
 const DawnUI := preload("res://game/dawn/dawn_ui.gd")
 const Designers := preload("res://game/dawn/designers.gd")
+const Crew := preload("res://game/dawn/crew.gd")
 const STORY_PATH := "res://game/dawn/story.gd"
 const LOBBY := "res://game/dawn/title.tscn"
 const POSTERS_FILE := "res://data/posters.json"
@@ -38,13 +39,13 @@ const POSTER_THEMES := {
 }
 
 var S := {}                     ## shared state (host is the boss of it)
-var crew := {}                  ## role -> player node (always all four)
+var crew := {}                  ## role -> player node (always all four); same dict as crew_ctl.members
+var crew_ctl                    ## crew.gd: who controls whom, TAB switching, follow, autopilot
 var camera: Camera2D
 var ui: CanvasLayer
 var story                       ## story.gd (null until that feature exists)
 var posters: Array = []
 var found := {}
-var local_count := 4            ## offline: how many people share this keyboard
 
 var _views := {}
 var _stations := {}
@@ -52,7 +53,6 @@ var _door_bars := {}            ## "room>to" -> CollisionShape2D that closes a l
 var _hz := {}                   ## role -> {uv, cold, bat}
 var _push_t := 0.0
 var _clock_seen := {"v": 0.0, "at": 0}
-var _npc_t := 0.0
 var _dark: Sprite2D
 var _shown_world := "earth"     ## world/scene this screen is showing (to spot changes in S)
 var _shown_scene := "game"
@@ -66,7 +66,13 @@ func _ready() -> void:
 		story = load(STORY_PATH).new()
 		story.g = self
 	S = fresh_state()
-	local_count = int(Network.get_meta("local_count", 4))
+	crew_ctl = Crew.new()
+	crew_ctl.name = "Crew"
+	crew_ctl.g = self
+	crew_ctl.me_role = str(Network.get_meta("my_role", "eng"))
+	crew_ctl.autopilot = str(Network.get_meta("crew_mode", "autopilot")) == "autopilot"
+	crew = crew_ctl.members
+	add_child(crew_ctl)
 	for id in WD.rooms():
 		_build_room(id)
 	camera = RoomCamera.new()
@@ -95,84 +101,33 @@ static func fresh_state() -> Dictionary:
 
 # ---------------------------------------------------------------- crew
 
-## Who controls each role: {role: {"peer": id, "index": keyboard set, "ai": bool}}
-func controllers() -> Dictionary:
-	var out := {}
-	if Network.is_online():
-		for r in ROLES:
-			out[r] = {"peer": 1, "index": 0, "ai": true}
-		for id in Network.players:
-			var r: String = RoleSprites.role_for_slot(Network.players[id]["slot"])
-			out[r] = {"peer": id, "index": 0, "ai": false}
-	else:
-		for i in ROLES.size():
-			out[ROLES[i]] = {"peer": 1, "index": i, "ai": i >= local_count}
-	return out
-
-
 func _rebuild_crew() -> void:
-	var keep := {}
-	for r in crew:
-		if is_instance_valid(crew[r]):
-			keep[r] = crew[r].position
-			remove_child(crew[r])
-			crew[r].free()
-	crew.clear()
-	var ctl := controllers()
-	var arrive := WD.arrive(S["world"])
-	for i in ROLES.size():
-		var r: String = ROLES[i]
-		var p = PlayerScene.instantiate()
-		p.name = "C_" + r
-		p.role = r
-		p.sprite_scale = SPRITE_SCALE
-		p.color_index = i
-		p.player_index = ctl[r]["index"]
-		p.ai = ctl[r]["ai"]
-		p.robot = S["world"] == "mars"
-		p.suited = S["suits"].get(r, false)
-		if S["world"] == "mars":
-			p.max_speed = 60.0
-		p.set_multiplayer_authority(ctl[r]["peer"])
-		p.position = keep.get(r, WD.room_origin(arrive) + WD.IB_CENTER + Vector2(-24 + i * 16, 10))
-		p.interact_requested.connect(_on_interact)
-		add_child(p)
-		crew[r] = p
-		_hz[r] = {"uv": UV_MAX, "cold": COLD_MAX, "bat": BATTERY_MAX}
-	var me = my_crew()
-	if me:
-		camera.target = me
+	crew_ctl.rebuild()
+	for r in ROLES:
+		if not _hz.has(r):
+			_hz[r] = {"uv": UV_MAX, "cold": COLD_MAX, "bat": BATTERY_MAX}
 
 
-## The crew member this screen follows (first person on this keyboard / this device).
+## The crew member this screen controls (and the camera follows).
 func my_crew():
-	for r in ROLES:
-		var p = crew.get(r)
-		if is_instance_valid(p) and p.is_multiplayer_authority() and not p.ai:
-			return p
-	return crew.get("eng")
+	return crew_ctl.me()
 
 
-## Crew members moved by this device (people on this keyboard + autopilot if host/offline).
+## Crew members this computer moves (mine + the autopilot crew on the host / in solo).
 func local_crew() -> Array:
-	var out := []
-	for r in ROLES:
-		var p = crew.get(r)
-		if is_instance_valid(p) and p.is_multiplayer_authority():
-			out.append(p)
-	return out
+	return crew_ctl.local()
 
 
+## True if no person is playing this role right now (CERES autopilot or waiting for a TAB switch).
 func is_ai(role: String) -> bool:
-	return is_instance_valid(crew.get(role)) and crew[role].ai
+	return not crew_ctl.is_person(role)
 
 
 func set_frozen(on: bool) -> void:
 	for p in local_crew():
-		if not p.ai:
-			p.can_move = not on
-			if on:
-				p.velocity = Vector2.ZERO
+		p.can_move = not on
+		if on:
+			p.velocity = Vector2.ZERO
 
 
 func place(p, room_id: String, at := Vector2.INF) -> void:
@@ -206,9 +161,8 @@ func _req_act(id: String, p: Dictionary, role: String) -> void:
 	if not Network.is_host():
 		return
 	var sender := multiplayer.get_remote_sender_id()
-	var ctl := controllers()
-	if ctl.get(role, {}).get("peer", 0) != sender and not ctl.get(role, {}).get("ai", false):
-		return                      # you may act for your own role or for autopilot crew
+	if crew_ctl.owner_peer(role) != sender and crew_ctl.is_person(role):
+		return                      # you may act for your own role or for a role nobody plays
 	_do_act(id, p, role)
 
 
@@ -283,12 +237,12 @@ func _process(delta: float) -> void:
 			S["time"] += delta * GAME_MINUTES_PER_SECOND
 		if story and story.has_method("host_tick"):
 			story.host_tick(delta)
-		_npc_tick(delta)
 		if Network.is_online():
 			_push_t -= delta
 			if _push_t <= 0.0:
 				_push_t = 1.0
 				_apply_state.rpc(S)
+	crew_ctl.tick(delta)
 	_refresh_hud()
 	var me = camera.target
 	if is_instance_valid(me):
@@ -332,6 +286,7 @@ func _check_doors(p) -> void:
 	if p == camera.target:
 		var r := WD.room(to)
 		ui.toast(r["name"] + " · " + r["info"][0], 2.2)
+		crew_ctl.on_leader_moved(to, WD.entry_point(to, id))
 		if story and story.has_method("on_enter"):
 			story.on_enter(p, to)
 
@@ -403,33 +358,6 @@ func uv_active() -> bool:
 func _hazard_msg(p, text: String) -> void:
 	if p == camera.target:
 		ui.toast(text, 3.5)
-
-
-## Host: autopilot crew walk... well, CERES teleports them to where a hold or storm needs them.
-func _npc_tick(delta: float) -> void:
-	_npc_t += delta
-	if _npc_t < 1.5:
-		return
-	_npc_t = 0.0
-	var h := current_hold()
-	for r in ROLES:
-		var p = crew.get(r)
-		if not is_instance_valid(p) or not p.ai or not p.is_multiplayer_authority():
-			continue
-		var target := ""
-		var sid := ""
-		if h.get("need", {}).has(r):
-			target = h["need"][r][0]
-			sid = h["need"][r][1]
-		elif story and story.has_method("npc_room"):
-			target = story.npc_room(r)
-		if target == "":
-			continue
-		if sid != "":
-			if not on_spot(r, target, sid):
-				place(p, target, station(target, sid)["pos"])
-		elif WD.room_at(p.position) != target:
-			place(p, target, WD.IB_CENTER + Vector2(-24 + ROLES.find(r) * 16, 12))
 
 
 # ---------------------------------------------------------------- holds and stations
@@ -521,12 +449,11 @@ func _on_interact(p) -> void:
 	if a.is_empty():
 		return
 	var need: String = a.get("role", "")
-	if need != "" and need != p.role:
-		if is_ai(need):
-			ui.toast("Covering for the %s (CERES autopilot)." % RoleSprites.NAMES[need], 2.0)
-		else:
-			ui.toast("Only the %s can do this. Ask them to come here." % RoleSprites.NAMES[need], 3.0)
-			return
+	var rule: Dictionary = crew_ctl.may_do(p, need)
+	if rule.has("msg"):
+		ui.toast(rule["msg"], 2.0 if rule["ok"] else 3.5)
+	if not rule["ok"]:
+		return
 	_acting_role = need if need != "" else p.role
 	a["fn"].call()
 
@@ -544,15 +471,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	if ui.dialogue_open() and (k == KEY_SPACE or k == KEY_ENTER):
 		ui.advance()
 		get_viewport().set_input_as_handled()
-	elif k == KEY_TAB:
-		open_mission_panel()
+	elif k == KEY_TAB and not ui.panel_open() and not ui.dialogue_open():
+		crew_ctl.cycle()                       # switch to the next crew member (like the HTML)
 		get_viewport().set_input_as_handled()
+	elif k == KEY_F and not ui.panel_open():
+		crew_ctl.toggle_follow()
+	elif k == KEY_C and not ui.panel_open():
+		crew_ctl.toggle_autopilot()
+	elif k == KEY_J:
+		open_mission_panel()
 	elif k == KEY_ESCAPE and ui.panel_open():
 		ui.close_panel()
-	elif not Network.is_online() and k >= KEY_F1 and k <= KEY_F4:
-		local_count = k - KEY_F1 + 1
-		_rebuild_crew()
-		ui.toast("%d on this keyboard. The others are CERES autopilot." % local_count)
 	elif not Network.is_online() and k in [KEY_F9, KEY_F10, KEY_F11]:
 		S["world"] = {KEY_F9: "earth", KEY_F10: "moon", KEY_F11: "mars"}[k]
 		commit()
@@ -615,12 +544,19 @@ func act_number() -> int:
 func _refresh_hud() -> void:
 	ui.top.text = "ACT %d · OZONE %d DU   ·   %s" % [act_number(), Designers.du(S["ozone"]), WD.clock_text(game_minutes())]
 	var ob := objective()
-	ui.obj.text = "> " + ob["text"] + "   [details: TAB]"
+	ui.obj.text = "> " + ob["text"] + "   [details: J]"
 	ui.obj.add_theme_color_override("font_color", WD.PAL["rose"] if ob.get("alert", false) else WD.PAL["white"])
 	var h: Dictionary = S["hold"]
 	ui.hold_bar.visible = not h.is_empty()
 	if not h.is_empty():
 		ui.hold_bar.value = h.get("p", 0.0)
+	var where := {}
+	var online := []
+	for r in ROLES:
+		where[r] = WD.room(WD.room_at(crew[r].position)).get("name", "?").replace("\n", " ") if is_instance_valid(crew.get(r)) else "?"
+		if crew_ctl.is_person(r) and r != crew_ctl.me_role:
+			online.append(r)
+	ui.update_crewbar(crew_ctl.me_role, online, where, crew_ctl.autopilot)
 	var me = camera.target
 	if is_instance_valid(me):
 		var id := WD.room_at(me.position)
@@ -656,10 +592,10 @@ func open_mission_panel() -> void:
 		var here := WD.room_at(p.position) if is_instance_valid(p) else ""
 		var jobs := work.filter(func(j): return j["role"] == r or j["role"] == "")
 		var job_txt := "; ".join(jobs.map(func(j): return "%s · %s" % [j["what"], WD.room(j["room"]).get("name", "")])) if not jobs.is_empty() else "Nothing waiting. Help the others."
-		var tag := " (you)" if p == camera.target else (" (autopilot)" if is_ai(r) else "")
+		var tag := " (you)" if p == camera.target else ((" (autopilot)" if crew_ctl.autopilot else " (waiting)") if is_ai(r) else " (online player)")
 		bb += "[color=#%s][b]%s%s[/b][/color] · in %s · %s\n" % [RoleSprites.TAGS[r].to_html(false), RoleSprites.NAMES[r], tag, WD.room(here).get("name", "?"), job_txt]
 	bb += "\n[color=#feae34]PROGRESS[/color]\n%s · Posters found: %d/21 · Optional missions: %d\n" % [WD.clock_text(game_minutes()), found.size(), S["opt"].size()]
-	bb += "[color=#8b9bb4]TAB or Esc closes this panel.[/color]"
+	bb += "[color=#8b9bb4]J or Esc closes this panel. TAB switch crew · F crew follow you · C CERES autopilot (%s)[/color]" % ("on" if crew_ctl.autopilot else "off")
 	ui.rich(box, bb, 16)
 	ui.button(box, "CLOSE", ui.close_panel)
 

@@ -2,9 +2,11 @@ extends Control
 ## Title screen and crew lobby, like the HTML demo: PLAY SOLO · HOST A CREW · JOIN A CREW.
 ## Owner: Sufi (gameplay). Uses the Network autoload (game/net/network.gd).
 ##
-## SOLO: pick how many people share this keyboard (1-4); CERES autopilot runs the other roles.
+## SOLO: pick who you start as and whether CERES autopilot moves the others (TAB switches in game).
 ## HOST: this laptop becomes the server. Friends on the same Wi-Fi type its CREW CODE (the IP address).
 ## JOIN: type the host's CREW CODE. The host presses START MISSION when everyone is in.
+## HOST and JOIN: click a role card to pick that role (roles nobody picks = CERES autopilot).
+## Passed to the game as Network meta: "my_role" (solo) and "crew_mode" ("autopilot" or "wait").
 ## Make this the main scene to start the game here (Project Settings → Run → Main Scene).
 
 const Pixel := preload("res://game/dawn/pixel.gd")
@@ -16,7 +18,8 @@ const ROLE_DESC := {"eng": "Builds · drills · heaters", "sci": "Instruments ·
 
 var _ui: Control
 var _mode := ""
-var _local := 4
+var _my_role := "eng"            ## solo: who you start as
+var _crew_mode := "autopilot"     ## solo: "autopilot" (CERES moves the others) or "wait" (you TAB to each)
 var _status: Label
 var _slots: VBoxContainer
 var _name: LineEdit
@@ -178,34 +181,48 @@ func _credits() -> void:
 
 func _solo() -> void:
 	_mode = "solo"
+	_my_role = str(Network.get_meta("my_role", "eng"))
+	_crew_mode = str(Network.get_meta("crew_mode", "autopilot"))
 	_clear()
 	var L := _panel(Vector2(32, 32), 720, 656)
 	_h(L, "YOUR CREW", 18)
-	_p(L, "You play all four. CERES autopilot runs anyone nobody plays. More people can share this keyboard: P1 WASD+E, P2 arrows+/, P3 IJKL+O, P4 numpad+0.", 20)
+	_p(L, "You play all four. Pick who you start as; press TAB in the game to switch and F to have the others follow you.", 20)
 	_slots = VBoxContainer.new()
 	_slots.add_theme_constant_override("separation", 10)
 	L.add_child(_slots)
 	var R := _panel(Vector2(784, 32), 464, 656)
 	_h(R, "SOLO CREW", 18)
-	_p(R, "How many people on this keyboard?", 20)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
-	R.add_child(row)
-	for n in [1, 2, 3, 4]:
-		var b := _btn(row, str(n), func():
-			_local = n
-			_refresh(), true)
-		b.custom_minimum_size = Vector2(80, 56)
+	_h(R, "THE OTHER THREE", 11, C["grey"])
+	var modes := VBoxContainer.new()
+	modes.add_theme_constant_override("separation", 10)
+	R.add_child(modes)
+	_mode_button(modes, "autopilot", "CERES AUTOPILOT", "CERES walks them to their spots and shelters.")
+	_mode_button(modes, "wait", "I MOVE EVERYONE", "They wait. Press TAB to take over each one.")
+	_p(R, "Change it in the game with C. Keys: WASD or arrows to walk, E to use.", 17, C["grey"])
 	var sp := Control.new()
 	sp.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	R.add_child(sp)
 	var go := _btn(R, "START MISSION  ▸▸", func():
 		Network.leave()
-		Network.set_meta("local_count", _local)
+		Network.set_meta("my_role", _my_role)
+		Network.set_meta("crew_mode", _crew_mode)
 		get_tree().change_scene_to_file(GAME))
 	_btn(R, "◂ BACK", _title, true)
 	go.grab_focus.call_deferred()
 	_refresh()
+
+
+func _mode_button(parent: Node, mode: String, label: String, note: String) -> void:
+	var b := _btn(parent, ("● " if _crew_mode == mode else "○ ") + label, func():
+		_crew_mode = mode
+		for c in parent.get_children():
+			var on: bool = c.get_meta("mode") == mode
+			c.text = ("● " if on else "○ ") + c.get_meta("label")
+			c.theme_type_variation = "" if on else "GhostButton", _crew_mode != mode)
+	b.set_meta("mode", mode)
+	b.set_meta("label", label)
+	b.tooltip_text = note
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 
 
 # ---------------------------------------------------------------- host / join
@@ -230,7 +247,8 @@ func _host_screen() -> void:
 	_mode = "host"
 	_clear()
 	var L := _panel(Vector2(32, 32), 720, 656)
-	_h(L, "YOUR CREW", 18)
+	_h(L, "CREW LOBBY", 18)
+	_p(L, "Pick a role. Roles nobody picks are run by CERES autopilot; the host can switch to them with TAB.", 20)
 	_slots = VBoxContainer.new()
 	_slots.add_theme_constant_override("separation", 10)
 	L.add_child(_slots)
@@ -246,7 +264,7 @@ func _host_screen() -> void:
 	var start := _btn(R, "OPEN THE CREW  ▸▸", func(): pass)
 	start.pressed.connect(func():
 		if Network.is_host():
-			Network.set_meta("local_count", 1)
+			Network.set_meta("crew_mode", "autopilot")
 			Network.start_game(GAME)
 			return
 		Network.set_meta("my_name", _name.text)
@@ -265,7 +283,8 @@ func _join_screen() -> void:
 	_mode = "join"
 	_clear()
 	var L := _panel(Vector2(32, 32), 720, 656)
-	_h(L, "THE CREW", 18)
+	_h(L, "CREW LOBBY", 18)
+	_p(L, "Pick a role. Roles nobody picks are run by CERES autopilot; the host can switch to them with TAB.", 20)
 	_slots = VBoxContainer.new()
 	_slots.add_theme_constant_override("separation", 10)
 	L.add_child(_slots)
@@ -294,55 +313,74 @@ func _join_screen() -> void:
 	_refresh()
 
 
-# ---------------------------------------------------------------- crew slots
+# ---------------------------------------------------------------- crew slots (click one to pick that role)
+
+## Role -> [player name, peer id] for everyone online.
+func _taken() -> Dictionary:
+	var who := {}
+	for id in Network.players:
+		who[RoleSprites.role_for_slot(Network.players[id]["slot"])] = [Network.players[id]["name"], id]
+	return who
+
+
+func _pick(r: String) -> void:
+	if _mode == "solo":
+		_my_role = r
+		_refresh()
+	elif Network.is_online():
+		Network.claim_slot(ROLES.find(r))      # the host checks the role is still free
+	else:
+		_status.text = "Open the crew first, then pick a role." if _mode == "host" else "Join the crew first, then pick a role."
+
 
 func _refresh() -> void:
 	if _slots == null or not is_instance_valid(_slots):
 		return
 	for c in _slots.get_children():
 		c.queue_free()
-	var who := {}
-	if Network.is_online():
-		for id in Network.players:
-			var p: Dictionary = Network.players[id]
-			who[RoleSprites.role_for_slot(p["slot"])] = [p["name"], id]
-	for i in 4:
-		var r: String = ROLES[i]
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 16)
-		var bgp := PanelContainer.new()
-		bgp.add_theme_stylebox_override("panel", DawnTheme.box(C["ink"], RoleSprites.TAGS[r] if (who.has(r) or (_mode == "solo" and i < _local)) else C["steel"], 4, Color(0, 0, 0, 0), 0, Vector4(12, 8, 12, 8)))
-		bgp.custom_minimum_size = Vector2(660, 0)
-		bgp.add_child(row)
-		var pic := Control.new()
-		pic.custom_minimum_size = Vector2(56, 80)
-		var tr := TextureRect.new()
-		tr.texture = RoleSprites.frames(r).get_frame_texture("idle_down", 0)
-		tr.size = Vector2(56, 80)
-		tr.stretch_mode = TextureRect.STRETCH_SCALE
-		tr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		pic.add_child(tr)
-		row.add_child(pic)
-		var col := VBoxContainer.new()
-		var nm := Label.new()
-		nm.text = RoleSprites.NAMES[r]
-		nm.add_theme_font_override("font", DawnTheme.title_font())
-		nm.add_theme_font_size_override("font_size", 12)
-		nm.add_theme_color_override("font_color", RoleSprites.TAGS[r])
-		col.add_child(nm)
-		var st := Label.new()
+	var who := _taken() if Network.is_online() else {}
+	for r in ROLES:
+		var mine: bool = (_mode == "solo" and r == _my_role) or (who.has(r) and who[r][1] == Network.my_id())
+		var taken: bool = who.has(r) and not mine
+		var status := ""
 		if _mode == "solo":
-			st.text = ("P%d · YOU" % (i + 1)) if i < _local else "CERES autopilot"
+			status = "YOU START AS THIS ROLE" if mine else ("CERES autopilot" if _crew_mode == "autopilot" else "Waits for you (TAB)")
 		elif who.has(r):
-			st.text = who[r][0] + (" (you)" if who[r][1] == Network.my_id() else "") + (" · HOST" if who[r][1] == 1 else "")
+			status = who[r][0] + (" (you)" if mine else "") + (" · HOST" if who[r][1] == 1 else "")
 		else:
-			st.text = "OPEN · CERES autopilot"
-		st.add_theme_font_size_override("font_size", 22)
-		col.add_child(st)
-		var d := Label.new()
-		d.text = ROLE_DESC[r]
-		d.add_theme_font_size_override("font_size", 18)
-		d.add_theme_color_override("font_color", C["grey"])
-		col.add_child(d)
-		row.add_child(col)
-		_slots.add_child(bgp)
+			status = "OPEN · click to pick · CERES autopilot"
+		_slots.add_child(_slot_card(r, mine, taken, status))
+
+
+func _slot_card(r: String, mine: bool, taken: bool, status: String) -> Button:
+	var card := Button.new()
+	card.custom_minimum_size = Vector2(660, 104)
+	card.disabled = taken
+	card.tooltip_text = "Taken by another player" if taken else "Play as the " + RoleSprites.NAMES[r]
+	var edge: Color = C["yellow"] if mine else (RoleSprites.TAGS[r] if taken else C["steel"])
+	for k in ["normal", "disabled"]:
+		card.add_theme_stylebox_override(k, DawnTheme.box(C["ink"], edge, 4, Color(0, 0, 0, 0), 0, Vector4(12, 8, 12, 8)))
+	for k in ["hover", "pressed", "focus"]:
+		card.add_theme_stylebox_override(k, DawnTheme.box(C["navy"], C["yellow"] if mine else RoleSprites.TAGS[r], 4, Color(0, 0, 0, 0), 0, Vector4(12, 8, 12, 8)))
+	card.pressed.connect(func(): _pick(r))
+	var row := HBoxContainer.new()
+	row.position = Vector2(12, 12)
+	row.add_theme_constant_override("separation", 16)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.add_child(row)
+	var tr := TextureRect.new()
+	tr.texture = RoleSprites.frames(r).get_frame_texture("idle_down", 0)
+	tr.custom_minimum_size = Vector2(56, 80)
+	tr.stretch_mode = TextureRect.STRETCH_SCALE
+	tr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	row.add_child(tr)
+	var col := VBoxContainer.new()
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(col)
+	var nm := _h(col, RoleSprites.NAMES[r], 12, RoleSprites.TAGS[r])
+	nm.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_p(col, status, 22, C["yellow"] if mine else C["white"]).autowrap_mode = TextServer.AUTOWRAP_OFF
+	_p(col, ROLE_DESC[r], 18, C["grey"]).autowrap_mode = TextServer.AUTOWRAP_OFF
+	for n in col.get_children():
+		n.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return card
