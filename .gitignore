@@ -25,3 +25,14 @@ export_credentials.cfg
 .DS_Store
 Thumbs.db
 .vscode/
+
+#scratch files
+download/.dodsrc
+download/raw/
+doc/raw/
+api/raw/
+# scratch files
+*.bak
+browse/raw_*.html
+browse/example.csv
+__pycache__/
