@@ -168,6 +168,9 @@ func _req_act(id: String, p: Dictionary, role: String) -> void:
 	if not Network.is_host():
 		return
 	var sender := multiplayer.get_remote_sender_id()
+	if id in ["skip_intro", "wake_start"]:
+		_do_act(id, p, role)
+		return
 	if crew_ctl.owner_peer(role) != sender and crew_ctl.is_person(role):
 		return                      # you may act for your own role or for a role nobody plays
 	_do_act(id, p, role)
@@ -180,6 +183,12 @@ func _do_act(id: String, p: Dictionary, role: String) -> void:
 		S["suits"][role] = bool(p.get("on", false))
 		if story and story.has_method("on_suit"):
 			story.on_suit(role)
+		commit()
+	elif id == "skip_intro":
+		S["intro_skipped"] = true
+		commit()
+	elif id == "wake_start":
+		S["wake_started"] = true
 		commit()
 	elif story:
 		story.do_effect(id, p, role)
@@ -200,6 +209,10 @@ func _apply_state(s: Dictionary) -> void:
 	var old_world := _shown_world
 	var old_scene := _shown_scene
 	S = s
+	if S.get("intro_skipped", false) and story and story.sui:
+		story.sui.skip_intro_for_all()
+	if S.get("wake_started", false) and story and story.sui:
+		story.sui.start_wake_for_all()
 	_shown_world = S["world"]
 	_shown_scene = S["scene"]
 	for r in crew:

@@ -176,7 +176,7 @@ func intro() -> void:
 	var skip := Button.new()
 	skip.text = "SKIP INTRO"
 	skip.theme_type_variation = "GhostButton"
-	skip.pressed.connect(_intro_done)
+	skip.pressed.connect(_request_skip_intro)
 	foot.add_child(skip)
 	var sp := Control.new()
 	sp.custom_minimum_size = Vector2(14, 0)
@@ -228,7 +228,13 @@ func _intro_next() -> void:
 	else:
 		_intro_show()
 
-
+func _request_skip_intro() -> void:
+	g.act("skip_intro", {}, g.acting_role())
+	
+func skip_intro_for_all() -> void:
+	if _intro_box != null:
+		_intro_done()
+		
 func _intro_done() -> void:
 	_intro_box = null
 	_close()
@@ -399,6 +405,12 @@ func wake() -> void:
 
 
 func _wake_start() -> void:
+	if _wk.is_empty() or _wk["phase"] != "black":
+		return
+	g.act("wake_start", {}, g.acting_role())
+
+
+func start_wake_for_all() -> void:
 	if _wk.is_empty() or _wk["phase"] != "black":
 		return
 	_wk["start"].queue_free()
