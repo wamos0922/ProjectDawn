@@ -1,0 +1,28 @@
+{
+  "id": "2_1_moon_scouts",
+  "objective": "2.1",
+  "destination": "moon",
+  "orbit": "lunar_100",
+  "needs_functions": [
+    "ice_finder"
+  ],
+  "platforms_allowed": [
+    "cubesat_12u",
+    "espa_class",
+    "lcross_bus",
+    "lro_bus"
+  ],
+  "reference_missions": [
+    "lro",
+    "lcross",
+    "lunar_prospector"
+  ],
+  "instruments_allowed": [
+    "lend_neutron",
+    "lcross_nir",
+    "lcross_vsp",
+    "lamp_uv",
+    "diviner_radiometer",
+    "lroc_nac"
+  ]
+}

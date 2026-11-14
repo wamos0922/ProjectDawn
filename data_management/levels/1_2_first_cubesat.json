@@ -1,0 +1,25 @@
+{
+  "id": "1_2_first_cubesat",
+  "objective": "1.2",
+  "destination": "earth",
+  "orbit": "leo_400",
+  "needs_functions": [
+    "ozone_mapper"
+  ],
+  "platforms_allowed": [
+    "cubesat_3u",
+    "cubesat_6u",
+    "cubesat_12u"
+  ],
+  "reference_missions": [
+    "phonesat",
+    "toms",
+    "aura"
+  ],
+  "instruments_allowed": [
+    "omi_ozone",
+    "mro_marci_uv",
+    "lamp_uv",
+    "crater_radiation"
+  ]
+}
