@@ -34,7 +34,7 @@ Solo play is simply "you are the host".
 | `game/dawn/story.gd` | The five acts: objective, holds, what each console does, effects, storms, optional missions | the story does not advance, wrong objective |
 | `game/dawn/story_ui.gd` | Full-screen scenes: intro, wake-up, workshop, poll, launch, report, travel, ending | an animation or story screen is wrong |
 | `game/dawn/designers.gd` | NASA numbers, the three designers (shield, Moon power, Mars power) and their rules | a design passes/fails when it should not |
-| `game/dawn/minigames.gd` | The role minigames (UV sensor timing, tuning, bolts, burn, cargo…) | a minigame crashes or cannot be won |
+| `game/dawn/minigames.gd` | The role minigames (UV sensor timing, tuning, bolts, burn, cargo…), and review mode (F8: one-click placeholders) | a minigame crashes or cannot be won |
 | `game/dawn/dawn_ui.gd` | HUD (top bar, objective, crew bar), toasts, dialogue box + portrait, panels | HUD layout, dialogue box, buttons |
 | `game/dawn/pixel.gd` | 320×180 pixel canvas with the HTML drawing helpers (sky, rocket, person, CERES robot) | a drawn animation looks different from HTML |
 | `game/dawn/dawn_theme.gd` | Colours, fonts, button and panel styles (`DawnTheme`) | colours or fonts |
@@ -75,7 +75,7 @@ HTML sources in `/home/claude/v2` (edit the path `V` at the top), then copy the 
 ## Keys
 
 WASD or arrows walk · E or Enter use · Space/click next line · TAB switch crew · F follow ·
-C autopilot · M world map · J mission details · Esc close · F9/F10/F11 jump to Earth/Moon/Mars (solo debug)
+C autopilot · M world map · J mission details · Esc close · F8 review mode (minigames become one click) · F9/F10/F11 jump to Earth/Moon/Mars (solo debug)
 
 ## Checking your change
 
@@ -85,5 +85,6 @@ godot --headless --path . -s res://tests/crew_test.gd       # TAB, follow, autop
 godot --headless --path . -s res://tests/door_test.gd       # walk out a door → map trip → next room
 godot --headless --path . -s res://tests/all_doors_test.gd  # every door in all 37 rooms can be walked through
 godot --headless --path . -s res://tests/minigame_test.gd   # plays each minigame through its buttons
+godot --headless --path . -s res://tests/review_mode_test.gd  # F8 review mode: every minigame is a one-click placeholder
 ```
 (The two "bolts" minigames have a moving target and time out in the test; that is expected.)

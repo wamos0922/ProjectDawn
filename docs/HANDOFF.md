@@ -4,6 +4,17 @@ Newest entry at the top. Write one at the end of every AI session. Read the last
 
 ---
 
+## 2026-11-15 · Sufi (with Claude) · branch feat/review-mode
+Done:
+- Review mode for team testing: every minigame becomes a placeholder panel with one COMPLETE button.
+  COMPLETE calls the same on_win as a real win, so the task is recorded exactly the same way (online too).
+  - Turn it on/off: F8 in game, or Esc > SETTINGS > REVIEW MODE. Per computer, kept across scenes
+    (Network meta "review_mode"). Off by default: the real minigames are unchanged.
+  - minigames.gd: _review() at the top of all 10 minigames (timing, sliders, fuel, orbit, wind, scan,
+    wires, wipe, pack, pick). esc_menu.gd: the SETTINGS switch + F8 in CONTROLS.
+  - Not affected (they are not minigames): designers, choices, press-and-wait tasks, holds.
+- Test: tests/review_mode_test.gd (25 checks). All other suites pass.
+
 ## 2026-11-14 · Wam (with Claude) · branch fix/playtest-round1
 Done:
 - Minigame crash on win fixed (Scientist UV sensor and the others with a STOP/LAUNCH button).

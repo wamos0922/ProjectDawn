@@ -21,6 +21,7 @@ const Designers := preload("res://game/dawn/designers.gd")
 const Crew := preload("res://game/dawn/crew.gd")
 const WorldMap := preload("res://game/dawn/world_map.gd")
 const EscMenu := preload("res://game/dawn/esc_menu.gd")
+const Minigames := preload("res://game/dawn/minigames.gd")
 const STORY_PATH := "res://game/dawn/story.gd"
 const LOBBY := "res://game/dawn/title.tscn"
 const POSTERS_FILE := "res://data/posters.json"
@@ -515,10 +516,19 @@ func _unhandled_input(event: InputEvent) -> void:
 		ui.close_panel()
 	elif k == KEY_ESCAPE and not ui.dialogue_open():
 		esc_menu.open()
+	elif k == KEY_F8:
+		toggle_review_mode()
 	elif not Network.is_online() and k in [KEY_F9, KEY_F10, KEY_F11]:
 		S["world"] = {KEY_F9: "earth", KEY_F10: "moon", KEY_F11: "mars"}[k]
 		commit()
 		ui.toast("Debug: jumped to " + S["world"].to_upper())
+
+
+## Review mode (team testing): every minigame becomes a one-click placeholder. Per computer.
+func toggle_review_mode() -> void:
+	var on := not Minigames.review_mode()
+	Minigames.set_review_mode(on)
+	ui.toast("REVIEW MODE ON: minigames are one-click placeholders (F8 to turn off)" if on else "Review mode off: real minigames", 3.0)
 
 
 # ---------------------------------------------------------------- locks

@@ -21,6 +21,9 @@ const CONTROLS := {
 		[["J"], "Mission details"],
 		[["ESC"], "Menu / close"],
 	],
+	"TEAM TESTING": [
+		[["F8"], "Review mode: minigames become one click"],
+	],
 }
 
 var g                             ## dawn.gd
@@ -75,11 +78,15 @@ func _key_cap(key: String) -> PanelContainer:
 	return cap
 
 
-## Placeholder until the settings are designed.
+## SETTINGS page. Review mode: every minigame becomes a one-click placeholder (team testing).
 func _settings() -> void:
 	var box: VBoxContainer = g.ui.panel(Color("#262b44"), Color("#feae34"), 520, 200)
 	g.ui.title(box, "SETTINGS")
-	g.ui.rich(box, "Coming soon.")
+	var on: bool = g.Minigames.review_mode()
+	g.ui.rich(box, "[b]Review mode[/b]: every minigame becomes one COMPLETE button, so you can play through all the acts quickly. Only on this computer. [color=#8b9bb4](Shortcut: F8)[/color]")
+	g.ui.button(box, "REVIEW MODE: %s" % ("ON" if on else "OFF"), func():
+		g.toggle_review_mode()
+		_settings(), false)
 	g.ui.button(box, "◂ BACK", open, false)
 
 
