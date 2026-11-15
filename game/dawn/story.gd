@@ -399,12 +399,7 @@ func role_task(k: String) -> Dictionary:
 		if st == 1 and k == "nav" and not task_done("wind"):
 			return {"label": "PICK LAUNCH HOUR", "role": "nav", "fn": func(): mg.wind("nav", _send("wind"))}
 		if st == 1 and k == "comms" and not task_done("tune"):
-			return {"label": "TUNE GROUND STATION", "role": "qm", "fn": func():
-				var tgt := 2200 + roundi((randf() - 0.5) * 30) * 10
-				mg.sliders("qm", "TUNE THE GROUND STATION", "Find the rocket's radio beacon in the S-band. Turn the dial until the signal is at least 90%, then lock it in.",
-					[{"label": "Frequency", "min": 2000, "max": 2400, "step": 5, "val": 2050, "unit": " MHz"}],
-					func(v): var s2 := exp(-pow((v[0] - tgt) / 28.0, 2)); return {"ok": s2 >= 0.9, "meter": s2, "read": "Signal strength: [b]%d%%[/b]" % roundi(s2 * 100), "why": "Signal too weak. Keep tuning."},
-					_send("tune"), "NASA's Deep Space Network talks to spacecraft on radio bands like this one.")}
+			return {"label": "PICK THE INSTRUMENTS", "role": "qm", "fn": func(): mg.play("Q1", "qm", _send("tune"))}
 		if st == 5:
 			if k == "nav" and not task_done("perigee"):
 				return {"label": "REACH ORBIT", "role": "nav", "fn": func(): mg.play("N1", "nav", _send("perigee"))}
