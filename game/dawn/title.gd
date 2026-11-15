@@ -27,6 +27,7 @@ var _addr: LineEdit
 
 
 func _ready() -> void:
+	Sound.music("title")
 	size = Vector2(1280, 720)
 	theme = DawnTheme.get_theme()
 	get_viewport().canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
@@ -145,7 +146,7 @@ func _title() -> void:
 	chip.add_theme_stylebox_override("panel", DawnTheme.box(Color(0.094, 0.078, 0.145, 0.88), C["slate"], 4, Color(0, 0, 0, 0), 0, Vector4(12, 7, 12, 7)))
 	chip.position = Vector2(32, 662)
 	var cl := Label.new()
-	cl.text = "CO-OP · 1–4 PLAYERS · EARTH · MOON · MARS"
+	cl.text = "CO-OP · 1–4 PLAYERS · EARTH · MOON"
 	cl.add_theme_font_override("font", DawnTheme.title_font())
 	cl.add_theme_font_size_override("font_size", 12)
 	cl.add_theme_color_override("font_color", C["sand"])
@@ -169,7 +170,6 @@ func _credits() -> void:
 		"• Ozone: healthy %d DU, hole below %d DU, record low %d DU (%s). NASA Ozone Watch\n" % [N["ozone"]["normal"], N["ozone"]["hole"], N["ozone"]["low"], N["ozone"]["low_when"]] +
 		"• Solar storm and satellites: %s. NASA Science\n" % N["storm"]["name"] +
 		"• Lunar south pole: Shackleton rim sunlit %s%% of the time, crater floors near %d K. LRO LOLA and Diviner\n" % [str(N["moon"]["rim"]), N["moon"]["cold"]] +
-		"• Mars dust storm: tau %s, Opportunity %d → %d watt-hours a day. NASA JPL\n" % [str(N["mars"]["tau"]), N["mars"]["wh_before"], N["mars"]["wh_after"]] +
 		"• RTG power: about %d W, %d kg. NASA MMRTG fact sheet\n\n" % [N["rtg"]["w"], N["rtg"]["kg"]] +
 		"[color=#feae34]FONTS[/color]\nPress Start 2P and Pixelify Sans (SIL Open Font License, Google Fonts).\n\n" +
 		"[color=#feae34]AI TOOLS USED[/color]\nClaude (Anthropic) and Codex helped write code, pixel art and text. The team chose the design, checked the facts and tested the game.")
@@ -257,22 +257,38 @@ func _host_screen() -> void:
 	_name_field(R)
 	var ips := local_ips()
 	_h(R, "CREW CODE", 11, C["grey"])
-	var code := _h(R, ips[0] if not ips.is_empty() else "127.0.0.1", 24, C["white"])
+	var code := _h(R, "—", 24, C["white"])
 	code.name = "Code"
-	_p(R, "Friends on the same Wi-Fi press JOIN A CREW and type this code." + ("\nOther addresses: " + ", ".join(ips.slice(1)) if ips.size() > 1 else ""), 18)
+	var how := _p(R, "ONLINE: friends anywhere type the room code.\nLAN: friends on the same Wi-Fi type this laptop's address.", 18)
 	_status = _p(R, "", 18, C["cyan"])
-	var start := _btn(R, "OPEN THE CREW  ▸▸", func(): pass)
+	var start := _btn(R, "OPEN ONLINE CREW  ▸▸", func(): pass)
+	var lan := _btn(R, "OPEN LAN CREW (same Wi-Fi)", func(): pass, true)
+	var opened := func(text: String, note: String):
+		code.text = text
+		how.text = note
+		start.text = "START MISSION  ▸▸"
+		lan.visible = false
+	Network.joined.connect(func():
+		if is_instance_valid(code) and Network.is_host() and Network.room_code != "":
+			opened.call(Network.room_code, "Friends press JOIN A CREW and type this room code (works over the internet)."))
 	start.pressed.connect(func():
 		if Network.is_host():
 			Network.set_meta("crew_mode", "autopilot")
 			Network.start_game(GAME)
 			return
+		if Network.multiplayer.multiplayer_peer is Network.RelayPeer:
+			return
+		Network.set_meta("my_name", _name.text)
+		var err: Error = Network.host_online(_name.text)
+		_status.text = "Opening an online crew…" if err == OK else "Could not go online: " + error_string(err))
+	lan.pressed.connect(func():
 		Network.set_meta("my_name", _name.text)
 		var err: Error = Network.host(_name.text)
 		if err != OK:
 			_status.text = "Could not host: %s (is another host running on this laptop?)" % error_string(err)
 			return
-		start.text = "START MISSION  ▸▸"
+		opened.call(ips[0] if not ips.is_empty() else "127.0.0.1",
+			"Friends on the same Wi-Fi type this address." + ("\nOther addresses: " + ", ".join(ips.slice(1)) if ips.size() > 1 else ""))
 		_status.text = "Hosting. Friends can join now. Press START when everyone is in.")
 	_btn(R, "◂ BACK", _title, true)
 	start.grab_focus.call_deferred()
@@ -305,7 +321,7 @@ func _join_screen() -> void:
 			return
 		Network.set_meta("my_name", _name.text)
 		Network.set_meta("last_code", code)
-		var err: Error = Network.join(code, _name.text)
+		var err: Error = Network.join(code, _name.text) if Network.is_lan_code(code) else Network.join_online(code, _name.text)
 		_status.text = ("Connecting to %s …" % code) if err == OK else "Could not join: " + error_string(err))
 	_btn(R, "◂ BACK", _title, true)
 	_addr.grab_focus.call_deferred()

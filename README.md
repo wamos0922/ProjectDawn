@@ -39,11 +39,9 @@ They are guided by **CERES**, the bunker's mission-control AI, named after the d
 |---|---|---|---|
 | 1 | First Light | Earth | Learn how bad the sky really is |
 | 2 | Water Above Us | Moon | Find fuel beyond Earth |
-| 3 | The Moon Factory | Moon | Build the shield |
-| 4 | The Red Teacher | Mars | Learn to live under a broken sky |
-| 5 | Dawn | Mars → Earth | Bring humanity back to the surface |
+| 3 | The Shield | Moon → Earth | Launch the shield, fly home, watch the dawn |
 
-Ten optional **"Helping Humanity"** missions (communication relays, a space-weather satellite, farming and disaster-watch satellites, planetary defense and more) reuse the technology from the main story to help the bunkers. How many the team completes decides the ending: **Quiet Dawn**, **Rising Dawn** or **Golden Dawn**.
+The shield goes up, the crew flies home and steps outside into the first real sunrise. The mission stars the team earns decide how bright the ending is: **Quiet Dawn**, **Rising Dawn** or **Golden Dawn**. (The game plays this shortened story; see `docs/STORY_MOON_ONLY.md`.)
 
 ---
 
@@ -52,7 +50,7 @@ Ten optional **"Helping Humanity"** missions (communication relays, a space-weat
 1. **Read the brief.** Each objective comes with a story and 3–5 requirements, e.g. *"Carry a UV sensor · Stay powered through 36 minutes of Earth's shadow · Send home at least 5 MB per day · Stay within 200 credits."*
 2. **Design the spacecraft.** Pick a frame, computer, instruments, power, batteries, radio and launcher. Live bars show mass, cost, power, battery energy and data.
 3. **Pass the Readiness Review.** CERES lists every problem with the real numbers and a suggested fix: *"Battery too small: needs 2.7 Wh for 36 min of shadow, has 1.5 Wh."* Each of the four roles must sign off before launch.
-4. **Launch.** For trips to the Moon and Mars, the Navigator sets the fuel load. The exact amount needed is hidden and shown only as a range that narrows with every attempt.
+4. **Launch.** For trips to the Moon, the Navigator sets the fuel load. The exact amount needed is hidden and shown only as a range that narrows with every attempt.
 5. **Read the Mission Report.** Each requirement is marked met or missed, with the reason, a score, and the **real NASA mission** your design is closest to.
 6. **Redesign or continue.** Fix one thing and fly again, or move on with the story.
 
@@ -112,11 +110,6 @@ The game follows NASA's own mission design process from the challenge resources:
 | The ozone layer heals once the cause stops | Montreal Protocol recovery: projected around 2040, around 2066 over Antarctica |
 | Smartphone CubeSat | NASA PhoneSat; CubeSat Launch Initiative |
 | Water ice for rocket fuel | Ice in permanently shadowed craters near the lunar south pole |
-| Asteroid deflection | NASA DART (2022) |
-| How Mars lost its atmosphere | NASA MAVEN |
-| Oxygen from Martian air | MOXIE on the Perseverance rover |
-| Dust storm danger to solar power | Opportunity rover, ended by a 2018 dust storm |
-| The Mars methane mystery | Methane spikes measured by Curiosity |
 
 Full source list with links: [`docs/SOURCES.md`](docs/SOURCES.md).
 

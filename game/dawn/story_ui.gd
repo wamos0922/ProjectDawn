@@ -831,7 +831,7 @@ func mission_board() -> void:
 		if s["step"] == 0:
 			g.act("pick", {}, g.acting_role()))
 	_card(r, "ACT 2\n???", "Unlocked" if done else "Classified until 1.1", func(pc, t, _d): pc.planet("moon", 8, 4, 32) if done else pc.text("?", 24, 26, "slate", 14), true)
-	_card(r, "ACTS 3–5\n???", "Later" if done else "Classified", func(pc, t, _d): pc.text("?", 24, 26, "slate", 14), true)
+	_card(r, "ACT 3\n???", "Later" if done else "Classified", func(pc, t, _d): pc.text("?", 24, 26, "slate", 14), true)
 	g.ui.button(box, "CLOSE", g.ui.close_panel, false)
 	c1.grab_focus.call_deferred()
 
@@ -1132,7 +1132,7 @@ func _report() -> void:
 	Rr.add_child(holder)
 	g.ui.title(Rr, "NASA SOUNDING\nROCKET PROGRAM", C["yellow"], 13)
 	g.ui.rich(Rr, "Real rockets that fly straight up and fall back, giving scientists a few minutes above the air.", 18)
-	g.ui.rich(Rr, "[color=#63c74d]NEW: ACT 2 · ???\nNEW: OPTIONAL B · UV CANOPY[/color]", 16)
+	g.ui.rich(Rr, "[color=#63c74d]NEW: ACT 2 · ???[/color]", 16)
 
 
 # ---------------------------------------------------------------- travel (ported from c5.js)
@@ -1171,12 +1171,8 @@ func _travel() -> void:
 			pc.px(round(bz.call(70, 170, 236, u)), round(bz.call(118, 150, 64, u)), "steel")
 		var x2: float = bz.call(70, 170, 236, k)
 		var y2: float = bz.call(118, 150, 64, k)
-		if c.get("kind", "") == "robots":
-			pc.R(x2 - 3, y2 - 3, 7, 6, "light")
-			pc.R(x2 - 2, y2 - 2, 5, 2, "cyan")
-		else:
-			pc.R(x2 - 1, y2 - 4, 3, 8, "light")
-			pc.R(x2 - 1, y2 - 5, 3, 1, "red")
+		pc.R(x2 - 1, y2 - 4, 3, 8, "light")
+		pc.R(x2 - 1, y2 - 5, 3, 1, "red")
 		if int(t * 12) % 2:
 			pc.R(x2 - 1, y2 + 4, 3, 2, "orange"))
 	var v := _banner(_screen, c.get("title", ""), c.get("sub", ""), true)
@@ -1196,12 +1192,21 @@ func _travel() -> void:
 	_screen.add_child(sk)
 
 
-# ---------------------------------------------------------------- ending (ported from c5.js)
+# ---------------------------------------------------------------- ending: home on Earth (always happy)
+
+## Ending titles by mission stars (rocket + outpost power + shield, up to 9). Every ending is a happy one;
+## more stars just make the dawn brighter.
+static func ending_tier(stars: int) -> String:
+	if stars >= 8:
+		return "GOLDEN DAWN"
+	if stars >= 5:
+		return "RISING DAWN"
+	return "QUIET DAWN"
+
 
 func _ending() -> void:
 	var s: Dictionary = g.S
-	var n: int = s["opt"].size()
-	var tier := "GOLDEN DAWN" if n >= 4 else ("RISING DAWN" if n >= 2 else "QUIET DAWN")
+	var tier := ending_tier(g.mission_stars())
 	var st0 := {"t": -1.0}
 	_open(func(pc, t, dt):
 		if st0["t"] < 0:
@@ -1211,14 +1216,28 @@ func _ending() -> void:
 		pc.stars(t)
 		pc.landscape(t, 0, true)
 		pc.dust(t, dt)
+		# the return capsule floats down under its parachute and lands by the bunker
+		var land := minf(1.0, e / 3.0)
+		var cx := 236.0
+		var cy := lerpf(-20.0, 136.0, 1.0 - pow(1.0 - land, 2.0))   # feet of the capsule on the ground
+		if land < 1.0:
+			pc.disc(cx, cy - 18, 9, "rose")
+			pc.R(cx - 9, cy - 18, 19, 4, "pink")
+			pc.line(cx - 8, cy - 15, cx - 3, cy - 4, "light")
+			pc.line(cx + 8, cy - 15, cx + 3, cy - 4, "light")
+		pc.R(cx - 5, cy - 4, 11, 8, "light")
+		pc.R(cx - 4, cy - 3, 9, 2, "steel")
+		pc.R(cx - 1, cy - 1, 3, 2, "cyan")
+		# then the crew walks out into the first real sunrise
 		for i in 4:
 			var tx := 74 + i * 24
-			var x := minf(tx, 40 + e * 14 - i * 12)
-			if x < 40:
+			var x := minf(tx, 40 + (e - 3.0) * 14 - i * 12)
+			if e < 3.0 or x < 40:
 				continue
 			var mv := x < tx
 			pc.person(ROLES[i], x, 120, "right" if mv else "down", int(t * 8) + 1 if mv else 0))
-	g.ui.say([{"who": "ceres", "text": "The last shield satellites are in place. The ozone meter reads %d%% and climbing." % s["ozone"]},
+	g.ui.say([{"who": "ceres", "text": "Touchdown! The capsule is down safely next to Bunker 4. Welcome home."},
+		{"who": "ceres", "text": "The shield satellites hold their place at L1. The ozone meter reads %d%% and climbing." % s["ozone"]},
 		{"who": "narrator", "text": "The four scientists step outside without suits and watch a real sunrise: a dawn."}], func(): _end_stats(tier))
 
 
@@ -1226,15 +1245,10 @@ func _end_stats(tier: String) -> void:
 	if _screen == null or g.S["scene"] != "ending":
 		return
 	var s: Dictionary = g.S
-	var n: int = s["opt"].size()
-	_banner(_screen, tier, "The shield is complete. The sky is healing. The bunker doors are open.")
+	_banner(_screen, tier, "The shield is up. The sky is healing. The bunker doors are open.")
 	var v := _box(_screen, Vector2(240, 548), 800, C["slate"])
-	var names := " · ".join(s["opt"].map(func(k): return story.OPTNAME[k]))
-	var total := 0
-	for k in s.get("stars", {}):
-		total += int(s["stars"][k])
-	g.ui.rich(v, "[center][color=#fee761][b]OZONE %d%%[/b][/color]\nOptional missions done: %d of 6 · Mistakes: %d\n[color=#8b9bb4]%s\nMission time: %s · Posters found: %d/21 · Mission stars: %d/12\n0–1 Quiet Dawn · 2–3 Rising Dawn · 4+ Golden Dawn[/color][/center]" % [
-		s["ozone"], n, s["pen"], names if names != "" else "None: they change the ending", _dur(s["time"]), g.found.size(), total], 18)
+	g.ui.rich(v, "[center][color=#fee761][b]OZONE %d%%[/b][/color]\nMission stars: %d/%d · Mistakes: %d\n[color=#8b9bb4]Mission time: %s · Posters found: %d/%d\n0–4 stars Quiet Dawn · 5–7 Rising Dawn · 8–9 Golden Dawn[/color][/center]" % [
+		s["ozone"], g.mission_stars(), g.MAX_STARS, s["pen"], _dur(s["time"]), g.found.size(), g.posters.size()], 18)
 	var r: HBoxContainer = g.ui.row(v)
 	r.alignment = BoxContainer.ALIGNMENT_CENTER
 	g.ui.button(r, "WALK BUNKER 4 ▸▸", func(): g.act("freeroam", {}, g.acting_role())).grab_focus.call_deferred()

@@ -146,14 +146,12 @@ static func inside(r: Dictionary, x: float, y: float) -> bool:
 
 func _texture() -> ImageTexture:
 	var w := _world()
-	var hydro: bool = w == "earth" and g.S.get("hydro", false)
-	var sig := w + ("_h" if hydro else "")
+	var sig := w
 	for r in _rooms():
 		sig += "1" if _locked(r) else "0"
 	if _tex.has(sig):
 		return _tex[sig]
-	var sfx := "_h" if hydro else ""
-	var img: Image = load("res://assets/map/%s_under%s.png" % [w, sfx]).get_image()
+	var img: Image = load("res://assets/map/%s_under.png" % w).get_image()
 	img.convert(Image.FORMAT_RGBA8)
 	var tones: Dictionary = _map["tones"]
 	for r in _rooms():
@@ -172,7 +170,7 @@ func _texture() -> ImageTexture:
 					continue
 				var c: String = T["b"] if edge else (T["f"] if ((x >> 2) + (y >> 2)) & 1 else T["t"])
 				img.set_pixel(x, y, Color(c))
-	var over: Image = load("res://assets/map/%s_over%s.png" % [w, sfx]).get_image()
+	var over: Image = load("res://assets/map/%s_over.png" % w).get_image()
 	over.convert(Image.FORMAT_RGBA8)
 	img.blend_rect(over, Rect2i(0, 0, W, H), Vector2i.ZERO)
 	_tex[sig] = ImageTexture.create_from_image(img)
@@ -221,7 +219,7 @@ func _paint(pc, t: float, _dt: float) -> void:
 		var at: Vector2 = _trip["a"].lerp(_trip["b"], k)
 		var d: Vector2 = _trip["b"] - _trip["a"]
 		var dir := ("right" if d.x > 0 else "left") if absf(d.x) > absf(d.y) else ("down" if d.y > 0 else "up")
-		pc.person(_trip["role"], at.x - 7, at.y - 18, dir, 1 + int(t * 8) % 4, 1.0, g.S["suits"].get(_trip["role"], false), w == "mars")
+		pc.person(_trip["role"], at.x - 7, at.y - 18, dir, 1 + int(t * 8) % 4, 1.0, g.S["suits"].get(_trip["role"], false))
 	if showing:
 		pc.R(0, 172, W, 8, Color(Pixel.P["ink"], 0.85))
 		pc.text("MAP · M OR ESC TO CLOSE · YOU = BLINKING", 160, 175, Pixel.P["grey"], 5)

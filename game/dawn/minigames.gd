@@ -4,9 +4,8 @@ extends RefCounted
 ## the host to record the task). Nothing here changes the shared state directly.
 ##
 ##   timing  stop a moving marker inside a band        sliders  set dials until the readout is right
-##   fuel    guess a hidden fuel load with test burns  orbit    launch at perigee / in the launch window
-##   wind    pick a launch hour                        scan     neutron scan for ice
-##   wires   match cable colours                        wipe     brush dust off solar panels
+##   orbit   launch when the Moon is closest           wind     pick a launch hour
+##   scan    neutron scan for ice                      wires    match cable colours
 ##   pack    fit cargo under a mass limit               pick     choose the right picture card
 ##
 ## REVIEW MODE (for the team, to play through the acts fast): F8 in game, or Esc > SETTINGS.
@@ -18,6 +17,12 @@ const RoleSprites := preload("res://game/player/role_sprites.gd")
 const P := WD.PAL
 
 var g
+var current: Game                 ## the minigame on screen (or a finished one), for the music
+
+
+## True while a minigame panel is open (dawn.gd plays the "minigame" music then).
+func is_open() -> bool:
+	return current != null and current.alive()
 
 
 ## Something to draw on, redrawn every frame. fn(canvas) does the drawing; input(canvas, event) is optional.
@@ -55,6 +60,7 @@ class Game extends RefCounted:
 		if done:
 			return
 		done = true
+		_sfx("success")
 		msg.text = "[b][color=#63c74d]DONE![/color][/b]" + ("  [color=#fee761]★ %s[/color]" % fact if fact != "" else "")
 		for c in foot.get_children():
 			c.queue_free()
@@ -64,10 +70,17 @@ class Game extends RefCounted:
 		b.grab_focus.call_deferred()
 
 	func fail(text: String) -> void:
+		_sfx("failure")
 		msg.text = "[color=#f6757a]%s[/color]" % text
 
 	func alive() -> bool:
 		return is_instance_valid(box) and box.is_inside_tree()
+
+	## One-shot sound through the Sound autoload (looked up at run time: see _net() below).
+	func _sfx(name: String) -> void:
+		var snd: Node = (Engine.get_main_loop() as SceneTree).root.get_node_or_null("Sound")
+		if snd:
+			snd.play(name)
 
 
 # ---------------------------------------------------------------- review mode (placeholder)
@@ -99,6 +112,7 @@ func _review(role: String, title: String, on_win: Callable) -> bool:
 		return false
 	var M := _open(role, title, "[color=#fee761]REVIEW MODE[/color] · placeholder minigame. The real one is skipped; press COMPLETE to finish this task. [color=#8b9bb4](F8 or Esc > SETTINGS turns review mode off.)[/color]")
 	var b: Button = g.ui.button(M.foot, "COMPLETE  ▸▸", func():
+		M._sfx("success")
 		g.ui.close_panel()
 		on_win.call())
 	M.foot.move_child(b, 0)
@@ -109,6 +123,7 @@ func _review(role: String, title: String, on_win: Callable) -> bool:
 func _open(role: String, title: String, text: String) -> Game:
 	var M := Game.new()
 	M.g = g
+	current = M
 	M.box = g.ui.panel(Color("#262b44"), RoleSprites.TAGS.get(role, P["amber"]), 860, 50)
 	g.ui.rich(M.box, "[color=#%s][b]%s TASK[/b][/color]" % [RoleSprites.TAGS[role].to_html(false), RoleSprites.NAMES[role]], 14)
 	g.ui.rich(M.box, "[b][color=#feae34]%s[/color][/b]" % title, 22)
@@ -254,58 +269,13 @@ func sliders(role: String, title: String, text: String, sl: Array, evaluate: Cal
 	first.grab_focus.call_deferred()
 
 
-# 3) FUEL BURN -----------------------------------------------------------------
-func fuel(role: String, title: String, text: String, need: int, on_win: Callable, fact := "") -> void:
+# 3) ORBIT ---------------------------------------------------------------------
+## Launch when the Moon swings closest to Earth (perigee): the shortest trip.
+func orbit(role: String, title: String, text: String, on_win: Callable, fact := "") -> void:
 	if _review(role, title, on_win):
 		return
 	var M := _open(role, title, text)
-	var st := {"lo": 100, "hi": 700}
-	var row := HBoxContainer.new()
-	var lab := Label.new()
-	lab.text = "Fuel load"
-	lab.custom_minimum_size = Vector2(160, 0)
-	var hs := HSlider.new()
-	hs.min_value = 100
-	hs.max_value = 700
-	hs.step = 10
-	hs.value = 250
-	hs.custom_minimum_size = Vector2(460, 24)
-	var out := Label.new()
-	out.text = "250 kg"
-	row.add_child(lab)
-	row.add_child(hs)
-	row.add_child(out)
-	M.add(row)
-	var rng := _rt("", 18)
-	M.add(rng)
-	var upd := func():
-		out.text = "%d kg" % int(hs.value)
-		rng.text = "Known range: [b]%d–%d kg[/b]" % [st["lo"], st["hi"]]
-	hs.value_changed.connect(func(_v): upd.call())
-	upd.call()
-	_foot_button(M, "TEST BURN", func(test: Button):
-		var f := int(hs.value)
-		if f < need:
-			st["lo"] = maxi(st["lo"], f)
-			upd.call()
-			M.fail("Ran dry %d km short of orbit. Need more." % (roundi((1.0 - float(f) / need) * 120) + 8))
-		elif f > need * 1.3:
-			st["hi"] = mini(st["hi"], f)
-			upd.call()
-			M.fail("So heavy with fuel it barely lifts off. Need less.")
-		else:
-			test.disabled = true
-			M.win(on_win, ("Within 10% of the need: efficient trajectory! " if f <= need * 1.1 else "Made orbit, with spare fuel. ") + fact))
-	hs.grab_focus.call_deferred()
-
-
-# 4) ORBIT ---------------------------------------------------------------------
-## mode "perigee": launch when the Moon is closest · mode "phase": launch when Earth is ~75° behind Mars
-func orbit(role: String, title: String, text: String, mode: String, on_win: Callable, fact := "") -> void:
-	if _review(role, title, on_win):
-		return
-	var M := _open(role, title, text)
-	var st := {"th": randf() * TAU, "te": randf() * TAU, "tm": randf() * TAU, "ok": false, "km": 0}
+	var st := {"th": randf() * TAU, "ok": false, "km": 0}
 	var read := _rt("", 18)
 	var S := 4.0                        # canvas pixels per demo pixel
 	_canvas(M, 200 * S, 110 * S, func(c: Canvas):
@@ -313,56 +283,33 @@ func orbit(role: String, title: String, text: String, mode: String, on_win: Call
 		c.draw_rect(Rect2(0, 0, 800, 440), P["ink"])
 		for i in 40:
 			c.draw_rect(Rect2(fposmod(i * 77.7, 800), fposmod(i * 41.3, 440), 3, 3), P["steel"])
-		if mode == "perigee":
-			var a := 66.0
-			var e := 0.55
-			var b := a * sqrt(1.0 - e * e)
-			var cy := 55.0
-			var fx := 100.0 - a * e
-			for k in 64:
-				var tt := k / 64.0 * TAU
-				c.draw_rect(Rect2((100 + a * cos(tt)) * S, (cy + b * sin(tt)) * S, 3, 3), P["slate"])
-			var x := 100 + a * cos(st["th"])
-			var y := cy + b * sin(st["th"])
-			var r := Vector2(x - fx, y - cy).length()
-			var rmin := a * (1 - e)
-			var rmax := a * (1 + e)
-			st["th"] += dt * (0.45 + 1.5 * (rmin * rmin) / (r * r))
-			c.draw_circle(Vector2(fx, cy) * S, 8 * S, P["blue"])
-			c.draw_circle(Vector2(x, y) * S, 4 * S, P["light"])
-			c.draw_rect(Rect2((100 - a - 2) * S, (cy - 12) * S, 10 * S, 24 * S), Color(P["green"], 0.3))
-			st["km"] = int(round((363300 + (405500 - 363300) * ((r - rmin) / (rmax - rmin))) / 100.0) * 100)
-			st["ok"] = st["km"] < 368000
-			read.text = "Earth–Moon distance: [b][color=%s]%s km[/color][/b] %s" % ["#63c74d" if st["ok"] else "#ffffff", _thousands(st["km"]), "· CLOSEST: GO!" if st["ok"] else ""]
-		else:
-			var sx := 100.0
-			var sy := 55.0
-			st["te"] += dt * 1.6
-			st["tm"] += dt * 0.85
-			c.draw_circle(Vector2(sx, sy) * S, 7 * S, P["yellow"])
-			for rr in [26.0, 46.0]:
-				c.draw_arc(Vector2(sx, sy) * S, rr * S, 0, TAU, 64, P["slate"], 2.0)
-			var ep := Vector2(sx + 26 * cos(st["te"]), sy + 26 * sin(st["te"]))
-			var mp := Vector2(sx + 46 * cos(st["tm"]), sy + 46 * sin(st["tm"]))
-			c.draw_circle(ep * S, 4 * S, P["blue"])
-			c.draw_circle(mp * S, 4 * S, P["rust"])
-			var ph := fmod(rad_to_deg(st["te"] - st["tm"]), 360.0)
-			if ph > 180:
-				ph -= 360
-			if ph < -180:
-				ph += 360
-			st["ok"] = absf(ph + 75.0) < 12.0
-			if st["ok"]:
-				c.draw_line(mp * S, Vector2(sx, sy) * S, P["green"], 3.0)
-				c.draw_line(Vector2(sx, sy) * S, ep * S, P["green"], 3.0)
-			read.text = "[b][color=#63c74d]LAUNCH WINDOW OPEN[/color][/b] · Earth will be waiting when we arrive" if st["ok"] else "Earth is %d° %s Mars · window closed" % [absi(roundi(ph)), "behind" if ph < 0 else "ahead of"])
+		var a := 66.0
+		var e := 0.55
+		var b := a * sqrt(1.0 - e * e)
+		var cy := 55.0
+		var fx := 100.0 - a * e
+		for k in 64:
+			var tt := k / 64.0 * TAU
+			c.draw_rect(Rect2((100 + a * cos(tt)) * S, (cy + b * sin(tt)) * S, 3, 3), P["slate"])
+		var x := 100 + a * cos(st["th"])
+		var y := cy + b * sin(st["th"])
+		var r := Vector2(x - fx, y - cy).length()
+		var rmin := a * (1 - e)
+		var rmax := a * (1 + e)
+		st["th"] += dt * (0.45 + 1.5 * (rmin * rmin) / (r * r))
+		c.draw_circle(Vector2(fx, cy) * S, 8 * S, P["blue"])
+		c.draw_circle(Vector2(x, y) * S, 4 * S, P["light"])
+		c.draw_rect(Rect2((100 - a - 2) * S, (cy - 12) * S, 10 * S, 24 * S), Color(P["green"], 0.3))
+		st["km"] = int(round((363300 + (405500 - 363300) * ((r - rmin) / (rmax - rmin))) / 100.0) * 100)
+		st["ok"] = st["km"] < 368000
+		read.text = "Earth–Moon distance: [b][color=%s]%s km[/color][/b] %s" % ["#63c74d" if st["ok"] else "#ffffff", _thousands(st["km"]), "· CLOSEST: GO!" if st["ok"] else ""])
 	M.add(read)
 	_foot_button(M, "LAUNCH NOW", func(go: Button):
 		if st["ok"]:
 			go.disabled = true
 			M.win(on_win, fact)
 		else:
-			M.fail(("The Moon is %s km away. Wait until it swings closer." % _thousands(st["km"])) if mode == "perigee" else "The planets are not lined up. Wait for the window."))
+			M.fail("The Moon is %s km away. Wait until it swings closer." % _thousands(st["km"])))
 
 
 static func _thousands(n: int) -> String:
@@ -374,7 +321,7 @@ static func _thousands(n: int) -> String:
 	return s + out
 
 
-# 5) WIND ----------------------------------------------------------------------
+# 4) WIND ----------------------------------------------------------------------
 func wind(role: String, on_win: Callable) -> void:
 	if _review(role, "PICK THE LAUNCH HOUR", on_win):
 		return
@@ -412,7 +359,7 @@ func wind(role: String, on_win: Callable) -> void:
 	grid.get_child(0).grab_focus.call_deferred()
 
 
-# 6) NEUTRON SCAN --------------------------------------------------------------
+# 5) NEUTRON SCAN --------------------------------------------------------------
 func scan(role: String, on_win: Callable, on_fail: Callable) -> void:
 	if _review(role, "NEUTRON SCAN FOR ICE", on_win):
 		return
@@ -459,7 +406,7 @@ func scan(role: String, on_win: Callable, on_fail: Callable) -> void:
 	grid.get_child(0).grab_focus.call_deferred()
 
 
-# 7) WIRES ---------------------------------------------------------------------
+# 6) WIRES ---------------------------------------------------------------------
 func wires(role: String, title: String, text: String, on_win: Callable) -> void:
 	if _review(role, title, on_win):
 		return
@@ -524,56 +471,7 @@ func wires(role: String, title: String, text: String, on_win: Callable) -> void:
 	lb[0].grab_focus.call_deferred()
 
 
-# 8) WIPE ----------------------------------------------------------------------
-func wipe(role: String, on_win: Callable) -> void:
-	if _review(role, "CLEAN THE SOLAR PANELS", on_win):
-		return
-	var M := _open(role, "CLEAN THE PANELS", "Drag across the panels (or press BRUSH) to sweep the dust off. Dusty panels make far less power.")
-	var dust := []
-	for i in 9 * 20:
-		dust.append(1.0)
-	var read := _rt("", 18)
-	var S := 4.0
-	var pct := func() -> int:
-		var sum := 0.0
-		for v in dust:
-			sum += v
-		return roundi(100 - sum / dust.size() * 100)
-	var check := func():
-		var p: int = pct.call()
-		read.text = "Clean: [b]%d%%[/b]" % p
-		if p >= 95:
-			M.win(on_win, "Wind gusts cleaned Spirit and Opportunity's panels and kept them alive for years.")
-	var c := _canvas(M, 160 * S, 72 * S, func(cv: Canvas):
-		cv.draw_rect(Rect2(0, 0, 640, 288), P["ink"])
-		for x in range(0, 160, 20):
-			cv.draw_rect(Rect2((x + 1) * S, S, 18 * S, 70 * S), Color("#124e89"))
-			cv.draw_rect(Rect2((x + 1) * S, S, 18 * S, S), Color("#2c6fb0"))
-		for i in dust.size():
-			if dust[i] > 0:
-				cv.draw_rect(Rect2((i % 20) * 8 * S, (i / 20) * 8 * S, 8 * S, 8 * S), Color(P["rust"], 0.35 + 0.6 * dust[i])))
-	c.mouse_default_cursor_shape = Control.CURSOR_CROSS
-	c.on_input = func(cv: Canvas, e: InputEvent):
-		var drag = (e is InputEventMouseMotion and (e.button_mask & MOUSE_BUTTON_MASK_LEFT)) or (e is InputEventMouseButton and e.pressed)
-		if drag:
-			var pos: Vector2 = e.position / S
-			for i in dust.size():
-				if Vector2((i % 20) * 8 + 4, (i / 20) * 8 + 4).distance_to(pos) < 10:
-					dust[i] = maxf(0.0, dust[i] - 0.5)
-			check.call()
-	M.add(read)
-	check.call()
-	_foot_button(M, "BRUSH", func():
-		var i := dust.find_custom(func(v): return v > 0)
-		if i < 0:
-			return
-		var row: int = i / 20
-		for k in range(row * 20, row * 20 + 20):
-			dust[k] = maxf(0.0, dust[k] - 0.5)
-		check.call())
-
-
-# 9) PACK ----------------------------------------------------------------------
+# 7) PACK ----------------------------------------------------------------------
 ## items: [{n, kg, req}]
 func pack(role: String, title: String, text: String, items: Array, cap: int, on_win: Callable, opts := {}) -> void:
 	if _review(role, title, on_win):
@@ -627,7 +525,7 @@ func pack(role: String, title: String, text: String, items: Array, cap: int, on_
 	first.grab_focus.call_deferred()
 
 
-# 10) PICK ---------------------------------------------------------------------
+# 8) PICK ----------------------------------------------------------------------
 ## cards: [{label, sub, draw (fn(canvas, rect)), ok, why}]
 func pick(role: String, title: String, text: String, cards: Array, on_win: Callable, opts := {}) -> void:
 	if _review(role, title, on_win):
