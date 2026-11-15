@@ -19,6 +19,7 @@ const CONTROLS := {
 	"SCREENS": [
 		[["M"], "World map"],
 		[["J"], "Mission details"],
+		[["T"], "Show / hide crew chat"],
 		[["ESC"], "Menu / close"],
 	],
 	"TEAM TESTING": [

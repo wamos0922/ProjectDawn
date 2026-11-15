@@ -154,6 +154,7 @@ inspired by real proposals for space sunshades. The rest is real science and rea
 | **Space** / click | Next line of dialogue |
 | **TAB** · **F** · **C** | Switch crew member · crew follows you · CERES autopilot |
 | **M** · **J** | Bunker map · mission details |
+| **T** | Show / hide the crew chat |
 | **Esc** | Menu, or close a window |
 | **F8** | Review mode (one-click minigames) |
 
