@@ -19,12 +19,14 @@ static var _body: Font
 static func title_font() -> Font:
 	if _title == null:
 		_title = load(TITLE_FONT)
+		_title.fallbacks = [load(SYMBOL_FONT)]
 	return _title
 
 
 static func body_font() -> Font:
 	if _body == null:
 		_body = load(BODY_FONT)
+		_body.fallbacks = [load(SYMBOL_FONT)]
 	return _body
 
 
