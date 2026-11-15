@@ -87,8 +87,27 @@ func _settings() -> void:
 	g.ui.button(box, "REVIEW MODE: %s" % ("ON" if on else "OFF"), func():
 		g.toggle_review_mode()
 		_settings(), false)
+	g.ui.button(box, "RESET SETTINGS", _confirm_reset, false)
 	g.ui.button(box, "◂ BACK", open, false)
 
+## Asks first, so nobody resets by accident.
+func _confirm_reset() -> void:
+	var box: VBoxContainer = g.ui.panel(Color("#262b44"), Color("#feae34"), 520, 200)
+	g.ui.title(box, "RESET SETTINGS?")
+	g.ui.rich(box, "Puts every setting back to how the game starts: review mode OFF, sound ON at full volume. Your mission progress is [b]not[/b] touched. Only this computer.")
+	g.ui.button(box, "YES, RESET", func():
+		reset_settings()
+		g.ui.toast("Settings reset to default", 2.0)
+		_settings(), false)
+	g.ui.button(box, "CANCEL", _settings, false)
+
+
+## Every setting back to its default. Add a line here when you add a new setting.
+func reset_settings() -> void:
+	g.Minigames.set_review_mode(false)
+	Sound.set_volume("Music", 1.0)
+	Sound.set_volume("SFX", 1.0)
+	AudioServer.set_bus_mute(0, false)
 
 func _text(text: String, color: Color, font: Font, size: int) -> Label:
 	var l := Label.new()
