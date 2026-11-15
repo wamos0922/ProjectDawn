@@ -437,6 +437,8 @@ func role_task(k: String) -> Dictionary:
 				func(): g.act("split", {}, "nav"), "Liquid hydrogen and oxygen powered the Space Shuttle's main engines.")}
 		if k == "port" and m == 6 and not task_done("l1"):
 			return {"label": "HOLD THE SHIELD AT L1", "role": "nav", "fn": func(): mg.play("N3", "nav", _send("l1"))}
+		if k == "port" and m == 6 and not task_done("aperture"):
+			return {"label": "OPEN THE APERTURE", "role": "eng", "fn": func(): mg.play("E3", "eng", _send("aperture"))}
 	return {}
 
 
