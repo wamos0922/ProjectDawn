@@ -106,11 +106,18 @@ static func set_review_mode(on: bool) -> void:
 		n.set_meta(REVIEW_META, on)
 
 
-## In review mode: show the placeholder instead of the real minigame and return true.
+## The real minigames are switched off while the new ones are designed: every station task opens
+## the task window with one COMPLETE button. Set to false to bring the old minigames back.
+const PLACEHOLDER_MINIGAMES := true
+
+
+## Placeholder instead of the real minigame (always while PLACEHOLDER_MINIGAMES, or in review mode).
+## Returns true when it opened the placeholder.
 func _review(role: String, title: String, on_win: Callable) -> bool:
-	if not review_mode():
+	if not PLACEHOLDER_MINIGAMES and not review_mode():
 		return false
-	var M := _open(role, title, "[color=#fee761]REVIEW MODE[/color] · placeholder minigame. The real one is skipped; press COMPLETE to finish this task. [color=#8b9bb4](F8 or Esc > SETTINGS turns review mode off.)[/color]")
+	var note := "New minigame coming soon. Press COMPLETE to finish this task." if PLACEHOLDER_MINIGAMES else "[color=#fee761]REVIEW MODE[/color] · placeholder minigame. The real one is skipped; press COMPLETE to finish this task. [color=#8b9bb4](F8 or Esc > SETTINGS turns review mode off.)[/color]"
+	var M := _open(role, title, note)
 	var b: Button = g.ui.button(M.foot, "COMPLETE  ▸▸", func():
 		M._sfx("success")
 		g.ui.close_panel()

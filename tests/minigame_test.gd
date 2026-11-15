@@ -33,6 +33,9 @@ func _process(_d):
 	if g == null:
 		g = current_scene
 		if g == null or not g.has_method("commit"): g = null; return false
+		if g.Minigames.PLACEHOLDER_MINIGAMES:
+			print("SKIPPED: the real minigames are switched off (PLACEHOLDER_MINIGAMES in minigames.gd)")
+			quit(); return true
 		g.story.sui._intro_done(); g.story.sui._close()
 		cases = [
 			["uvcal", "earth", 1, "ozone", "STOP"], ["tune", "earth", 1, "comms", "LOCK IN"], ["wind", "earth", 1, "nav", "cell"],
