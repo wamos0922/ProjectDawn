@@ -47,6 +47,7 @@ var _queue: Array = []
 var _dlg_done: Array = []
 var _type := 0.0
 var _full := ""
+var _who := "ceres"
 
 
 func _ready() -> void:
@@ -196,7 +197,10 @@ func _process(delta: float) -> void:
 	_toast.visible = _toast_t > 0.0
 	if _dlg.visible and _dlg_text.visible_characters < _full.length() and _dlg_text.visible_characters >= 0:
 		_type += delta
+		var before := _dlg_text.visible_characters
 		_dlg_text.visible_characters = mini(_full.length(), int(_type / 0.022))
+		if _dlg_text.visible_characters / 2 != before / 2:
+			Sound.play("robot_type" if _who == "ceres" else "type")
 		_dlg_cont.visible = _dlg_text.visible_characters >= _full.length()
 
 
@@ -321,6 +325,7 @@ func _show_next() -> void:
 		_dlg.visible = false
 		return
 	var l: Dictionary = _queue[0]
+	_who = l.get("who", "ceres")
 	var who: Array = WHO.get(l.get("who", "ceres"), WHO["ceres"])
 	_dlg_who.text = who[0]
 	_dlg_who.add_theme_color_override("font_color", who[1])
@@ -330,7 +335,7 @@ func _show_next() -> void:
 	_dlg_text.visible_characters = 0
 	_type = 0.0
 	_dlg_cont.visible = false
-	_dlg.visible = true
+	_dlg.visible = true             
 	root.move_child(_dlg, -1)
 	root.move_child(_portrait, -1)
 
