@@ -121,7 +121,7 @@ No bad endings. We think humanity deserves one.
 | Every NASA source with links | [`docs/SOURCES.md`](docs/SOURCES.md) |
 | The science behind the L1 shield | [`docs/L1_SHIELD_SCIENCE.md`](docs/L1_SHIELD_SCIENCE.md) |
 | Our data and image pack | [`data_management/`](data_management) |
-| The original longer design (with Mars) | [`GAMEPLAY.md`](GAMEPLAY.md) · [`docs/STORY.md`](docs/STORY.md) |
+| The original longer design (with Mars) | [`docs/STORY.md`](docs/STORY.md) |
 | Credits for images, fonts and sounds | [`assets/CREDITS.md`](assets/CREDITS.md) |
 | How the code is organised | [`docs/CODE_MAP.md`](docs/CODE_MAP.md) |
 
@@ -185,7 +185,7 @@ Made at NASA Space Apps 2026 in Seoul by:
 | **Imran** | Team lead, integration, deployment |
 | **Sufi** | Game logic and simulation |
 | **Zaliq** | Interface and screens |
-| **Wam** | Story |
+| **Wam** | Story Lead and Back End |
 | **Dino** | Research and NASA data |
 | **Wafi** | Visuals, art and video |
 
