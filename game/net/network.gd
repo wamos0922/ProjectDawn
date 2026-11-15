@@ -24,7 +24,7 @@ signal disconnected(reason: String)
 
 const MAX_PLAYERS := 4
 
-const RELAY_URL := "wss://<your-site>.sslip.io/relay"   # fixed in Step 6
+const RELAY_URL := "wss://34-50-21-254.sslip.io/relay"   # fixed in Step 6
 const RelayPeer := preload("res://game/net/relay_peer.gd")
 
 var players := {}          ## peer_id -> {"name": String, "slot": int}
