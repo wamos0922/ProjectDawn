@@ -22,10 +22,9 @@ signal joined
 signal join_failed(reason: String)
 signal disconnected(reason: String)
 
-const PORT := 7777
 const MAX_PLAYERS := 4
 
-const RELAY_URL := "wss://CHANGE-ME.sslip.io/relay"   # fixed in Step 6
+const RELAY_URL := "wss://34-50-21-254.sslip.io/relay"   # fixed in Step 6
 const RelayPeer := preload("res://game/net/relay_peer.gd")
 
 var players := {}          ## peer_id -> {"name": String, "slot": int}
@@ -41,36 +40,7 @@ func _ready() -> void:
 	multiplayer.connection_failed.connect(_on_connection_failed)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
 
-
-# ---------------------------------------------------------------- public API
-
 func host(player_name: String) -> Error:
-	leave()
-	var peer := ENetMultiplayerPeer.new()
-	# Room for one extra guest, so a 5th player gets a clear "team is full" message.
-	var err := peer.create_server(PORT, MAX_PLAYERS)
-	if err != OK:
-		return err   # usually: port already in use (another host is running on this machine)
-	multiplayer.multiplayer_peer = peer
-	_my_name = player_name
-	players = {1: {"name": clean_name(player_name), "slot": 0}}
-	players_changed.emit()
-	joined.emit()
-	return OK
-
-
-func join(address: String, player_name: String) -> Error:
-	leave()
-	var peer := ENetMultiplayerPeer.new()
-	var err := peer.create_client(address, PORT)
-	if err != OK:
-		return err
-	multiplayer.multiplayer_peer = peer
-	_my_name = player_name
-	return OK   # result arrives later as `joined` or `join_failed`
-
-
-func host_online(player_name: String) -> Error:
 	leave()
 	var peer = RelayPeer.new()
 	var err: Error = peer.open(relay_url(), "")
@@ -86,7 +56,7 @@ func host_online(player_name: String) -> Error:
 	return OK
 
 
-func join_online(code: String, player_name: String) -> Error:
+func join(code: String, player_name: String) -> Error:
 	leave()
 	var peer = RelayPeer.new()
 	var err: Error = peer.open(relay_url(), code)
@@ -95,11 +65,6 @@ func join_online(code: String, player_name: String) -> Error:
 	multiplayer.multiplayer_peer = peer
 	_my_name = player_name
 	return OK
-
-
-static func is_lan_code(code: String) -> bool:
-	return code.contains(".") or code.contains(":") or code.to_lower() == "localhost"
-
 
 static func relay_url() -> String:
 	for a in OS.get_cmdline_user_args() + OS.get_cmdline_args():

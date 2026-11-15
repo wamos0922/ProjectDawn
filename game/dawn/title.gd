@@ -3,7 +3,7 @@ extends Control
 ## Owner: Sufi (gameplay). Uses the Network autoload (game/net/network.gd).
 ##
 ## SOLO: pick who you start as and whether CERES autopilot moves the others (TAB switches in game).
-## HOST: this laptop becomes the server. Friends on the same Wi-Fi type its CREW CODE (the IP address).
+## HOST: this laptop becomes the server. Friends on the same Wi-Fi type its ROOM CODE (the IP address).
 ## JOIN: type the host's CREW CODE. The host presses START MISSION when everyone is in.
 ## HOST and JOIN: click a role card to pick that role (roles nobody picks = CERES autopilot).
 ## Passed to the game as Network meta: "my_role" (solo) and "crew_mode" ("autopilot" or "wait").
@@ -234,15 +234,6 @@ func _name_field(parent: Node) -> void:
 	_name.max_length = 12
 	parent.add_child(_name)
 
-
-static func local_ips() -> Array:
-	var out := []
-	for ip in IP.get_local_addresses():
-		if ip.count(".") == 3 and not ip.begins_with("127.") and not ip.begins_with("169.254."):
-			out.append(ip)
-	return out
-
-
 func _host_screen() -> void:
 	_mode = "host"
 	_clear()
@@ -255,22 +246,17 @@ func _host_screen() -> void:
 	var R := _panel(Vector2(784, 32), 464, 656)
 	_h(R, "HOST A CREW", 18)
 	_name_field(R)
-	var ips := local_ips()
-	_h(R, "CREW CODE", 11, C["grey"])
+	_h(R, "ROOM CODE", 11, C["grey"])
 	var code := _h(R, "—", 24, C["white"])
 	code.name = "Code"
-	var how := _p(R, "ONLINE: friends anywhere type the room code.\nLAN: friends on the same Wi-Fi type this laptop's address.", 18)
+	var how := _p(R, "Press OPEN THE CREW to get a room code, then tell your friends the code.", 18)
 	_status = _p(R, "", 18, C["cyan"])
-	var start := _btn(R, "OPEN ONLINE CREW  ▸▸", func(): pass)
-	var lan := _btn(R, "OPEN LAN CREW (same Wi-Fi)", func(): pass, true)
-	var opened := func(text: String, note: String):
-		code.text = text
-		how.text = note
-		start.text = "START MISSION  ▸▸"
-		lan.visible = false
+	var start := _btn(R, "OPEN THE CREW  ▸▸", func(): pass)
 	Network.joined.connect(func():
-		if is_instance_valid(code) and Network.is_host() and Network.room_code != "":
-			opened.call(Network.room_code, "Friends press JOIN A CREW and type this room code (works over the internet)."))
+		if is_instance_valid(code) and Network.is_host():
+			code.text = Network.room_code
+			how.text = "Friends open the game, press JOIN A CREW and type this code."
+			start.text = "START MISSION  ▸▸")
 	start.pressed.connect(func():
 		if Network.is_host():
 			Network.set_meta("crew_mode", "autopilot")
@@ -279,17 +265,8 @@ func _host_screen() -> void:
 		if Network.multiplayer.multiplayer_peer is Network.RelayPeer:
 			return
 		Network.set_meta("my_name", _name.text)
-		var err: Error = Network.host_online(_name.text)
-		_status.text = "Opening an online crew…" if err == OK else "Could not go online: " + error_string(err))
-	lan.pressed.connect(func():
-		Network.set_meta("my_name", _name.text)
 		var err: Error = Network.host(_name.text)
-		if err != OK:
-			_status.text = "Could not host: %s (is another host running on this laptop?)" % error_string(err)
-			return
-		opened.call(ips[0] if not ips.is_empty() else "127.0.0.1",
-			"Friends on the same Wi-Fi type this address." + ("\nOther addresses: " + ", ".join(ips.slice(1)) if ips.size() > 1 else ""))
-		_status.text = "Hosting. Friends can join now. Press START when everyone is in.")
+		_status.text = "Opening the crew…" if err == OK else "Could not go online: " + error_string(err))
 	_btn(R, "◂ BACK", _title, true)
 	start.grab_focus.call_deferred()
 	_refresh()
@@ -311,7 +288,8 @@ func _join_screen() -> void:
 	_h(R, "CREW CODE", 11, C["grey"])
 	_addr = LineEdit.new()
 	_addr.text = Network.get_meta("last_code", "")
-	_addr.placeholder_text = "192.168.0.12"
+	_addr.placeholder_text = "K7QX"
+	_addr.max_length = 4
 	R.add_child(_addr)
 	_status = _p(R, "", 18, C["cyan"])
 	var go := _btn(R, "JOIN  ▸▸", func():
@@ -321,11 +299,12 @@ func _join_screen() -> void:
 			return
 		Network.set_meta("my_name", _name.text)
 		Network.set_meta("last_code", code)
-		var err: Error = Network.join(code, _name.text) if Network.is_lan_code(code) else Network.join_online(code, _name.text)
+		var err: Error = Network.join(code, _name.text)
 		_status.text = ("Connecting to %s …" % code) if err == OK else "Could not join: " + error_string(err))
 	_btn(R, "◂ BACK", _title, true)
 	_addr.grab_focus.call_deferred()
 	go.focus_neighbor_top = _addr.get_path()
+	_addr.text_submitted.connect(func(_t): go.pressed.emit())
 	_refresh()
 
 
