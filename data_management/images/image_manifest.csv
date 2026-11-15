@@ -1,15 +1,15 @@
 key,kind,instrument_id,raw_file,game_file,frame,fit,used_in,credit,source_url,flags
-diviner,instrument,diviner_radiometer,raw/diviner.jpg,img/diviner.png,256x256,cover,"E2, Q2",UCLA Diviner team (no credit on page),https://www.diviner.ucla.edu/instrument-overview,credit=CHECK
-lend,instrument,lend_neutron,raw/lend.jpg,img/lend.png,256x256,cover,"E2, Q1, Q2",Space Research Institute IKI RAS (no credit on page),https://np.cosmos.ru/en-us/instruments/lend,credit=CHECK
-lamp,instrument,lamp_uv,raw/lamp.jpg,img/lamp.png,256x256,cover,Q2,NASA (no credit on page),https://science.nasa.gov/mission/lro/spacecraft-and-instruments/,credit=CHECK;image=GRAPHIC_NOT_PHOTO
-lola,instrument,lola_altimeter,raw/lola.jpg,img/lola.png,256x256,cover,Q2,NASA (no credit on page),https://science.nasa.gov/wp-content/uploads/2024/01/lola-fact-sheet.pdf,credit=CHECK
-lroc,instrument,lroc_nac,raw/lroc.jpg,img/lroc.png,256x256,cover,Q2,NASA/GSFC/Arizona State University,https://lroc.im-ldi.com/about/specs,credit=CHECK
-crater,instrument,crater_radiation,raw/crater.jpg,img/crater.png,256x256,cover,"Q1, Q2",University of New Hampshire,https://crater.unh.edu/instrument.shtml,credit=CHECK;license=CHECK
+diviner,instrument,diviner_radiometer,raw/diviner.jpg,img/diviner.png,256x256,cover,"E2, Q2",NASA/JPL,https://images.nasa.gov/details/PIA12084,
+lend,instrument,lend_neutron,raw/lend.jpg,img/lend.png,256x256,cover,"E2, Q1, Q2",Courtesy NASA/JPL-Caltech,https://search-pdsppi.igpp.ucla.edu/mission/Lunar_Reconnaissance_Orbiter/LRO/LEND,
+lamp,instrument,lamp_uv,raw/lamp.jpg,img/lamp.png,256x256,cover,Q2,NASA,https://www2.boulder.swri.edu/lamp/science.html,
+lola,instrument,lola_altimeter,raw/lola.jpg,img/lola.png,256x256,cover,Q2,NASA,https://science.nasa.gov/mission/lro/lola/,
+lroc,instrument,lroc_nac,raw/lroc.jpg,img/lroc.png,256x256,cover,Q2,NASA/GSFC/Arizona State University,https://lroc.im-ldi.com/about/specs,
+crater,instrument,crater_radiation,raw/crater.jpg,img/crater.png,256x256,cover,"Q1, Q2",University of New Hampshire,https://crater.unh.edu/instrument.shtml,
 omi,instrument,omi_ozone,raw/omi.jpg,img/omi.png,256x256,cover,"Q1, Q2",NASA,https://science.nasa.gov/image-detail/omi-pfm-3/,
 hirise,instrument,mro_hirise,raw/hirise.jpg,img/hirise.png,256x256,cover,"Q1, Q2",NASA/JPL/Ball Aerospace,https://science.nasa.gov/photojournal/telescopic-camera-for-mars-reconnaissance-orbiter-front-end/,
 tega,instrument,tega_phoenix,raw/tega.jpg,img/tega.png,256x256,cover,Q1,NASA/JPL-Caltech/UA,https://photojournal.jpl.nasa.gov/catalog/PIA09950,
 sam,instrument,sam_suite,raw/sam.jpg,img/sam.png,256x256,cover,Q2,NASA,https://science.nasa.gov/photojournal/sample-analysis-at-mars-instrument-side-panels-off/,
-marci,instrument,mro_marci,raw/marci.jpg,img/marci.png,256x256,cover,Q1,Malin Space Science Systems,https://www.msss.com/all_projects/mro-ctx.php,credit=CHECK;source=CTX_PAGE_NOT_MARCI
+marci,instrument,mro_marci,raw/marci.jpg,img/marci.png,256x256,cover,Q1,NASA/JPL-Caltech/MSSS,https://science.nasa.gov/resource/mars-color-imager-marci-for-mars-reconnaissance-orbiter/,
 ozone_1984,ozone_map,,raw/ozone_1984.jpg,ozone/ozone_1984.jpg,720x510,contain,S1,NASA Earth Observatory,https://science.nasa.gov/earth/earth-observatory/world-of-change/ozone-hole/,
 ozone_1994,ozone_map,,raw/ozone_1994.jpg,ozone/ozone_1994.jpg,720x510,contain,S1,NASA Earth Observatory,https://science.nasa.gov/earth/earth-observatory/world-of-change/ozone-hole/,
 ozone_2004,ozone_map,,raw/ozone_2004.jpg,ozone/ozone_2004.jpg,720x510,contain,S1,NASA Earth Observatory,https://science.nasa.gov/earth/earth-observatory/world-of-change/ozone-hole/,
