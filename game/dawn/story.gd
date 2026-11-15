@@ -422,6 +422,8 @@ func role_task(k: String) -> Dictionary:
 		var m: int = s["ms"]
 		if k == "science" and m == 1:
 			return {"label": "NEUTRON SCAN", "role": "sci", "fn": func(): mg.scan("sci", func(): g.act("scan", {"ok": 1}, "sci"), func(): g.act("scan", {"ok": 0}, "sci"))}
+		if k == "factory" and m == 5 and not s["sats_chosen"] and not task_done("sunscan"):
+			return {"label": "SCAN THE SUN'S LIGHT", "role": "sci", "fn": func(): mg.play("S3", "sci", _send("sunscan"))}
 		if k == "solar" and m == 2:
 			return {"label": "DESIGN OUTPOST POWER", "role": "qm", "fn": func(): dz.moon(func(x):
 				if x["cable"] > 0:
