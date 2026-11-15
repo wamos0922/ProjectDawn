@@ -408,7 +408,7 @@ func role_task(k: String) -> Dictionary:
 					[{"n": "Water", "kg": 30, "req": true}, {"n": "Food", "kg": 25, "req": true}, {"n": "Oxygen tanks", "kg": 30, "req": true}, {"n": "Ice drill", "kg": 20, "req": true}, {"n": "Spare radio", "kg": 10}, {"n": "Tool chest", "kg": 25}, {"n": "Books", "kg": 12}],
 					115, _send("cargo"), {"fact": "Every kilogram launched costs fuel. Real missions weigh everything."})}
 			if k == "pad" and not task_done("bolts"):
-				return {"label": "PRE-FLIGHT CHECK", "role": "eng", "fn": func(): mg.timing("eng", "TORQUE THE BOLTS", "Stop the wrench in the green zone to torque each bolt. Four bolts.", [0.4, 0.55], _send("bolts"), {"hits": 4, "random": true, "label": "TIGHTEN", "fact": "Launch vibration shakes loose anything not torqued right."})}
+				return {"label": "PRE-FLIGHT CHECK", "role": "eng", "fn": func(): mg.play("PF", "eng", _send("bolts"))}
 			if k == "ozone" and not task_done("site"):
 				return {"label": "PICK LANDING SITE", "role": "sci", "fn": func(): mg.pick("sci", "PICK THE LANDING SITE", "We need ice for fuel and sunlight for power. Where should the outpost land?", [
 					{"label": "Equator plain", "sub": "Easy landing", "ok": false, "why": "Sunny, but far too warm for ice to survive.", "draw": func(c, r): c.draw_rect(r, P["steel"]); c.draw_rect(Rect2(116, 6, 18, 18), P["yellow"])},

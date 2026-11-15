@@ -108,7 +108,7 @@ static func set_review_mode(on: bool) -> void:
 
 ## The real minigames are switched off while the new ones are designed: every station task opens
 ## the task window with one COMPLETE button. Set to false to bring the old minigames back.
-const PLACEHOLDER_MINIGAMES := true
+const PLACEHOLDER_MINIGAMES := false
 
 
 ## Placeholder instead of the real minigame (always while PLACEHOLDER_MINIGAMES, or in review mode).
@@ -155,7 +155,9 @@ const NEW_GAMES := {
 	"S3": "res://game/dawn/minigames/s3_sun_scan.gd",      # Act 3 Scientist · scan the Sun's light
 	"N3": "res://game/dawn/minigames/n3_l1_hold.gd",       # Act 3 Navigator · hold the shield at L1
 	"Q3": "res://game/dawn/minigames/q3_ripples.gd",       # Act 3 Quartermaster · data ripples
+	"PF": "res://game/dawn/minigames/pf_bolts.gd",         # Act 1 Engineer · pre-flight check (easy: click 4 bolts)
 }
+
 
 
 ## Opens a new minigame in the task window. on_win records the task (story.gd: _send("...")).
@@ -391,7 +393,9 @@ func wind(role: String, on_win: Callable) -> void:
 	for s in hrs:
 		var b := Button.new()
 		b.text = "%02d:00\n%d km/h%s%s" % [s["h"], s["w"], "\nUV STORM" if s["storm"] else "", "\nnight" if s["h"] < 6 or s["h"] > 18 else ""]
-		b.custom_minimum_size = Vector2(130, 78)
+		b.custom_minimum_size = Vector2(150, 88)
+		b.add_theme_font_size_override("font_size", 11)     # 3 lines fit inside the button
+		b.add_theme_constant_override("line_spacing", 4)
 		b.pressed.connect(func():
 			if s["h"] >= 6 and s["h"] <= 18 and s["w"] < 20 and not s["storm"]:
 				b.modulate = P["green"]
@@ -592,6 +596,8 @@ func pick(role: String, title: String, text: String, cards: Array, on_win: Calla
 		var b := Button.new()
 		b.text = cd["label"] + ("\n" + cd["sub"] if cd.get("sub", "") != "" else "")
 		b.custom_minimum_size = Vector2(144, 50)
+		b.add_theme_font_size_override("font_size", 11)     # 3 cards fit in the task window
+		b.add_theme_constant_override("line_spacing", 4)
 		b.pressed.connect(func():
 			if cd.get("ok", false):
 				b.disabled = true
