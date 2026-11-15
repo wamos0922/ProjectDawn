@@ -37,6 +37,9 @@ const SFX := {
 	"door":    DIR + "door_hum.wav",        ## walking into a room
 	"alarm":   DIR + "alarm_beep.wav",      ## a storm starts
 	"poster":  DIR + "chime.wav",           ## found a new poster
+	"type":    DIR + "oneclick.wav",       ## one letter typed in a dialogue box
+	"siren":   DIR + "alarm.wav",           ## wake-up scene alarm, repeats until silenced
+	"robot_type": DIR + "ceres_blip_low.wav",   ## CERES typing in a dialogue box
 	"footstep": DIR + "footstep_new.wav",
 }
 
@@ -126,6 +129,13 @@ func play(name: String) -> void:
 			return
 	_voices[0].stream = stream                # all busy: reuse the first voice
 	_voices[0].play()
+
+## Stop a one-shot sound that is playing now (a key of SFX).
+func stop(name: String) -> void:
+	var stream := _load(SFX.get(name, ""))
+	for v in _voices:
+		if v.playing and v.stream == stream:
+			v.stop()
 
 
 ## Every button in the game clicks (also buttons made later, e.g. in panels).

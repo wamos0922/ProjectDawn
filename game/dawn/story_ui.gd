@@ -51,7 +51,10 @@ func _process(delta: float) -> void:
 	_watch_report()
 	if _intro_text and _intro_text.visible_ratio < 1.0:
 		_intro_t += delta
+		var before := _intro_text.visible_characters
 		_intro_text.visible_characters = int(_intro_t / 0.024 * 2)
+		if _intro_text.visible_characters / 3 != before / 3:
+			Sound.play("type")
 
 
 ## Show the shared mission report when the host posts one; close it when someone else continues.
@@ -509,6 +512,9 @@ func _wake_tick(delta: float) -> void:
 		return
 	if W8["alarm"]:
 		W8["alarm_t"] -= delta
+		if W8["alarm_t"] <= 0.0:
+			W8["alarm_t"] = 1.6                      ## seconds between sirens: set to the length of your file
+			Sound.play("siren")
 	if W8["phase"] == "wake":
 		W8["wake_t"] += delta
 		if W8["wake_t"] >= 2.4:
@@ -609,6 +615,7 @@ func _w_alarm() -> void:
 	var W8 := _wk
 	W8["phase"] = "cut"
 	W8["alarm"] = false
+	Sound.stop("siren")                    ## cut the siren the moment the alarm is silenced
 	W8["term_on"] = true
 	await _wait(.9)
 	W8["ce"]["screen_on"] = true
