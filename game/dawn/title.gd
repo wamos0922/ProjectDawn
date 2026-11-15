@@ -246,7 +246,7 @@ func _host_screen() -> void:
 	var R := _panel(Vector2(784, 32), 464, 656)
 	_h(R, "HOST A CREW", 18)
 	_name_field(R)
-		_h(R, "ROOM CODE", 11, C["grey"])
+	_h(R, "ROOM CODE", 11, C["grey"])
 	var code := _h(R, "—", 24, C["white"])
 	code.name = "Code"
 	var how := _p(R, "Press OPEN THE CREW to get a room code, then tell your friends the code.", 18)
@@ -299,7 +299,7 @@ func _join_screen() -> void:
 			return
 		Network.set_meta("my_name", _name.text)
 		Network.set_meta("last_code", code)
-		var err: Error = Network.join(code, _name.text) if Network.is_lan_code(code) else Network.join_online(code, _name.text)
+		var err: Error = Network.join(code, _name.text)
 		_status.text = ("Connecting to %s …" % code) if err == OK else "Could not join: " + error_string(err))
 	_btn(R, "◂ BACK", _title, true)
 	_addr.grab_focus.call_deferred()
