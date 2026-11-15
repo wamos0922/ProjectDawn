@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://dp8q7gqtrkvoc"]
+[gd_scene format=3 uid="uid://bwyvywa70rafd"]
 
-[ext_resource type="Script" uid="uid://dtnu8smirplpl" path="res://game/dawn/title.gd" id="1_title"]
+[ext_resource type="Script" uid="uid://vq0m3qpw05yk" path="res://game/dawn/title.gd" id="1_title"]
 
 [node name="Title" type="Control" unique_id=615766753]
 layout_mode = 3
