@@ -359,8 +359,7 @@ func close_panel() -> void:
 	panel_closed.emit()
 
 
-## Opens an empty modal panel and returns its VBox to fill. Freezes local players.
-## Dark layer behind a modal window (blocks clicks on the game). dim: 0 = clear, 1 = black.
+
 func _modal(dim: float) -> void:
 	if _panel:
 		_panel.queue_free()
@@ -378,11 +377,17 @@ func _modal(dim: float) -> void:
 func panel(bg := Color("#262b44"), border := Color("#feae34"), width := 760.0, top_y := 70.0) -> VBoxContainer:
 	_modal(0.55)
 	var p := PanelContainer.new()
+	p.add_theme_stylebox_override("panel", DawnTheme.box(bg, border, 4, Color(0, 0, 0, 0), 0, Vector4(24, 20, 24, 20)))
+	p.custom_minimum_size = Vector2(width, 0)
+	p.position = Vector2((1280 - width) / 2.0, top_y)
+	root.add_child(p)
+	_panel = p
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 12)
 	p.add_child(box)
 	return box
 
+# ---------------------------------------------------------------- task popup (minigames)
 # ---------------------------------------------------------------- task popup (minigames)
 
 const POPUP_SIZE := Vector2(880, 560)        ## every minigame window has this size
