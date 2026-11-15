@@ -23,17 +23,24 @@ const BODY := {"kg": 30, "cr": 30}
 
 ## Every role has a job: prep checklists that must be done before the story moves on.
 const PREP := {"e1": ["build", "uvcal", "wind", "tune"], "e5": ["perigee", "cargo", "bolts", "site"]}
-const PREP_NAMES := {"e1": ["ENG rocket", "SCI UV sensor", "NAV launch hour", "QM radio"], "e5": ["NAV perigee", "QM cargo", "ENG bolts", "SCI landing site"]}
+const PREP_NAMES := {"e1": ["ENG rocket", "SCI ozone maps", "NAV launch hour", "QM instruments"], "e5": ["NAV orbit", "QM cargo", "ENG bolts", "SCI landing site"]}
 ## task -> [role, world, progress key, value, line said when done]
 const TASKS := {
-	"uvcal": ["sci", "earth", "step", 1, "UV sensor calibrated on the UV-B band. It will measure exactly what hurts us."],
+	"cube": ["eng", "earth", "step", 1, "Payload cube assembled: power, data and the UV sensor window all in place."],
+	"uvcal": ["sci", "earth", "step", 1, "Ozone maps compared: 1984 had the thickest ozone, 1994 the biggest hole. Now we know what we measure."],
 	"wind": ["nav", "earth", "step", 1, "Launch hour picked: daylight, calm wind, no UV storm."],
-	"tune": ["qm", "earth", "step", 1, "Ground station locked on. We will hear the rocket all the way up."],
-	"perigee": ["nav", "earth", "step", 5, "Course set for when the Moon swings closest. Shorter trip, less fuel."],
+	"tune": ["qm", "earth", "step", 1, "Instruments loaded: only the ozone mappers fly, inside mass, power and data limits."],
+	"perigee": ["nav", "earth", "step", 5, "Orbit speed found: fast enough sideways and we fall around the Earth, not into it."],
 	"cargo": ["qm", "earth", "step", 5, "Cargo sealed: water, food, oxygen and the ice drill."],
 	"bolts": ["eng", "earth", "step", 5, "Shuttle bolts torqued. She will hold together."],
 	"site": ["sci", "earth", "step", 5, "Landing site picked: the rim of a shadowed crater at the south pole."],
-	"l1": ["nav", "moon", "ms", 6, "Shield aimed at L1, where the pull of the Sun and Earth balance."],
+	"arrival": ["nav", "moon", "ms", 0, "Arrival burn logged: we braked right at the closest point to the Moon."],
+	"outpost": ["qm", "moon", "ms", 2, "Outpost payload packed: it finds ice, watches radiation and sees into the shadows."],
+	"icescan": ["eng", "moon", "ms", 3, "Drill spot confirmed: very cold AND few neutrons. That is ice."],
+	"sunscan": ["sci", "moon", "ms", 5, "Sunlight scanned: the shield only has to stop the UV that ozone used to stop."],
+	"l1": ["nav", "moon", "ms", 6, "Shield held at L1, where the pull of the Sun and Earth balance."],
+	"aperture": ["eng", "moon", "ms", 6, "Shield aperture opens all the way. No jams in space."],
+	"datahome": ["qm", "moon", "ms", 6, "Data link tested: the shield's readings will reach home."],
 }
 const BUDGET := 150
 
@@ -189,12 +196,24 @@ func _moon_obj(s: Dictionary) -> Dictionary:
 	if not s["storm"].is_empty():
 		return {"room": "moon.shelter", "alert": true, "text": "SOLAR STORM! ALL 4 crew into the RADIATION SHELTER: %ds" % maxi(0, ceili(s["storm"]["t"]))}
 	var m: int = s["ms"]
+	if m == 0 and not task_done("arrival"):
+		return {"room": "moon.landing", "text": "NAVIGATOR · replay the arrival burn at the LANDING PAD"}
+	if m == 2 and not task_done("outpost"):
+		return {"room": "moon.solar", "text": "QUARTERMASTER · pack the outpost payload at the SOLAR RIDGE"}
 	if m == 2:
 		return {"room": "moon.solar", "text": "QUARTERMASTER · design the outpost power at the SOLAR RIDGE"}
+	if m == 3 and not task_done("icescan"):
+		return {"room": "moon.mine", "text": "ENGINEER · scan for ice before drilling in the ICE MINE"}
+	if m == 5 and not s["sats_chosen"] and not task_done("sunscan"):
+		return {"room": "moon.factory", "text": "ACT 3 · SCIENTIST · scan the Sun's light at the MOON FACTORY"}
 	if m == 5 and not s["sats_chosen"]:
 		return {"room": "moon.factory", "text": "ACT 3 · ENGINEER · design the shield satellites at the MOON FACTORY"}
 	if m == 6 and not task_done("l1"):
-		return {"room": "moon.port", "text": "NAVIGATOR · aim the shield at the L1 point from the MOON PORT"}
+		return {"room": "moon.port", "text": "NAVIGATOR · hold the shield at the L1 point from the MOON PORT"}
+	if m == 6 and not task_done("aperture"):
+		return {"room": "moon.port", "text": "ENGINEER · open the shield aperture at the MOON PORT"}
+	if m == 6 and not task_done("datahome"):
+		return {"room": "moon.lc", "text": "QUARTERMASTER · test the data link at LUNAR CONTROL"}
 	if m == 5 and s["sats_chosen"]:
 		return {"room": "moon.factory", "hold": true, "text": "ENGINEER + QUARTERMASTER · hold your stations in the MOON FACTORY"}
 	var list := [
@@ -232,11 +251,11 @@ func hold() -> Dictionary:
 		"moon":
 			if not s["storm"].is_empty():
 				return {}
-			if s["ms"] == 3:
+			if s["ms"] == 3 and task_done("icescan"):
 				return {"id": "mine", "need": {"eng": ["moon.mine", "drill"], "sci": ["moon.mine", "lamp"]}, "secs": 5.0}
 			if s["ms"] == 5 and s["sats_chosen"]:
 				return {"id": "factory", "need": {"eng": ["moon.factory", "asm"], "qm": ["moon.factory", "feed"]}, "secs": 5.0}
-			if s["ms"] == 6 and task_done("l1"):
+			if s["ms"] == 6 and _launch_ready():
 				return {"id": "port", "need": seats("port", "s_"), "secs": 3.0}
 	return {}
 
@@ -445,6 +464,8 @@ func _base_action(k: String) -> Dictionary:
 			var m: int = s["ms"]
 			if not s["storm"].is_empty():
 				return {}
+			if k == "lc" and m == 0 and not task_done("arrival"):
+				return {"label": "CHECK IN", "fn": func(): g.ui.toast("Navigator first: replay the arrival burn at the Landing Pad.", 3.0)}
 			if k == "lc" and m == 0:
 				return {"label": "CHECK IN", "fn": _act("checkin")}
 			if k == "science" and m == 1:
@@ -708,6 +729,9 @@ func _retry(R: Dictionary) -> void:
 			s["time"] -= TRIP_DAYS["shield"] * 1440
 			g.say_all([{"who": "ceres", "text": "Simulation reset. Engineer: redesign the shield at the Moon Factory."}])
 
+## Act 3: the shield launches when the Navigator, Engineer and Quartermaster jobs are done.
+func _launch_ready() -> bool:
+	return task_done("l1") and task_done("aperture") and task_done("datahome")
 
 ## A role task was finished (the workshop counts as one): move on when Act 1 prep is done.
 func _after_task() -> void:
@@ -717,7 +741,7 @@ func _after_task() -> void:
 		g.say_all([{"who": "ceres", "text": "Launch prep complete. Readiness review: all four of you, stand on your consoles in Mission Control."}])
 	elif s["world"] == "earth" and s["step"] == 5 and prep_done("e5") and not all_suited():
 		g.say_all([{"who": "ceres", "text": "Trip prep complete. Everyone: spacesuits from the locker in Crew Quarters, then board at the Launch Pad."}])
-	elif s["world"] == "moon" and s["ms"] == 6 and task_done("l1"):
+	elif s["world"] == "moon" and s["ms"] == 6 and _launch_ready():
 		g.say_all([{"who": "ceres", "text": "All four: take your launch seats at the Moon Port."}])
 
 
@@ -788,7 +812,7 @@ func finish_travel() -> void:
 			s["ms"] = 0
 			s["suits"] = {}
 			s["scene"] = "game"
-			g.say_all([{"who": "ceres", "text": "Touchdown at the lunar south pole. Anyone: check in at Lunar Control."}, {"who": "qm", "text": "Suits stowed at the Landing Pad. Inside the outpost we work in uniform again."}])
+			g.say_all([{"who": "ceres", "text": "Touchdown at the lunar south pole. Navigator: log the arrival burn at the Landing Pad. Then anyone checks in at Lunar Control."}, {"who": "qm", "text": "Suits stowed at the Landing Pad. Inside the outpost we work in uniform again."}])
 		"shield":
 			_shield_result()
 		"home":
