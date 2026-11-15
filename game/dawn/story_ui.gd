@@ -51,7 +51,10 @@ func _process(delta: float) -> void:
 	_watch_report()
 	if _intro_text and _intro_text.visible_ratio < 1.0:
 		_intro_t += delta
+		var before := _intro_text.visible_characters
 		_intro_text.visible_characters = int(_intro_t / 0.024 * 2)
+		if _intro_text.visible_characters / 3 != before / 3:
+			Sound.play("type")
 
 
 ## Show the shared mission report when the host posts one; close it when someone else continues.
@@ -176,7 +179,7 @@ func intro() -> void:
 	var skip := Button.new()
 	skip.text = "SKIP INTRO"
 	skip.theme_type_variation = "GhostButton"
-	skip.pressed.connect(_intro_done)
+	skip.pressed.connect(_request_skip_intro)
 	foot.add_child(skip)
 	var sp := Control.new()
 	sp.custom_minimum_size = Vector2(14, 0)
@@ -228,7 +231,13 @@ func _intro_next() -> void:
 	else:
 		_intro_show()
 
-
+func _request_skip_intro() -> void:
+	g.act("skip_intro", {}, g.acting_role())
+	
+func skip_intro_for_all() -> void:
+	if _intro_box != null:
+		_intro_done()
+		
 func _intro_done() -> void:
 	_intro_box = null
 	_close()
@@ -401,6 +410,12 @@ func wake() -> void:
 func _wake_start() -> void:
 	if _wk.is_empty() or _wk["phase"] != "black":
 		return
+	g.act("wake_start", {}, g.acting_role())
+
+
+func start_wake_for_all() -> void:
+	if _wk.is_empty() or _wk["phase"] != "black":
+		return
 	_wk["start"].queue_free()
 	_wk["phase"] = "wake"
 	_wk["alarm"] = true
@@ -497,32 +512,37 @@ func _wake_tick(delta: float) -> void:
 		return
 	if W8["alarm"]:
 		W8["alarm_t"] -= delta
+		if W8["alarm_t"] <= 0.0:
+			W8["alarm_t"] = 1.6                      ## seconds between sirens: set to the length of your file
+			Sound.play("siren")
 	if W8["phase"] == "wake":
 		W8["wake_t"] += delta
 		if W8["wake_t"] >= 2.4:
 			W8["phase"] = "play"
 			W8["obj"].visible = true
+
 	W8["obj_l"].text = "▸ " + (WTXT[W8["step"]] if W8["step"] < WTXT.size() else "")
 	var p: Dictionary = W8["pl"]
+
+# Automatically walk to objectives that have a defined target.
 	if W8["phase"] == "play" and not g.ui.dialogue_open():
-		var dv := Input.get_vector("p1_left", "p1_right", "p1_up", "p1_down") + Input.get_vector("p2_left", "p2_right", "p2_up", "p2_down")
-		if dv != Vector2.ZERO:
+		var target = WOBJ.get(W8["step"])
+		if target != null:
+			p["tx"] = float(target["ax"])
+			p["ty"] = float(target["ay"])
+			p["sp"] = 58.0
+			p["arrive"] = Callable()
+		else:
 			p["tx"] = null
-			var n = dv.normalized() * p["sp"] * delta
-			p["x"] = clampf(p["x"] + n.x, 10, 310)
-			p["y"] = clampf(p["y"] + n.y, 108, 166)
-			p["m"] = true
-			if absf(dv.x) >= absf(dv.y):
-				p["d"] = "right" if dv.x > 0 else "left"
-			else:
-				p["d"] = "down" if dv.y > 0 else "up"
-		elif p.get("tx") == null:
 			p["m"] = false
+
 	if W8["phase"] == "play" or p.get("tx") != null:
 		_move(p, delta)
+
 	_move(W8["ce"], delta)
-	for o in W8["others"]:
-		_move(o, delta)
+	for crew_member in W8["others"]:
+		_move(crew_member, delta)
+
 	var ce: Dictionary = W8["ce"]
 	if ce["follow"] and W8["phase"] == "play":
 		var fx: float = p["x"] + (20 if p["d"] == "left" else -20)
@@ -531,12 +551,20 @@ func _wake_tick(delta: float) -> void:
 			ce["tx"] = clampf(fx, 10, 310)
 			ce["ty"] = clampf(fy, 108, 166)
 			ce["sp"] = 46.0
+
 	if W8["door_opening"] and W8["door_p"] < 1:
 		W8["door_p"] = minf(1.0, W8["door_p"] + delta / 1.6)
 	if W8["fading"] and W8["fade"] < 1:
 		W8["fade"] = minf(1.0, W8["fade"] + delta / 1.5)
+
 	var ob = WOBJ.get(W8["step"])
-	var near: bool = ob != null and W8["phase"] == "play" and W8["view"] == "" and absf(p["x"] - ob["ax"]) <= 16 and absf(p["y"] - ob["ay"]) <= 26
+	var near: bool = (
+		ob != null
+		and W8["phase"] == "play"
+		and W8["view"] == ""
+		and absf(p["x"] - ob["ax"]) <= 16
+		and absf(p["y"] - ob["ay"]) <= 26
+	)
 	var pr: Button = W8["prompt"]
 	pr.visible = near
 	if near:
@@ -548,24 +576,46 @@ func _wake_interact() -> void:
 	var W8 := _wk
 	if W8.is_empty():
 		return
+
 	var o = WOBJ.get(W8["step"])
 	if o == null or W8["phase"] != "play" or g.ui.dialogue_open():
 		return
+
 	var p: Dictionary = W8["pl"]
 	if not (absf(p["x"] - o["ax"]) <= 16 and absf(p["y"] - o["ay"]) <= 26):
 		return
+
 	W8["prompt"].visible = false
-	match W8["step"]:
-		0: _w_alarm()
-		1: _w_view("peri", "UV INDEX: EXTREME", [{"who": "ceres", "text": "A gamma-ray burst destroyed the ozone layer. Deadly UV now covers the surface."}], 2)
-		2: _w_view("net", "NETWORK: OFFLINE", [{"who": "ceres", "text": "Every bunker is alone. Nobody can go outside to fix the towers."}], 3)
-		4: _w_door()
+	g.request_wake_step(int(W8["step"]))
+	
+func _run_wake_step(step: int) -> void:
+	if _wk.is_empty():
+		return
+	if _wk["phase"] != "play" or _wk["step"] != step:
+		return
+	if g.ui.dialogue_open():
+		return
+
+	match step:
+		0:
+			_w_alarm()
+		1:
+			_w_view("peri", "UV INDEX: EXTREME",
+				[{"who": "ceres", "text": "A gamma-ray burst destroyed the ozone layer. Deadly UV now covers the surface."}],
+				2)
+		2:
+			_w_view("net", "NETWORK: OFFLINE",
+				[{"who": "ceres", "text": "Every bunker is alone. Nobody can go outside to fix the towers."}],
+				3)
+		4:
+			_w_door()
 
 
 func _w_alarm() -> void:
 	var W8 := _wk
 	W8["phase"] = "cut"
 	W8["alarm"] = false
+	Sound.stop("siren")                    ## cut the siren the moment the alarm is silenced
 	W8["term_on"] = true
 	await _wait(.9)
 	W8["ce"]["screen_on"] = true
@@ -788,7 +838,7 @@ func mission_board() -> void:
 		if s["step"] == 0:
 			g.act("pick", {}, g.acting_role()))
 	_card(r, "ACT 2\n???", "Unlocked" if done else "Classified until 1.1", func(pc, t, _d): pc.planet("moon", 8, 4, 32) if done else pc.text("?", 24, 26, "slate", 14), true)
-	_card(r, "ACTS 3–5\n???", "Later" if done else "Classified", func(pc, t, _d): pc.text("?", 24, 26, "slate", 14), true)
+	_card(r, "ACT 3\n???", "Later" if done else "Classified", func(pc, t, _d): pc.text("?", 24, 26, "slate", 14), true)
 	g.ui.button(box, "CLOSE", g.ui.close_panel, false)
 	c1.grab_focus.call_deferred()
 
@@ -829,36 +879,55 @@ func _card(row: Node, t: String, sub: String, art: Callable, locked: bool) -> Bu
 
 # ---------------------------------------------------------------- workshop (Engineer)
 
+const SHOP_SCALE := 0.3                     ## workshop picture size inside the task window (0.3 = 384 x 216)
+
+
+## The Engineer's rocket workshop, in the same fixed task window as the minigames (dawn_ui.popup).
+## Left: the workshop with the rocket you are building. Right: mass / cost / height gauges.
+## Bottom: the parts. LOCK DESIGN sends it to the host; ✕ or Esc closes without locking.
 func workshop() -> void:
 	_design = g.S["design"].duplicate()
 	var me: String = g.camera.target.role if is_instance_valid(g.camera.target) else "eng"
-	_open(func(pc, t, _d):
-		pc.workshop_bg(t)
-		pc.rocket(160, 132, _design, t)
-		pc.person(me, 20, 60 + (int(t * 2) % 2), "down", 0, 4))
-	var hb := PanelContainer.new()
-	hb.add_theme_stylebox_override("panel", DawnTheme.box(Color(0.094, 0.078, 0.145, 0.92), C["cyan"], 4, Color(0, 0, 0, 0), 0, Vector4(12, 8, 12, 8)))
-	hb.position = Vector2(24, 16)
-	hb.custom_minimum_size = Vector2(760, 0)
+	var win: Dictionary = g.ui.popup("ENGINEER TASK", "BUILD THE ROCKET", RoleSprites.TAGS["eng"])
+	var body: VBoxContainer = win["body"]
+	# CERES hint line
 	var hrow := HBoxContainer.new()
 	hrow.add_theme_constant_override("separation", 12)
 	var who := Label.new()
 	who.text = " CERES "
 	who.add_theme_font_override("font", DawnTheme.title_font())
-	who.add_theme_font_size_override("font_size", 12)
+	who.add_theme_font_size_override("font_size", 11)
 	who.add_theme_color_override("font_color", C["ink"])
 	var whobg := PanelContainer.new()
 	whobg.add_theme_stylebox_override("panel", DawnTheme.box(C["cyan"], Color(0, 0, 0, 0), 0, Color(0, 0, 0, 0), 0, Vector4(6, 4, 6, 4)))
+	whobg.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	whobg.add_child(who)
 	hrow.add_child(whobg)
 	var say := Label.new()
-	say.add_theme_font_size_override("font_size", 22)
+	say.add_theme_font_size_override("font_size", 20)
 	say.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	say.custom_minimum_size = Vector2(620, 0)
+	say.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hrow.add_child(say)
-	hb.add_child(hrow)
-	_screen.add_child(hb)
-	var gs := _box(_screen, Vector2(880, 16), 376, C["slate"])
+	body.add_child(hrow)
+	# picture of the workshop (the 320x180 pixel scene, scaled down) + gauges
+	var mid := HBoxContainer.new()
+	mid.add_theme_constant_override("separation", 16)
+	body.add_child(mid)
+	var pic := Control.new()
+	pic.custom_minimum_size = Vector2(1280, 720) * SHOP_SCALE
+	pic.clip_contents = true
+	mid.add_child(pic)
+	var art := Pixel.new()
+	art.scale = Vector2(SHOP_SCALE, SHOP_SCALE)
+	art.painter = func(pc, t, _d):
+		pc.workshop_bg(t)
+		pc.rocket(160, 132, _design, t)
+		pc.person(me, 20, 60 + (int(t * 2) % 2), "down", 0, 4)
+	pic.add_child(art)
+	var gs := VBoxContainer.new()
+	gs.add_theme_constant_override("separation", 8)
+	gs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	mid.add_child(gs)
 	var gauges := {}
 	for k in [["mass", "MASS"], ["cost", "COST"], ["alt", "HEIGHT"]]:
 		var l := Label.new()
@@ -874,17 +943,17 @@ func workshop() -> void:
 	var reqs := Label.new()
 	reqs.add_theme_font_size_override("font_size", 18)
 	gs.add_child(reqs)
+	# the parts
 	var tray := HBoxContainer.new()
-	tray.position = Vector2(24, 600)
-	tray.add_theme_constant_override("separation", 10)
-	_screen.add_child(tray)
+	tray.add_theme_constant_override("separation", 8)
+	body.add_child(tray)
 	var buttons := {}
 	for k in ["small", "big", "uv", "cam", "chute", "radio"]:
 		var b := Button.new()
 		b.theme_type_variation = "GhostButton"
-		b.custom_minimum_size = Vector2(132, 92)
+		b.custom_minimum_size = Vector2(124, 74)
 		b.add_theme_font_override("font", DawnTheme.body_font())
-		b.add_theme_font_size_override("font_size", 18)
+		b.add_theme_font_size_override("font_size", 16)
 		b.pressed.connect(func():
 			if k == "small" or k == "big":
 				_design["motor"] = k
@@ -893,19 +962,9 @@ func workshop() -> void:
 			_refresh_shop(say, gauges, reqs, buttons))
 		tray.add_child(b)
 		buttons[k] = b
-	var lock := Button.new()
-	lock.text = "LOCK DESIGN ▸▸"
-	lock.custom_minimum_size = Vector2(196, 64)
-	lock.pressed.connect(func():
+	g.ui.button(win["foot"], "LOCK DESIGN ▸▸", func():
 		g.act("design", {"d": _design}, "eng")
-		_close())
-	tray.add_child(lock)
-	var later := Button.new()
-	later.text = "LATER"
-	later.theme_type_variation = "GhostButton"
-	later.custom_minimum_size = Vector2(0, 64)
-	later.pressed.connect(_close)
-	tray.add_child(later)
+		g.ui.close_panel())
 	_refresh_shop(say, gauges, reqs, buttons)
 	buttons["uv"].grab_focus.call_deferred()
 
@@ -1089,7 +1148,7 @@ func _report() -> void:
 	Rr.add_child(holder)
 	g.ui.title(Rr, "NASA SOUNDING\nROCKET PROGRAM", C["yellow"], 13)
 	g.ui.rich(Rr, "Real rockets that fly straight up and fall back, giving scientists a few minutes above the air.", 18)
-	g.ui.rich(Rr, "[color=#63c74d]NEW: ACT 2 · ???\nNEW: OPTIONAL B · UV CANOPY[/color]", 16)
+	g.ui.rich(Rr, "[color=#63c74d]NEW: ACT 2 · ???[/color]", 16)
 
 
 # ---------------------------------------------------------------- travel (ported from c5.js)
@@ -1128,12 +1187,8 @@ func _travel() -> void:
 			pc.px(round(bz.call(70, 170, 236, u)), round(bz.call(118, 150, 64, u)), "steel")
 		var x2: float = bz.call(70, 170, 236, k)
 		var y2: float = bz.call(118, 150, 64, k)
-		if c.get("kind", "") == "robots":
-			pc.R(x2 - 3, y2 - 3, 7, 6, "light")
-			pc.R(x2 - 2, y2 - 2, 5, 2, "cyan")
-		else:
-			pc.R(x2 - 1, y2 - 4, 3, 8, "light")
-			pc.R(x2 - 1, y2 - 5, 3, 1, "red")
+		pc.R(x2 - 1, y2 - 4, 3, 8, "light")
+		pc.R(x2 - 1, y2 - 5, 3, 1, "red")
 		if int(t * 12) % 2:
 			pc.R(x2 - 1, y2 + 4, 3, 2, "orange"))
 	var v := _banner(_screen, c.get("title", ""), c.get("sub", ""), true)
@@ -1153,12 +1208,21 @@ func _travel() -> void:
 	_screen.add_child(sk)
 
 
-# ---------------------------------------------------------------- ending (ported from c5.js)
+# ---------------------------------------------------------------- ending: home on Earth (always happy)
+
+## Ending titles by mission stars (rocket + outpost power + shield, up to 9). Every ending is a happy one;
+## more stars just make the dawn brighter.
+static func ending_tier(stars: int) -> String:
+	if stars >= 8:
+		return "GOLDEN DAWN"
+	if stars >= 5:
+		return "RISING DAWN"
+	return "QUIET DAWN"
+
 
 func _ending() -> void:
 	var s: Dictionary = g.S
-	var n: int = s["opt"].size()
-	var tier := "GOLDEN DAWN" if n >= 4 else ("RISING DAWN" if n >= 2 else "QUIET DAWN")
+	var tier := ending_tier(g.mission_stars())
 	var st0 := {"t": -1.0}
 	_open(func(pc, t, dt):
 		if st0["t"] < 0:
@@ -1168,14 +1232,28 @@ func _ending() -> void:
 		pc.stars(t)
 		pc.landscape(t, 0, true)
 		pc.dust(t, dt)
+		# the return capsule floats down under its parachute and lands by the bunker
+		var land := minf(1.0, e / 3.0)
+		var cx := 236.0
+		var cy := lerpf(-20.0, 136.0, 1.0 - pow(1.0 - land, 2.0))   # feet of the capsule on the ground
+		if land < 1.0:
+			pc.disc(cx, cy - 18, 9, "rose")
+			pc.R(cx - 9, cy - 18, 19, 4, "pink")
+			pc.line(cx - 8, cy - 15, cx - 3, cy - 4, "light")
+			pc.line(cx + 8, cy - 15, cx + 3, cy - 4, "light")
+		pc.R(cx - 5, cy - 4, 11, 8, "light")
+		pc.R(cx - 4, cy - 3, 9, 2, "steel")
+		pc.R(cx - 1, cy - 1, 3, 2, "cyan")
+		# then the crew walks out into the first real sunrise
 		for i in 4:
 			var tx := 74 + i * 24
-			var x := minf(tx, 40 + e * 14 - i * 12)
-			if x < 40:
+			var x := minf(tx, 40 + (e - 3.0) * 14 - i * 12)
+			if e < 3.0 or x < 40:
 				continue
 			var mv := x < tx
 			pc.person(ROLES[i], x, 120, "right" if mv else "down", int(t * 8) + 1 if mv else 0))
-	g.ui.say([{"who": "ceres", "text": "The last shield satellites are in place. The ozone meter reads %d%% and climbing." % s["ozone"]},
+	g.ui.say([{"who": "ceres", "text": "Touchdown! The capsule is down safely next to Bunker 4. Welcome home."},
+		{"who": "ceres", "text": "The shield satellites hold their place at L1. The ozone meter reads %d%% and climbing." % s["ozone"]},
 		{"who": "narrator", "text": "The four scientists step outside without suits and watch a real sunrise: a dawn."}], func(): _end_stats(tier))
 
 
@@ -1183,15 +1261,10 @@ func _end_stats(tier: String) -> void:
 	if _screen == null or g.S["scene"] != "ending":
 		return
 	var s: Dictionary = g.S
-	var n: int = s["opt"].size()
-	_banner(_screen, tier, "The shield is complete. The sky is healing. The bunker doors are open.")
+	_banner(_screen, tier, "The shield is up. The sky is healing. The bunker doors are open.")
 	var v := _box(_screen, Vector2(240, 548), 800, C["slate"])
-	var names := " · ".join(s["opt"].map(func(k): return story.OPTNAME[k]))
-	var total := 0
-	for k in s.get("stars", {}):
-		total += int(s["stars"][k])
-	g.ui.rich(v, "[center][color=#fee761][b]OZONE %d%%[/b][/color]\nOptional missions done: %d of 6 · Mistakes: %d\n[color=#8b9bb4]%s\nMission time: %s · Posters found: %d/21 · Mission stars: %d/12\n0–1 Quiet Dawn · 2–3 Rising Dawn · 4+ Golden Dawn[/color][/center]" % [
-		s["ozone"], n, s["pen"], names if names != "" else "None: they change the ending", _dur(s["time"]), g.found.size(), total], 18)
+	g.ui.rich(v, "[center][color=#fee761][b]OZONE %d%%[/b][/color]\nMission stars: %d/%d · Mistakes: %d\n[color=#8b9bb4]Mission time: %s · Posters found: %d/%d\n0–4 stars Quiet Dawn · 5–7 Rising Dawn · 8–9 Golden Dawn[/color][/center]" % [
+		s["ozone"], g.mission_stars(), g.MAX_STARS, s["pen"], _dur(s["time"]), g.found.size(), g.posters.size()], 18)
 	var r: HBoxContainer = g.ui.row(v)
 	r.alignment = BoxContainer.ALIGNMENT_CENTER
 	g.ui.button(r, "WALK BUNKER 4 ▸▸", func(): g.act("freeroam", {}, g.acting_role())).grab_focus.call_deferred()

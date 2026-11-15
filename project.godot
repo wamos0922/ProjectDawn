@@ -15,13 +15,14 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Project Dawn"
-run/main_scene="res://ui/main.tscn"
+run/main_scene="res://game/dawn/title.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]
 
 GameEngine="*res://engine/game_engine.gd"
 Network="*uid://inlxg53nyawt"
+Sound="*res://game/audio/sound.gd"
 
 [display]
 

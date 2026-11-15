@@ -22,12 +22,15 @@ signal joined
 signal join_failed(reason: String)
 signal disconnected(reason: String)
 
-const PORT := 7777
 const MAX_PLAYERS := 4
+
+const RELAY_URL := "wss://34-50-21-254.sslip.io/relay"   # fixed in Step 6
+const RelayPeer := preload("res://game/net/relay_peer.gd")
 
 var players := {}          ## peer_id -> {"name": String, "slot": int}
 var game_scene := ""       ## scene the host started ("" = still in the lobby)
 var _my_name := ""
+var room_code := ""
 
 
 func _ready() -> void:
@@ -37,34 +40,37 @@ func _ready() -> void:
 	multiplayer.connection_failed.connect(_on_connection_failed)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
 
-
-# ---------------------------------------------------------------- public API
-
 func host(player_name: String) -> Error:
 	leave()
-	var peer := ENetMultiplayerPeer.new()
-	# Room for one extra guest, so a 5th player gets a clear "team is full" message.
-	var err := peer.create_server(PORT, MAX_PLAYERS)
+	var peer = RelayPeer.new()
+	var err: Error = peer.open(relay_url(), "")
 	if err != OK:
-		return err   # usually: port already in use (another host is running on this machine)
+		return err
+	peer.room_ready.connect(func(code: String):
+		room_code = code
+		players = {1: {"name": clean_name(player_name), "slot": 0}}
+		players_changed.emit()
+		joined.emit())
 	multiplayer.multiplayer_peer = peer
 	_my_name = player_name
-	players = {1: {"name": clean_name(player_name), "slot": 0}}
-	players_changed.emit()
-	joined.emit()
 	return OK
 
 
-func join(address: String, player_name: String) -> Error:
+func join(code: String, player_name: String) -> Error:
 	leave()
-	var peer := ENetMultiplayerPeer.new()
-	var err := peer.create_client(address, PORT)
+	var peer = RelayPeer.new()
+	var err: Error = peer.open(relay_url(), code)
 	if err != OK:
 		return err
 	multiplayer.multiplayer_peer = peer
 	_my_name = player_name
-	return OK   # result arrives later as `joined` or `join_failed`
+	return OK
 
+static func relay_url() -> String:
+	for a in OS.get_cmdline_user_args() + OS.get_cmdline_args():
+		if a.begins_with("--relay="):
+			return a.trim_prefix("--relay=")
+	return RELAY_URL
 
 ## Host only: every device (including late joiners) switches to this scene.
 func start_game(scene_path: String) -> void:
@@ -76,6 +82,7 @@ func start_game(scene_path: String) -> void:
 
 func leave() -> void:
 	game_scene = ""
+	room_code = ""
 	if multiplayer.multiplayer_peer and not (multiplayer.multiplayer_peer is OfflineMultiplayerPeer):
 		multiplayer.multiplayer_peer.close()
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
@@ -205,8 +212,12 @@ func _refused(reason: String) -> void:
 
 
 func _on_connection_failed() -> void:
+	var why := "Could not reach the host. Check the address and that the host is running."
+	var peer = multiplayer.multiplayer_peer
+	if peer is RelayPeer and peer.fail_reason != "":
+		why = peer.fail_reason
 	leave()
-	join_failed.emit("Could not reach the host. Check the address and that the host is running.")
+	join_failed.emit(why)
 
 
 func _on_server_disconnected() -> void:

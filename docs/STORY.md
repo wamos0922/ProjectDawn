@@ -1,5 +1,8 @@
 # PROJECT DAWN — Storyline & Objectives
 
+> **Note (15 Nov 2026):** the game now plays a shorter story: Earth → Moon → shield → home, with no Mars
+> acts and no optional missions. See `docs/STORY_MOON_ONLY.md`. This file keeps the original full design.
+
 NASA Space Apps Challenge 2026 · Space Mission Design Game
 **Worlds:** Earth · Moon · Mars
 

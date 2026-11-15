@@ -40,16 +40,13 @@ var suited := false:
 	set(v):
 		suited = v
 		_redress()
-## Shown as a Mars robot (the crew drives robots from the Moon in Acts 4-5).
-var robot := false:
-	set(v):
-		robot = v
-		_redress()
 
 
 ## Computer-controlled crew member (CERES autopilot): ignores the keyboard and walks by ai_input.
 var ai := false
 var ai_input := Vector2.ZERO
+var _footstep_timer := 0.0
+const FOOTSTEP_INTERVAL := 0.38
 
 var can_move := true
 var facing := Vector2.DOWN
@@ -57,23 +54,32 @@ var is_moving := false
 
 var _sprite: AnimatedSprite2D
 
+var _tag: Label                      # role name above the head (spacesuits all look alike)
+
+## Short role names shown above each crew member.
+const TAG_TEXT := {"eng": "ENGINEER", "sci": "SCIENTIST", "nav": "NAVIGATOR", "qm": "QUARTERMASTER"}
+const TAG_FONT_SIZE := 18            # bigger number = bigger text
+const TAG_SCALE := 0.25              # drawn at 4x then shrunk, so the pixel font stays sharp at camera zoom 4
+
 const SEND_INTERVAL := 0.05          # seconds between position updates (20 per second)
 var _send_timer := 0.0
 var _net_target := Vector2.ZERO      # where a remote player should be
 var _has_net_target := false
 
 
+
 func _redress() -> void:
 	if _sprite and role != "":
-		RoleSprites.dress(_sprite, role, suited, robot, sprite_scale)
-
+		RoleSprites.dress(_sprite, role, suited, sprite_scale)
+	_place_tag()          # <-- add this line
 
 func _ready() -> void:
 	InputSetup.ensure()
 	_sprite = get_node_or_null("Sprite") as AnimatedSprite2D
 	if _sprite == null and role != "":
-		_sprite = RoleSprites.make(role, suited, sprite_scale, robot)
+		_sprite = RoleSprites.make(role, suited, sprite_scale)
 		add_child(_sprite)
+	_make_tag() 
 	if get_node_or_null("CollisionShape2D") == null:
 		# Feet-sized box: in top-down games only the feet should hit walls.
 		var shape := CollisionShape2D.new()
@@ -93,21 +99,69 @@ func _ready() -> void:
 		var cam := Camera2D.new()
 		cam.zoom = Vector2(4, 4)
 		get_parent().add_child.call_deferred(cam)
+		
+		
+# ---------------------------------------------------------------- name tag above the head
+
+func _make_tag() -> void:
+	if role == "" or not TAG_TEXT.has(role):
+		return
+	_tag = Label.new()
+	_tag.text = TAG_TEXT[role]
+	_tag.add_theme_font_override("font", DawnTheme.body_font())
+	_tag.add_theme_font_size_override("font_size", TAG_FONT_SIZE)
+	_tag.add_theme_color_override("font_color", RoleSprites.TAGS[role])
+	_tag.add_theme_color_override("font_outline_color", Color("#181425"))
+	_tag.add_theme_constant_override("outline_size", 6)
+	_tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_tag.size = Vector2(200, 22)
+	_tag.scale = Vector2(TAG_SCALE, TAG_SCALE)
+	_tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tag.z_index = 5
+	add_child(_tag)
+	_place_tag()
+
+
+## Sit the tag just above the head.
+func _place_tag() -> void:
+	if _tag == null:
+		return
+	var head := float(RoleSprites.FRAME.y) * sprite_scale
+	_tag.position = Vector2(-_tag.size.x * TAG_SCALE / 2.0, -head - 6.0)
+
+
+## The crew member you control shows "▼ENG" in yellow, like the HTML's yellow arrow.
+func _update_tag() -> void:
+	if _tag == null:
+		return
+	var mine := is_multiplayer_authority() and not ai
+	_tag.text = ("▼" + TAG_TEXT[role]) if mine else TAG_TEXT[role]
+	_tag.add_theme_color_override("font_color", Color("#fee761") if mine else RoleSprites.TAGS[role])
+
+
+func _process(_delta: float) -> void:
+	_update_tag()
 
 
 func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority():
-		_follow_network(delta)        # someone else controls this player
+		_follow_network(delta)
 		return
+
 	var input := Vector2.ZERO
 	if ai:
 		input = ai_input if can_move else Vector2.ZERO
-	elif can_move:
+	elif can_move and not _typing_in_chat():
 		input = Input.get_vector(
-			InputSetup.action(player_index, "left"), InputSetup.action(player_index, "right"),
-			InputSetup.action(player_index, "up"), InputSetup.action(player_index, "down"))
+			InputSetup.action(player_index, "left"),
+			InputSetup.action(player_index, "right"),
+			InputSetup.action(player_index, "up"),
+			InputSetup.action(player_index, "down")
+		)
+
 	step(input, delta)
 	move_and_slide()
+	_update_footsteps(delta)
 	_update_animation()
 	_send_state(delta)
 
@@ -117,6 +171,9 @@ func _physics_process(delta: float) -> void:
 func _is_online() -> bool:
 	return multiplayer.multiplayer_peer != null and not (multiplayer.multiplayer_peer is OfflineMultiplayerPeer)
 
+func _typing_in_chat() -> bool:
+	var focused_control: Control = get_viewport().gui_get_focus_owner()
+	return focused_control is LineEdit or focused_control is TextEdit
 
 func _send_state(delta: float) -> void:
 	if not _is_online():
@@ -157,8 +214,18 @@ func step(input: Vector2, delta: float) -> void:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 	is_moving = velocity.length() > 1.0
 
+func _update_footsteps(delta: float) -> void:
+	if not ai and can_move and get_real_velocity().length() > 1.0:
+		_footstep_timer -= delta
+		if _footstep_timer <= 0.0:
+			Sound.play("footstep")
+			_footstep_timer = FOOTSTEP_INTERVAL
+	else:
+		_footstep_timer = 0.0
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _typing_in_chat():
+		return
 	if can_move and not ai and is_multiplayer_authority() and event.is_action_pressed(InputSetup.action(player_index, "interact")):
 		get_viewport().set_input_as_handled()     # one key press = one action (no double dialogue skip)
 		interact_requested.emit(self)

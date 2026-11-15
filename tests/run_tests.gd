@@ -47,8 +47,8 @@ func _init() -> void:
 			if not WD.inside_local(id, s["pos"]):
 				all_ok = false
 				print("    station outside the floor: %s %s" % [id, s["id"]])
-	_check(all_ok, "every door has a way back, every station is on the floor (37 rooms)")
-	_check(WD.rooms().size() == 37, "37 rooms across Earth, Moon and Mars")
+	_check(all_ok, "every door has a way back, every station is on the floor (24 rooms)")
+	_check(WD.rooms().size() == 24, "24 rooms across Earth and the Moon (no Mars)")
 	_check(WD.next_hop("earth.crew", "earth.pad", {"earth.canopy": true}) == "earth.mc", "crew quarters to launch pad goes via mission control")
 	_check(WD.next_hop("earth.mc", "earth.hydro", {"earth.hydro": true}) == "", "locked rooms are unreachable")
 	_check(WD.room_at(WD.room_origin("moon.mine") + Vector2(10, 10)) == "moon.mine", "room_at finds the Moon's ice mine")
@@ -66,9 +66,11 @@ func _init() -> void:
 	var mp: Dictionary = DZ.moon_calc({"site": "rim", "solar": 1, "cable": 1, "rtg": 0, "bat": 1})
 	_check(mp["ok"] and mp["cr"] == 75 and mp["kg"] == 85 and mp["survives"], "rim solar + cable + battery: 75 cr, 85 kg, survives the cable cut")
 	_check(not DZ.moon_calc({"site": "floor", "solar": 0, "cable": 0, "rtg": 1, "bat": 1})["ok"], "one RTG on the crater floor is not enough")
-	_check(DZ.mars_calc({"solar": 3, "bat": 0, "rtg": 0, "ins": 0})["days"] == 0, "all-solar greenhouse dies on storm day 1")
-	_check(DZ.mars_calc({"solar": 2, "bat": 1, "rtg": 1, "ins": 1})["days"] == 3, "RTG + insulation + battery survives the 3-day storm")
 	_check(DZ.du(0) == 92 and DZ.du(100) == 300, "ozone % maps to the real Dobson range")
+
+	var SUI = load("res://game/dawn/story_ui.gd")
+	_check(SUI.ending_tier(9) == "GOLDEN DAWN" and SUI.ending_tier(6) == "RISING DAWN" and SUI.ending_tier(1) == "QUIET DAWN", "ending title follows the mission stars")
+	_check(not Story.TASKS.has("window") and not Story.PREP.has("m4"), "no Mars tasks left in the story")
 
 	print("\n%d passed, %d failed" % [_passes, _fails])
 	eng.free()

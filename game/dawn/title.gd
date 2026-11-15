@@ -3,7 +3,7 @@ extends Control
 ## Owner: Sufi (gameplay). Uses the Network autoload (game/net/network.gd).
 ##
 ## SOLO: pick who you start as and whether CERES autopilot moves the others (TAB switches in game).
-## HOST: this laptop becomes the server. Friends on the same Wi-Fi type its CREW CODE (the IP address).
+## HOST: this laptop becomes the server. Friends on the same Wi-Fi type its ROOM CODE (the IP address).
 ## JOIN: type the host's CREW CODE. The host presses START MISSION when everyone is in.
 ## HOST and JOIN: click a role card to pick that role (roles nobody picks = CERES autopilot).
 ## Passed to the game as Network meta: "my_role" (solo) and "crew_mode" ("autopilot" or "wait").
@@ -27,6 +27,7 @@ var _addr: LineEdit
 
 
 func _ready() -> void:
+	Sound.music("title")
 	size = Vector2(1280, 720)
 	theme = DawnTheme.get_theme()
 	get_viewport().canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
@@ -145,7 +146,7 @@ func _title() -> void:
 	chip.add_theme_stylebox_override("panel", DawnTheme.box(Color(0.094, 0.078, 0.145, 0.88), C["slate"], 4, Color(0, 0, 0, 0), 0, Vector4(12, 7, 12, 7)))
 	chip.position = Vector2(32, 662)
 	var cl := Label.new()
-	cl.text = "CO-OP · 1–4 PLAYERS · EARTH · MOON · MARS"
+	cl.text = "CO-OP · 1–4 PLAYERS · EARTH · MOON"
 	cl.add_theme_font_override("font", DawnTheme.title_font())
 	cl.add_theme_font_size_override("font_size", 12)
 	cl.add_theme_color_override("font_color", C["sand"])
@@ -169,7 +170,6 @@ func _credits() -> void:
 		"• Ozone: healthy %d DU, hole below %d DU, record low %d DU (%s). NASA Ozone Watch\n" % [N["ozone"]["normal"], N["ozone"]["hole"], N["ozone"]["low"], N["ozone"]["low_when"]] +
 		"• Solar storm and satellites: %s. NASA Science\n" % N["storm"]["name"] +
 		"• Lunar south pole: Shackleton rim sunlit %s%% of the time, crater floors near %d K. LRO LOLA and Diviner\n" % [str(N["moon"]["rim"]), N["moon"]["cold"]] +
-		"• Mars dust storm: tau %s, Opportunity %d → %d watt-hours a day. NASA JPL\n" % [str(N["mars"]["tau"]), N["mars"]["wh_before"], N["mars"]["wh_after"]] +
 		"• RTG power: about %d W, %d kg. NASA MMRTG fact sheet\n\n" % [N["rtg"]["w"], N["rtg"]["kg"]] +
 		"[color=#feae34]FONTS[/color]\nPress Start 2P and Pixelify Sans (SIL Open Font License, Google Fonts).\n\n" +
 		"[color=#feae34]AI TOOLS USED[/color]\nClaude (Anthropic) and Codex helped write code, pixel art and text. The team chose the design, checked the facts and tested the game.")
@@ -234,15 +234,6 @@ func _name_field(parent: Node) -> void:
 	_name.max_length = 12
 	parent.add_child(_name)
 
-
-static func local_ips() -> Array:
-	var out := []
-	for ip in IP.get_local_addresses():
-		if ip.count(".") == 3 and not ip.begins_with("127.") and not ip.begins_with("169.254."):
-			out.append(ip)
-	return out
-
-
 func _host_screen() -> void:
 	_mode = "host"
 	_clear()
@@ -255,25 +246,27 @@ func _host_screen() -> void:
 	var R := _panel(Vector2(784, 32), 464, 656)
 	_h(R, "HOST A CREW", 18)
 	_name_field(R)
-	var ips := local_ips()
-	_h(R, "CREW CODE", 11, C["grey"])
-	var code := _h(R, ips[0] if not ips.is_empty() else "127.0.0.1", 24, C["white"])
+	_h(R, "ROOM CODE", 11, C["grey"])
+	var code := _h(R, "—", 24, C["white"])
 	code.name = "Code"
-	_p(R, "Friends on the same Wi-Fi press JOIN A CREW and type this code." + ("\nOther addresses: " + ", ".join(ips.slice(1)) if ips.size() > 1 else ""), 18)
+	var how := _p(R, "Press OPEN THE CREW to get a room code, then tell your friends the code.", 18)
 	_status = _p(R, "", 18, C["cyan"])
 	var start := _btn(R, "OPEN THE CREW  ▸▸", func(): pass)
+	Network.joined.connect(func():
+		if is_instance_valid(code) and Network.is_host():
+			code.text = Network.room_code
+			how.text = "Friends open the game, press JOIN A CREW and type this code."
+			start.text = "START MISSION  ▸▸")
 	start.pressed.connect(func():
 		if Network.is_host():
 			Network.set_meta("crew_mode", "autopilot")
 			Network.start_game(GAME)
 			return
+		if Network.multiplayer.multiplayer_peer is Network.RelayPeer:
+			return
 		Network.set_meta("my_name", _name.text)
 		var err: Error = Network.host(_name.text)
-		if err != OK:
-			_status.text = "Could not host: %s (is another host running on this laptop?)" % error_string(err)
-			return
-		start.text = "START MISSION  ▸▸"
-		_status.text = "Hosting. Friends can join now. Press START when everyone is in.")
+		_status.text = "Opening the crew…" if err == OK else "Could not go online: " + error_string(err))
 	_btn(R, "◂ BACK", _title, true)
 	start.grab_focus.call_deferred()
 	_refresh()
@@ -295,7 +288,8 @@ func _join_screen() -> void:
 	_h(R, "CREW CODE", 11, C["grey"])
 	_addr = LineEdit.new()
 	_addr.text = Network.get_meta("last_code", "")
-	_addr.placeholder_text = "192.168.0.12"
+	_addr.placeholder_text = "K7QX"
+	_addr.max_length = 4
 	R.add_child(_addr)
 	_status = _p(R, "", 18, C["cyan"])
 	var go := _btn(R, "JOIN  ▸▸", func():
@@ -310,6 +304,7 @@ func _join_screen() -> void:
 	_btn(R, "◂ BACK", _title, true)
 	_addr.grab_focus.call_deferred()
 	go.focus_neighbor_top = _addr.get_path()
+	_addr.text_submitted.connect(func(_t): go.pressed.emit())
 	_refresh()
 
 
