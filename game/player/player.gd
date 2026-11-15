@@ -45,6 +45,8 @@ var suited := false:
 ## Computer-controlled crew member (CERES autopilot): ignores the keyboard and walks by ai_input.
 var ai := false
 var ai_input := Vector2.ZERO
+var _footstep_timer := 0.0
+const FOOTSTEP_INTERVAL := 0.38
 
 var can_move := true
 var facing := Vector2.DOWN
@@ -143,17 +145,23 @@ func _process(_delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority():
-		_follow_network(delta)        # someone else controls this player
+		_follow_network(delta)
 		return
+
 	var input := Vector2.ZERO
 	if ai:
 		input = ai_input if can_move else Vector2.ZERO
 	elif can_move:
 		input = Input.get_vector(
-			InputSetup.action(player_index, "left"), InputSetup.action(player_index, "right"),
-			InputSetup.action(player_index, "up"), InputSetup.action(player_index, "down"))
+			InputSetup.action(player_index, "left"),
+			InputSetup.action(player_index, "right"),
+			InputSetup.action(player_index, "up"),
+			InputSetup.action(player_index, "down")
+		)
+
 	step(input, delta)
 	move_and_slide()
+	_update_footsteps(delta)
 	_update_animation()
 	_send_state(delta)
 
@@ -203,6 +211,14 @@ func step(input: Vector2, delta: float) -> void:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 	is_moving = velocity.length() > 1.0
 
+func _update_footsteps(delta: float) -> void:
+	if not ai and can_move and get_real_velocity().length() > 1.0:
+		_footstep_timer -= delta
+		if _footstep_timer <= 0.0:
+			Sound.play("footstep")
+			_footstep_timer = FOOTSTEP_INTERVAL
+	else:
+		_footstep_timer = 0.0
 
 func _unhandled_input(event: InputEvent) -> void:
 	if can_move and not ai and is_multiplayer_authority() and event.is_action_pressed(InputSetup.action(player_index, "interact")):

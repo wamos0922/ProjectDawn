@@ -48,10 +48,13 @@ func _process(_d):
 		g.ui.advance()
 	var MG = g.Minigames
 
-	# 1. off by default: the real minigame opens
+	# 1. off by default: the real minigame opens (or the placeholder while PLACEHOLDER_MINIGAMES is on)
 	MG.set_review_mode(false)
 	_task("earth", 1, "ozone")
-	ok(find("COMPLETE") == null and find("STOP") != null, "review mode off: the real UV minigame opens (STOP button, no COMPLETE)")
+	if MG.PLACEHOLDER_MINIGAMES:
+		ok(find("COMPLETE") != null and find("STOP") == null, "minigames switched off for now: the UV task opens with COMPLETE")
+	else:
+		ok(find("COMPLETE") == null and find("STOP") != null, "review mode off: the real UV minigame opens (STOP button, no COMPLETE)")
 	g.ui.close_panel()
 
 	# 2. F8 turns it on

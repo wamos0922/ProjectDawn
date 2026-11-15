@@ -31,8 +31,8 @@ const MUSIC := {
 
 ## One-shot sounds → file.
 const SFX := {
-	"success": DIR + "chime.wav",           ## minigame won / task done
-	"failure": DIR + "bad.wav",             ## minigame wrong try
+	"success": DIR + "correct_sounde.wav",           ## minigame won / task done
+	"failure": DIR + "error404.wav",             ## minigame wrong try
 	"click":   DIR + "blip.wav",            ## any button pressed
 	"door":    DIR + "door_hum.wav",        ## walking into a room
 	"alarm":   DIR + "alarm_beep.wav",      ## a storm starts
@@ -40,6 +40,7 @@ const SFX := {
 	"type":    DIR + "oneclick.wav",       ## one letter typed in a dialogue box
 	"siren":   DIR + "alarm.wav",           ## wake-up scene alarm, repeats until silenced
 	"robot_type": DIR + "ceres_blip_low.wav",   ## CERES typing in a dialogue box
+	"footstep": DIR + "footstep_new.wav",
 }
 
 const BACKGROUNDS := ["title", "earth", "moon"]   ## situations that are a "background" for "" situations
