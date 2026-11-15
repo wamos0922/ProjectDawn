@@ -560,7 +560,10 @@ func _on_interact(p) -> void:
 	if not rule["ok"]:
 		return
 	_acting_role = need if need != "" else p.role
+	ui.station_mode = true                  # anything this opens uses the fixed-size station window
 	a["fn"].call()
+	if not ui.panel_open():
+		ui.station_mode = false             # it only spoke, toasted or opened a full-screen scene
 
 
 var _acting_role := "eng"

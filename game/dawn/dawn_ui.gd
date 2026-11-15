@@ -349,6 +349,7 @@ func panel_open() -> bool:
 
 
 func close_panel() -> void:
+	station_mode = false
 	if _panel:
 		_panel.queue_free()
 		_panel = null
@@ -373,8 +374,11 @@ func _modal(dim: float) -> void:
 	game.set_frozen(true)
 
 
-## Opens an empty modal panel and returns its VBox to fill. Freezes local players.
+## While station_mode is on, panel() opens the same fixed-size window as the minigames
+## (station_window). dawn.gd turns it on when you press E at a station; close_panel() turns it off.
 func panel(bg := Color("#262b44"), border := Color("#feae34"), width := 760.0, top_y := 70.0) -> VBoxContainer:
+	if station_mode:
+		return station_window(bg, border)
 	_modal(0.55)
 	var p := PanelContainer.new()
 	p.add_theme_stylebox_override("panel", DawnTheme.box(bg, border, 4, Color(0, 0, 0, 0), 0, Vector4(24, 20, 24, 20)))
@@ -386,6 +390,42 @@ func panel(bg := Color("#262b44"), border := Color("#feae34"), width := 760.0, t
 	box.add_theme_constant_override("separation", 12)
 	p.add_child(box)
 	return box
+	
+# ---------------------------------------------------------------- station window (anything opened with E)
+
+var station_mode := false                    ## true from pressing E at a station until the panel closes
+
+
+## Fixed POPUP_SIZE window in the middle of the screen, room visible behind. Same colours as the
+## panel that asked for it; the content scrolls if it is taller than the window.
+func station_window(bg: Color, border: Color) -> VBoxContainer:
+	_modal(POPUP_DIM)
+	var p := PanelContainer.new()
+	p.add_theme_stylebox_override("panel", DawnTheme.box(bg, border, 4, Color(0, 0, 0, 0.5), 10, Vector4(24, 20, 12, 20)))
+	p.custom_minimum_size = POPUP_SIZE
+	p.size = POPUP_SIZE
+	p.position = (Vector2(1280, 720) - POPUP_SIZE) / 2.0
+	root.add_child(p)
+	_panel = p
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	p.add_child(scroll)
+	var box := VBoxContainer.new()
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.add_theme_constant_override("separation", 12)
+	scroll.add_child(box)
+	_pop_in(p)
+	return box
+
+
+## Grow from 92% and fade in (both popups).
+func _pop_in(p: Control) -> void:
+	p.pivot_offset = POPUP_SIZE / 2.0
+	p.scale = Vector2(0.92, 0.92)
+	p.modulate.a = 0.0
+	var tw := p.create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(p, "scale", Vector2.ONE, 0.16)
+	tw.tween_property(p, "modulate:a", 1.0, 0.1)
 
 # ---------------------------------------------------------------- task popup (minigames)
 # ---------------------------------------------------------------- task popup (minigames)
@@ -450,13 +490,7 @@ func popup(kicker: String, heading: String, accent: Color) -> Dictionary:
 	var foot := HBoxContainer.new()
 	foot.add_theme_constant_override("separation", 14)
 	fpad.add_child(foot)
-	# pop in: grow from 92% and fade in
-	p.pivot_offset = POPUP_SIZE / 2.0
-	p.scale = Vector2(0.92, 0.92)
-	p.modulate.a = 0.0
-	var tw := p.create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tw.tween_property(p, "scale", Vector2.ONE, 0.16)
-	tw.tween_property(p, "modulate:a", 1.0, 0.1)
+	_pop_in(p)
 	return {"body": body, "foot": foot}
 
 func title(box: Node, text: String, color := Color("#fee761"), size := 18) -> Label:
