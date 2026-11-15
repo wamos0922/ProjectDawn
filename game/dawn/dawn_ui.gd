@@ -502,10 +502,17 @@ func station_window(bg: Color, border: Color) -> VBoxContainer:
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	p.add_child(scroll)
+		# 6 px of room inside the scroll area: the cyan focus ring is drawn 4 px OUTSIDE a button,
+	# and the scroll area cuts off anything outside it (the ring was missing on the left).
+	var pad := MarginContainer.new()
+	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for side in ["left", "top", "right", "bottom"]:
+		pad.add_theme_constant_override("margin_" + side, 6)
+	scroll.add_child(pad)
 	var box := VBoxContainer.new()
 	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_theme_constant_override("separation", 12)
-	scroll.add_child(box)
+	pad.add_child(box)
 	_pop_in(p)
 	return box
 
