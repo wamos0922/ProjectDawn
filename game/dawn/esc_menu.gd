@@ -35,6 +35,7 @@ func open() -> void:
 	g.ui.title(box, "MENU")
 	g.ui.button(box, "SETTINGS", _settings, false)
 	g.ui.button(box, "CONTROLS", _controls, false)
+	g.ui.button(box, "RESTART GAME", _confirm_restart, false)
 	g.ui.button(box, "BACK TO GAME", g.ui.close_panel)
 
 
@@ -87,27 +88,29 @@ func _settings() -> void:
 	g.ui.button(box, "REVIEW MODE: %s" % ("ON" if on else "OFF"), func():
 		g.toggle_review_mode()
 		_settings(), false)
-	g.ui.button(box, "RESET SETTINGS", _confirm_reset, false)
 	g.ui.button(box, "◂ BACK", open, false)
 
 ## Asks first, so nobody resets by accident.
 func _confirm_reset() -> void:
 	var box: VBoxContainer = g.ui.panel(Color("#262b44"), Color("#feae34"), 520, 200)
-	g.ui.title(box, "RESET SETTINGS?")
 	g.ui.rich(box, "Puts every setting back to how the game starts: review mode OFF, sound ON at full volume. Your mission progress is [b]not[/b] touched. Only this computer.")
 	g.ui.button(box, "YES, RESET", func():
-		reset_settings()
 		g.ui.toast("Settings reset to default", 2.0)
 		_settings(), false)
 	g.ui.button(box, "CANCEL", _settings, false)
 
-
-## Every setting back to its default. Add a line here when you add a new setting.
-func reset_settings() -> void:
-	g.Minigames.set_review_mode(false)
-	Sound.set_volume("Music", 1.0)
-	Sound.set_volume("SFX", 1.0)
-	AudioServer.set_bus_mute(0, false)
+## RESTART GAME asks first. What happens depends on who you are (dawn.gd restart_game()).
+func _confirm_restart() -> void:
+	var box: VBoxContainer = g.ui.panel(Color("#262b44"), Color("#f6757a"), 520, 200)
+	g.ui.title(box, "RESTART GAME?")
+	var text := "Go back to the title screen and start over. Your mission progress is lost."
+	if Network.is_online() and Network.is_host():
+		text = "You are the HOST: the mission ends for [b]everyone[/b]. All players are sent back to the title screen and the room code stops working."
+	elif Network.is_online():
+		text = "You leave this crew and go back to the title screen. The others keep playing; CERES takes over your role."
+	g.ui.rich(box, text)
+	g.ui.button(box, "YES, RESTART", g.restart_game, false)
+	g.ui.button(box, "CANCEL", open, false)
 
 func _text(text: String, color: Color, font: Font, size: int) -> Label:
 	var l := Label.new()
