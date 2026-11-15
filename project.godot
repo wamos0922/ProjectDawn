@@ -15,7 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Project Dawn"
-run/main_scene="uid://bwyvywa70rafd"
+run/main_scene="res://game/dawn/title.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]
