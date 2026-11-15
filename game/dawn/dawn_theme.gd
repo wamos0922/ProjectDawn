@@ -79,6 +79,8 @@ static func get_theme() -> Theme:
 	th.set_stylebox("normal", "GhostButton", box(C["navy"], Color(0, 0, 0, 0), 0, C["ink"], 6))
 	th.set_stylebox("hover", "GhostButton", box(C["slate"], Color(0, 0, 0, 0), 0, C["ink"], 6))
 	th.set_stylebox("pressed", "GhostButton", box(C["navy"], Color(0, 0, 0, 0), 0, C["ink"], 2))
+	th.set_stylebox("disabled", "GhostButton", box(C["ink"], C["slate"], 2, Color(0, 0, 0, 0), 0))   # locked cards: dark, not light grey
+	th.set_color("font_disabled_color", "GhostButton", C["grey"])
 	# panels
 	th.set_stylebox("panel", "PanelContainer", box(Color(C["navy"], 0.97), C["amber"], 4, C["ink"], 0, Vector4(24, 20, 24, 20)))
 	# text

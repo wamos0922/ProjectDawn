@@ -204,8 +204,16 @@ func _load_scene(scene_path: String) -> void:
 	game_scene = scene_path
 	get_tree().change_scene_to_file(scene_path)
 
+## Host only: send every guest back to the title screen with a message (RESTART GAME).
+func kick_all(reason: String) -> void:
+	if is_host():
+		_kicked.rpc(reason)
 
 @rpc("authority", "reliable")
+func _kicked(reason: String) -> void:
+	leave()
+	disconnected.emit(reason)
+	
 func _refused(reason: String) -> void:
 	leave()
 	join_failed.emit(reason)
