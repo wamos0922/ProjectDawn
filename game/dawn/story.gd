@@ -436,10 +436,7 @@ func role_task(k: String) -> Dictionary:
 				func(v): var h: float = v[0]; var o: float = v[1]; var ok: bool = o >= 2 and is_equal_approx(h, 2 * o); var q := maxf(0.0, 1.0 - absf(h / o - 2.0) / 2.0) if o > 0 else 0.0; return {"ok": ok, "meter": q, "read": "Ratio H : O = [b]%s : 1[/b]" % ("%.1f" % (h / o) if o > 0 else "–"), "why": "Water has two hydrogen atoms for every oxygen. Match that."},
 				func(): g.act("split", {}, "nav"), "Liquid hydrogen and oxygen powered the Space Shuttle's main engines.")}
 		if k == "port" and m == 6 and not task_done("l1"):
-			return {"label": "AIM THE SHIELD", "role": "nav", "fn": func(): mg.sliders("nav", "AIM FOR THE L1 POINT", "The shield must sit on the line between the Sun and Earth, where their pulls balance (L1). Slide the target along the line.",
-				[{"label": "Distance from Earth", "min": 0.2, "max": 6.0, "step": 0.1, "val": 4.0, "unit": " M km"}],
-				func(v): var d: float = v[0]; var ok: bool = d >= 1.3 and d <= 1.7; return {"ok": ok, "meter": maxf(0.0, 1.0 - absf(d - 1.5) / 3.0), "read": "[b][color=#63c74d]Balanced: the shield will stay put[/color][/b]" if ok else ("Too close: Earth's pull wins" if d < 1.3 else "Too far: the Sun's pull wins"), "why": "Not balanced yet."},
-				_send("l1"), "L1 is about 1.5 million km from Earth, toward the Sun.")}
+			return {"label": "HOLD THE SHIELD AT L1", "role": "nav", "fn": func(): mg.play("N3", "nav", _send("l1"))}
 	return {}
 
 
