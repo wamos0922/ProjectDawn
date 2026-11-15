@@ -441,6 +441,8 @@ func role_task(k: String) -> Dictionary:
 			return {"label": "HOLD THE SHIELD AT L1", "role": "nav", "fn": func(): mg.play("N3", "nav", _send("l1"))}
 		if k == "port" and m == 6 and not task_done("aperture"):
 			return {"label": "OPEN THE APERTURE", "role": "eng", "fn": func(): mg.play("E3", "eng", _send("aperture"))}
+		if k == "lc" and m == 6 and not task_done("datahome"):
+			return {"label": "SEND DATA HOME", "role": "qm", "fn": func(): mg.play("Q3", "qm", _send("datahome"))}
 	return {}
 
 
