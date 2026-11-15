@@ -390,6 +390,8 @@ func role_task(k: String) -> Dictionary:
 	var P := WD.PAL
 	if w == "earth":
 		var st: int = s["step"]
+		if st == 1 and k == "shop" and not task_done("cube"):
+			return {"label": "BUILD THE PAYLOAD CUBE", "role": "eng", "fn": func(): mg.play("E1", "eng", _send("cube"))}
 		if (st == 1 or st == 2) and k == "shop":
 			return {"label": "REBUILD THE ROCKET" if task_done("build") else "BUILD THE ROCKET", "role": "eng", "fn": _workshop}
 		if st == 1 and k == "ozone" and not task_done("uvcal"):
