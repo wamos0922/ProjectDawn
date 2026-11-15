@@ -139,6 +139,46 @@ func _open(role: String, title: String, text: String) -> Game:
 	M.msg = g.ui.rich(M.box, "", 16)
 	return M
 
+# ---------------------------------------------------------------- the new minigames (game/dawn/minigames/)
+
+## id -> script. Each one is a 640x360 game (extends minigames/mini_game.gd). ACT · ROLE.
+const NEW_GAMES := {
+	"E1": "res://game/dawn/minigames/e1_cubesat.gd",       # Act 1 Engineer · build the UV payload cube
+	"S1": "res://game/dawn/minigames/s1_ozone.gd",         # Act 1 Scientist · ozone through the decades
+	"N1": "res://game/dawn/minigames/n1_cannon.gd",        # Act 1 Navigator · Newton's cannon
+	"Q1": "res://game/dawn/minigames/q1_instruments.gd",   # Act 1 Quartermaster · pick the rocket instruments
+	"E2": "res://game/dawn/minigames/e2_ice_scan.gd",      # Act 2 Engineer · ice scan
+	"S2": "res://game/dawn/minigames/s2_peak.gd",          # Act 2 Scientist · find the peak
+	"N2": "res://game/dawn/minigames/n2_arrival.gd",       # Act 2 Navigator · Moon arrival burn
+	"Q2": "res://game/dawn/minigames/q2_outpost.gd",       # Act 2 Quartermaster · pack the outpost payload
+	"E3": "res://game/dawn/minigames/e3_aperture.gd",      # Act 3 Engineer · open the shield aperture
+	"S3": "res://game/dawn/minigames/s3_sun_scan.gd",      # Act 3 Scientist · scan the Sun's light
+	"N3": "res://game/dawn/minigames/n3_l1_hold.gd",       # Act 3 Navigator · hold the shield at L1
+	"Q3": "res://game/dawn/minigames/q3_ripples.gd",       # Act 3 Quartermaster · data ripples
+}
+
+
+## Opens a new minigame in the task window. on_win records the task (story.gd: _send("...")).
+## Review mode (F8) still gives the COMPLETE placeholder instead.
+func play(id: String, role: String, on_win: Callable) -> void:
+	var game: Control = load(NEW_GAMES[id]).new()
+	if review_mode() and _review(role, game.title, on_win):
+		game.free()
+		return
+	var M := Game.new()
+	M.g = g
+	current = M
+	var win: Dictionary = g.ui.popup(RoleSprites.NAMES[role] + " TASK", game.title, RoleSprites.TAGS.get(role, P["amber"]))
+	M.box = win["body"]
+	M.foot = win["foot"]
+	M.box.add_theme_constant_override("separation", 6)
+	M.msg = g.ui.rich(M.box, "", 14)            # message line under the game, in the sharp pixel font
+	M.msg.add_theme_font_override("normal_font", game.crisp_font())
+	M.msg.add_theme_font_size_override("normal_font_size", 16)
+	game.host = M
+	game.on_win = on_win
+	M.box.add_child(game)
+	M.box.move_child(game, 0)
 
 func _canvas(M: Game, w: float, h: float, fn: Callable) -> Canvas:
 	var c := Canvas.new()
