@@ -303,13 +303,18 @@ func toast(text: String, seconds := 2.6) -> void:
 	_toast_l.text = text
 	var w := minf(960.0, DawnTheme.body_font().get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x + 40)
 	_toast_l.custom_minimum_size = Vector2(w, 0)
-	_toast.size = Vector2.ZERO
-	_toast.reset_size()
-	_toast.position = Vector2((1280 - _toast.size.x) / 2.0, 560 - _toast.size.y)
 	_toast_t = seconds
 	_toast.visible = true
 	root.move_child(_toast, -1)
+	_fit_toast()
+	_fit_toast.call_deferred()     # again after the label has wrapped at its real width (the first toast was huge)
 
+
+## Shrinks the toast box to its text and puts it above the bottom of the screen.
+func _fit_toast() -> void:
+	_toast.size = Vector2.ZERO
+	_toast.reset_size()
+	_toast.position = Vector2((1280 - _toast.size.x) / 2.0, 560 - _toast.size.y)
 
 func meter(label: String, frac: float) -> void:
 	meter_box.visible = frac >= 0.0
