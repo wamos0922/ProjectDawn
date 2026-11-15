@@ -22,6 +22,12 @@ const WHO := {
 
 signal panel_closed
 
+signal chat_send(message: String)
+
+var _chat_panel: PanelContainer
+var _chat_log: RichTextLabel
+var _chat_input: LineEdit
+
 var game
 var root: Control
 var top: Label
@@ -114,6 +120,7 @@ func _ready() -> void:
 	_toast.add_child(_toast_l)
 	_toast.visible = false
 	root.add_child(_toast)
+	_build_chat()
 	_build_dialogue()
 
 
@@ -171,6 +178,79 @@ func _build_crewbar() -> void:
 		key.add_theme_constant_override("outline_size", 4)
 		col.add_child(key)
 		_crew_buttons[r] = b
+		
+func _build_chat() -> void:
+	_chat_panel = PanelContainer.new()
+	_chat_panel.position = Vector2(12, 546)
+	_chat_panel.size = Vector2(360, 162)
+	_chat_panel.custom_minimum_size = Vector2(360, 162)
+	_chat_panel.add_theme_stylebox_override(
+		"panel",
+		DawnTheme.box(Color(0.06, 0.07, 0.11, 0.94), DawnTheme.C["slate"], 3)
+	)
+	root.add_child(_chat_panel)
+
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 5)
+	_chat_panel.add_child(box)
+
+	var heading := Label.new()
+	heading.text = "CREW CHAT"
+	heading.add_theme_font_override("font", DawnTheme.title_font())
+	heading.add_theme_font_size_override("font_size", 9)
+	heading.add_theme_color_override("font_color", DawnTheme.C["cyan"])
+	box.add_child(heading)
+
+	_chat_log = RichTextLabel.new()
+	_chat_log.bbcode_enabled = true
+	_chat_log.scroll_active = true
+	_chat_log.custom_minimum_size = Vector2(0, 78)
+	_chat_log.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_chat_log.add_theme_font_override("normal_font", DawnTheme.body_font())
+	_chat_log.add_theme_font_size_override("normal_font_size", 16)
+	_chat_log.add_theme_color_override("default_color", DawnTheme.C["white"])
+	box.add_child(_chat_log)
+
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	box.add_child(row)
+
+	_chat_input = LineEdit.new()
+	_chat_input.placeholder_text = "Type a message..."
+	_chat_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_chat_input.add_theme_font_override("font", DawnTheme.body_font())
+	_chat_input.add_theme_font_size_override("font_size", 16)
+	row.add_child(_chat_input)
+
+	var send_button := Button.new()
+	send_button.text = "SEND"
+	send_button.add_theme_font_override("font", DawnTheme.title_font())
+	send_button.add_theme_font_size_override("font_size", 8)
+	row.add_child(send_button)
+
+	send_button.pressed.connect(_send_chat)
+	_chat_input.text_submitted.connect(func(_text: String): _send_chat())
+
+
+func _send_chat() -> void:
+	var message := _chat_input.text.strip_edges()
+	if message.is_empty():
+		return
+
+	_chat_input.clear()
+	chat_send.emit(message)
+
+
+func add_chat_message(sender: String, message: String) -> void:
+	if _chat_log == null:
+		return
+
+	# Keep player text from being interpreted as RichTextLabel formatting.
+	var safe_message := message.replace("[", "[lb]")
+	_chat_log.append_text(
+		"[color=#2ce8f5]%s[/color]: %s\n" % [sender, safe_message]
+	)
+	_chat_log.scroll_to_line(_chat_log.get_line_count())
 
 
 ## me = role I control; online = roles other people play; where = role -> room name.
@@ -198,6 +278,8 @@ func _process(delta: float) -> void:
 		_type += delta
 		_dlg_text.visible_characters = mini(_full.length(), int(_type / 0.022))
 		_dlg_cont.visible = _dlg_text.visible_characters >= _full.length()
+		
+	_chat_panel.visible = not _dlg.visible and _panel == null
 
 
 func _label(pos: Vector2, size: int, color: Color, title := false) -> Label:
