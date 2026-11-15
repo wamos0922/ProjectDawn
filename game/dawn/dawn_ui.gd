@@ -246,6 +246,15 @@ func _send_chat() -> void:
 func add_chat_message(sender: String, message: String) -> void:
 	if _chat_log == null:
 		return
+
+	# Keep player text from being interpreted as RichTextLabel formatting.
+	var safe_message := message.replace("[", "[lb]")
+	_chat_log.append_text(
+		"[color=#2ce8f5]%s[/color]: %s\n" % [sender, safe_message]
+	)
+	_chat_log.scroll_to_line(_chat_log.get_line_count())
+
+
 func toggle_chatbox() -> void:
 	_chat_open = not _chat_open
 	
