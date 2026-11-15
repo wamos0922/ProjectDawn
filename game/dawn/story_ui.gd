@@ -872,36 +872,55 @@ func _card(row: Node, t: String, sub: String, art: Callable, locked: bool) -> Bu
 
 # ---------------------------------------------------------------- workshop (Engineer)
 
+const SHOP_SCALE := 0.3                     ## workshop picture size inside the task window (0.3 = 384 x 216)
+
+
+## The Engineer's rocket workshop, in the same fixed task window as the minigames (dawn_ui.popup).
+## Left: the workshop with the rocket you are building. Right: mass / cost / height gauges.
+## Bottom: the parts. LOCK DESIGN sends it to the host; ✕ or Esc closes without locking.
 func workshop() -> void:
 	_design = g.S["design"].duplicate()
 	var me: String = g.camera.target.role if is_instance_valid(g.camera.target) else "eng"
-	_open(func(pc, t, _d):
-		pc.workshop_bg(t)
-		pc.rocket(160, 132, _design, t)
-		pc.person(me, 20, 60 + (int(t * 2) % 2), "down", 0, 4))
-	var hb := PanelContainer.new()
-	hb.add_theme_stylebox_override("panel", DawnTheme.box(Color(0.094, 0.078, 0.145, 0.92), C["cyan"], 4, Color(0, 0, 0, 0), 0, Vector4(12, 8, 12, 8)))
-	hb.position = Vector2(24, 16)
-	hb.custom_minimum_size = Vector2(760, 0)
+	var win: Dictionary = g.ui.popup("ENGINEER TASK", "BUILD THE ROCKET", RoleSprites.TAGS["eng"])
+	var body: VBoxContainer = win["body"]
+	# CERES hint line
 	var hrow := HBoxContainer.new()
 	hrow.add_theme_constant_override("separation", 12)
 	var who := Label.new()
 	who.text = " CERES "
 	who.add_theme_font_override("font", DawnTheme.title_font())
-	who.add_theme_font_size_override("font_size", 12)
+	who.add_theme_font_size_override("font_size", 11)
 	who.add_theme_color_override("font_color", C["ink"])
 	var whobg := PanelContainer.new()
 	whobg.add_theme_stylebox_override("panel", DawnTheme.box(C["cyan"], Color(0, 0, 0, 0), 0, Color(0, 0, 0, 0), 0, Vector4(6, 4, 6, 4)))
+	whobg.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	whobg.add_child(who)
 	hrow.add_child(whobg)
 	var say := Label.new()
-	say.add_theme_font_size_override("font_size", 22)
+	say.add_theme_font_size_override("font_size", 20)
 	say.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	say.custom_minimum_size = Vector2(620, 0)
+	say.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hrow.add_child(say)
-	hb.add_child(hrow)
-	_screen.add_child(hb)
-	var gs := _box(_screen, Vector2(880, 16), 376, C["slate"])
+	body.add_child(hrow)
+	# picture of the workshop (the 320x180 pixel scene, scaled down) + gauges
+	var mid := HBoxContainer.new()
+	mid.add_theme_constant_override("separation", 16)
+	body.add_child(mid)
+	var pic := Control.new()
+	pic.custom_minimum_size = Vector2(1280, 720) * SHOP_SCALE
+	pic.clip_contents = true
+	mid.add_child(pic)
+	var art := Pixel.new()
+	art.scale = Vector2(SHOP_SCALE, SHOP_SCALE)
+	art.painter = func(pc, t, _d):
+		pc.workshop_bg(t)
+		pc.rocket(160, 132, _design, t)
+		pc.person(me, 20, 60 + (int(t * 2) % 2), "down", 0, 4)
+	pic.add_child(art)
+	var gs := VBoxContainer.new()
+	gs.add_theme_constant_override("separation", 8)
+	gs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	mid.add_child(gs)
 	var gauges := {}
 	for k in [["mass", "MASS"], ["cost", "COST"], ["alt", "HEIGHT"]]:
 		var l := Label.new()
@@ -917,17 +936,17 @@ func workshop() -> void:
 	var reqs := Label.new()
 	reqs.add_theme_font_size_override("font_size", 18)
 	gs.add_child(reqs)
+	# the parts
 	var tray := HBoxContainer.new()
-	tray.position = Vector2(24, 600)
-	tray.add_theme_constant_override("separation", 10)
-	_screen.add_child(tray)
+	tray.add_theme_constant_override("separation", 8)
+	body.add_child(tray)
 	var buttons := {}
 	for k in ["small", "big", "uv", "cam", "chute", "radio"]:
 		var b := Button.new()
 		b.theme_type_variation = "GhostButton"
-		b.custom_minimum_size = Vector2(132, 92)
+		b.custom_minimum_size = Vector2(124, 74)
 		b.add_theme_font_override("font", DawnTheme.body_font())
-		b.add_theme_font_size_override("font_size", 18)
+		b.add_theme_font_size_override("font_size", 16)
 		b.pressed.connect(func():
 			if k == "small" or k == "big":
 				_design["motor"] = k
@@ -936,19 +955,9 @@ func workshop() -> void:
 			_refresh_shop(say, gauges, reqs, buttons))
 		tray.add_child(b)
 		buttons[k] = b
-	var lock := Button.new()
-	lock.text = "LOCK DESIGN ▸▸"
-	lock.custom_minimum_size = Vector2(196, 64)
-	lock.pressed.connect(func():
+	g.ui.button(win["foot"], "LOCK DESIGN ▸▸", func():
 		g.act("design", {"d": _design}, "eng")
-		_close())
-	tray.add_child(lock)
-	var later := Button.new()
-	later.text = "LATER"
-	later.theme_type_variation = "GhostButton"
-	later.custom_minimum_size = Vector2(0, 64)
-	later.pressed.connect(_close)
-	tray.add_child(later)
+		g.ui.close_panel())
 	_refresh_shop(say, gauges, reqs, buttons)
 	buttons["uv"].grab_focus.call_deferred()
 
