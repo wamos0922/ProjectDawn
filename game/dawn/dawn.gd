@@ -86,6 +86,7 @@ func _ready() -> void:
 	ui = DawnUI.new()
 	ui.game = self
 	add_child(ui)
+	ui.chat_send.connect(_on_chat_send)
 	world_map = WorldMap.new()
 	world_map.name = "WorldMap"
 	world_map.g = self
@@ -301,6 +302,42 @@ func _wake_step_all(step: int) -> void:
 func _say(lines: Array) -> void:
 	ui.say(lines)
 
+func _on_chat_send(message: String) -> void:
+	var clean_message := message.strip_edges().substr(0, 160)
+	if clean_message.is_empty():
+		return
+
+	if not Network.is_online():
+		ui.add_chat_message("YOU", clean_message)
+	elif Network.is_host():
+		_chat_broadcast.rpc(crew_ctl.me_role, clean_message)
+	else:
+		_chat_request.rpc_id(1, clean_message)
+
+
+@rpc("any_peer", "reliable")
+func _chat_request(message: String) -> void:
+	if not Network.is_host():
+		return
+
+	var clean_message := message.strip_edges().substr(0, 160)
+	if clean_message.is_empty():
+		return
+
+	var sender_peer := multiplayer.get_remote_sender_id()
+	for role in ROLES:
+		if crew_ctl.is_person(role) and crew_ctl.owner_peer(role) == sender_peer:
+			_chat_broadcast.rpc(role, clean_message)
+			return
+
+
+@rpc("authority", "call_local", "reliable")
+func _chat_broadcast(role: String, message: String) -> void:
+	if ui == null:
+		return
+
+	var sender: String = str(RoleSprites.NAMES.get(role, role.to_upper()))
+	ui.add_chat_message(sender, message)
 
 # ---------------------------------------------------------------- frame loop
 
