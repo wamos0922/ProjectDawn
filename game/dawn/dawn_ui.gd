@@ -678,7 +678,7 @@ func task(t: String, text: String, btn: String, secs: float, on_done: Callable, 
 
 ## choices: [{label, sub, fn}]
 ## Review mode (F8): if one choice is marked "best", show a placeholder with COMPLETE that picks it.
-func choice(t: String, text: String, choices: Array, tag := "") -> void:
+func choice(t: String, text: String, choices: Array, tag := "", can_later := true) -> void:
 	var best := choices.filter(func(c): return c.get("best", false))
 	if not best.is_empty() and game and game.Minigames.review_mode():
 		var pb := panel()
@@ -715,6 +715,7 @@ func choice(t: String, text: String, choices: Array, tag := "") -> void:
 		r.add_child(b)
 		if first == null:
 			first = b
-	button(box, "LATER", close_panel, false)
+	if can_later:                          # some questions must be answered (the launch storm)
+		button(box, "LATER", close_panel, false)
 	if first:
 		first.grab_focus.call_deferred()

@@ -1045,6 +1045,8 @@ func _launch_tick(delta: float) -> void:
 	if L["paused"]:
 		if g.S["event"] != "":
 			launch_state()
+		elif not L.get("answered", false) and not g.ui.panel_open():
+			L["paused"] = false      # the storm question was closed without an answer (Esc): ask again
 		return
 	L["t"] += delta
 	var T: float = L["t"] - 3.0
@@ -1077,8 +1079,8 @@ func _launch_tick(delta: float) -> void:
 		else:
 			L["paused"] = true
 			g.ui.choice("A RADIATION BURST HITS AT 60 KM", "Anyone on the crew can call it. The first answer counts.", [
-				{"label": "Safe mode", "sub": "Pause the sensor, lose a few readings", "fn": func(): g.act("evt", {"k": "safe"}, g.acting_role())},
-				{"label": "Keep measuring", "sub": "Risk the sensor for more data", "fn": func(): g.act("evt", {"k": "keep"}, g.acting_role())}], "UV STORM")
+				{"label": "Safe mode", "sub": "Pause the sensor, lose a few readings", "fn": func(): L["answered"] = true; g.act("evt", {"k": "safe"}, g.acting_role())},
+				{"label": "Keep measuring", "sub": "Risk the sensor for more data", "fn": func(): L["answered"] = true; g.act("evt", {"k": "keep"}, g.acting_role())}], "UV STORM", false)
 
 
 func _paint_launch(pc: Pixel, t: float, _d: float) -> void:
