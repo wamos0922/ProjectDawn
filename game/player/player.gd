@@ -151,7 +151,7 @@ func _physics_process(delta: float) -> void:
 	var input := Vector2.ZERO
 	if ai:
 		input = ai_input if can_move else Vector2.ZERO
-	elif can_move:
+	elif can_move and not _typing_in_chat():
 		input = Input.get_vector(
 			InputSetup.action(player_index, "left"),
 			InputSetup.action(player_index, "right"),
@@ -171,6 +171,9 @@ func _physics_process(delta: float) -> void:
 func _is_online() -> bool:
 	return multiplayer.multiplayer_peer != null and not (multiplayer.multiplayer_peer is OfflineMultiplayerPeer)
 
+func _typing_in_chat() -> bool:
+	var focused_control: Control = get_viewport().gui_get_focus_owner()
+	return focused_control is LineEdit or focused_control is TextEdit
 
 func _send_state(delta: float) -> void:
 	if not _is_online():
@@ -221,6 +224,8 @@ func _update_footsteps(delta: float) -> void:
 		_footstep_timer = 0.0
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _typing_in_chat():
+		return
 	if can_move and not ai and is_multiplayer_authority() and event.is_action_pressed(InputSetup.action(player_index, "interact")):
 		get_viewport().set_input_as_handled()     # one key press = one action (no double dialogue skip)
 		interact_requested.emit(self)
