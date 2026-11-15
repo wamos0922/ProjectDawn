@@ -349,6 +349,7 @@ func panel_open() -> bool:
 
 
 func close_panel() -> void:
+	station_mode = false
 	if _panel:
 		_panel.queue_free()
 		_panel = null
@@ -359,17 +360,26 @@ func close_panel() -> void:
 	panel_closed.emit()
 
 
-## Opens an empty modal panel and returns its VBox to fill. Freezes local players.
-func panel(bg := Color("#262b44"), border := Color("#feae34"), width := 760.0, top_y := 70.0) -> VBoxContainer:
+
+func _modal(dim: float) -> void:
 	if _panel:
 		_panel.queue_free()
 	if _shade == null:
 		_shade = ColorRect.new()
-		_shade.color = Color(0.094, 0.078, 0.145, 0.55)
 		_shade.size = Vector2(1280, 720)
 		_shade.mouse_filter = Control.MOUSE_FILTER_STOP
 		root.add_child(_shade)
+	_shade.color = Color(0.094, 0.078, 0.145, dim)
 	root.move_child(_shade, -1)
+	game.set_frozen(true)
+
+
+## While station_mode is on, panel() opens the same fixed-size window as the minigames
+## (station_window). dawn.gd turns it on when you press E at a station; close_panel() turns it off.
+func panel(bg := Color("#262b44"), border := Color("#feae34"), width := 760.0, top_y := 70.0) -> VBoxContainer:
+	if station_mode:
+		return station_window(bg, border)
+	_modal(0.55)
 	var p := PanelContainer.new()
 	p.add_theme_stylebox_override("panel", DawnTheme.box(bg, border, 4, Color(0, 0, 0, 0), 0, Vector4(24, 20, 24, 20)))
 	p.custom_minimum_size = Vector2(width, 0)
@@ -379,9 +389,109 @@ func panel(bg := Color("#262b44"), border := Color("#feae34"), width := 760.0, t
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 12)
 	p.add_child(box)
-	game.set_frozen(true)
+	return box
+	
+# ---------------------------------------------------------------- station window (anything opened with E)
+
+var station_mode := false                    ## true from pressing E at a station until the panel closes
+
+
+## Fixed POPUP_SIZE window in the middle of the screen, room visible behind. Same colours as the
+## panel that asked for it; the content scrolls if it is taller than the window.
+func station_window(bg: Color, border: Color) -> VBoxContainer:
+	_modal(POPUP_DIM)
+	var p := PanelContainer.new()
+	p.add_theme_stylebox_override("panel", DawnTheme.box(bg, border, 4, Color(0, 0, 0, 0.5), 10, Vector4(24, 20, 12, 20)))
+	p.custom_minimum_size = POPUP_SIZE
+	p.size = POPUP_SIZE
+	p.position = (Vector2(1280, 720) - POPUP_SIZE) / 2.0
+	root.add_child(p)
+	_panel = p
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	p.add_child(scroll)
+	var box := VBoxContainer.new()
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.add_theme_constant_override("separation", 12)
+	scroll.add_child(box)
+	_pop_in(p)
 	return box
 
+
+## Grow from 92% and fade in (both popups).
+func _pop_in(p: Control) -> void:
+	p.pivot_offset = POPUP_SIZE / 2.0
+	p.scale = Vector2(0.92, 0.92)
+	p.modulate.a = 0.0
+	var tw := p.create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(p, "scale", Vector2.ONE, 0.16)
+	tw.tween_property(p, "modulate:a", 1.0, 0.1)
+
+# ---------------------------------------------------------------- task popup (minigames)
+# ---------------------------------------------------------------- task popup (minigames)
+
+const POPUP_SIZE := Vector2(880, 560)        ## every minigame window has this size
+const POPUP_DIM := 0.35                      ## how dark the game behind gets (0 = clear, 1 = black)
+
+
+## Opens a fixed-size task window in the middle of the screen, like a task in Among Us: the room
+## stays visible around it. Returns {"body": VBox to fill (scrolls if too tall), "foot": buttons row}.
+## Same life cycle as panel(): panel_open(), close_panel() and Esc work the same.
+func popup(kicker: String, heading: String, accent: Color) -> Dictionary:
+	_modal(POPUP_DIM)
+	var p := PanelContainer.new()
+	p.add_theme_stylebox_override("panel", DawnTheme.box(Color("#1b1e33"), DawnTheme.C["slate"], 6, Color(0, 0, 0, 0.5), 10, Vector4(0, 0, 0, 0)))
+	p.custom_minimum_size = POPUP_SIZE
+	p.size = POPUP_SIZE
+	p.position = (Vector2(1280, 720) - POPUP_SIZE) / 2.0
+	root.add_child(p)
+	_panel = p
+	var frame := VBoxContainer.new()
+	frame.add_theme_constant_override("separation", 0)
+	p.add_child(frame)
+	# header strip: role + task name on the accent colour, close button on the right
+	var head := PanelContainer.new()
+	head.add_theme_stylebox_override("panel", DawnTheme.box(accent, Color(0, 0, 0, 0), 0, Color(0, 0, 0, 0), 0, Vector4(20, 10, 12, 10)))
+	frame.add_child(head)
+	var hrow := HBoxContainer.new()
+	head.add_child(hrow)
+	var names := VBoxContainer.new()
+	names.add_theme_constant_override("separation", 6)
+	names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hrow.add_child(names)
+	title(names, kicker, DawnTheme.C["ink"], 10)
+	title(names, heading, DawnTheme.C["ink"], 20)
+	var x := Button.new()
+	x.text = "✕"
+	x.tooltip_text = "Close (Esc). You can come back later."
+	x.focus_mode = Control.FOCUS_NONE
+	x.theme_type_variation = "GhostButton"
+	x.custom_minimum_size = Vector2(44, 44)
+	x.add_theme_font_size_override("font_size", 22)
+	x.pressed.connect(close_panel)
+	hrow.add_child(x)
+	# body (scrolls if a minigame is taller than the window) and the fixed button row
+	var pad := MarginContainer.new()
+	pad.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	for side in ["left", "right", "top"]:
+		pad.add_theme_constant_override("margin_" + side, 20)
+	frame.add_child(pad)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	pad.add_child(scroll)
+	var body := VBoxContainer.new()
+	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_theme_constant_override("separation", 12)
+	scroll.add_child(body)
+	var fpad := MarginContainer.new()
+	for side in ["left", "right", "top", "bottom"]:
+		fpad.add_theme_constant_override("margin_" + side, 16 if side != "top" else 8)
+	frame.add_child(fpad)
+	var foot := HBoxContainer.new()
+	foot.add_theme_constant_override("separation", 14)
+	fpad.add_child(foot)
+	_pop_in(p)
+	return {"body": body, "foot": foot}
 
 func title(box: Node, text: String, color := Color("#fee761"), size := 18) -> Label:
 	var l := Label.new()

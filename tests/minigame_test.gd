@@ -33,6 +33,9 @@ func _process(_d):
 	if g == null:
 		g = current_scene
 		if g == null or not g.has_method("commit"): g = null; return false
+		if g.Minigames.PLACEHOLDER_MINIGAMES:
+			print("SKIPPED: the real minigames are switched off (PLACEHOLDER_MINIGAMES in minigames.gd)")
+			quit(); return true
 		g.story.sui._intro_done(); g.story.sui._close()
 		cases = [
 			["uvcal", "earth", 1, "ozone", "STOP"], ["tune", "earth", 1, "comms", "LOCK IN"], ["wind", "earth", 1, "nav", "cell"],
@@ -76,6 +79,6 @@ func _process(_d):
 				if cb is CheckBox and cb.text.find("needed") >= 0: cb.button_pressed = true
 			var b3 := find("SEAL"); if b3: b3.pressed.emit()
 		"cell", "card":
-			var bs := buttons(g.ui._panel, []).filter(func(b): return not b.disabled and b.text.find("LATER") < 0)
+			var bs := buttons(g.ui._panel, []).filter(func(b): return not b.disabled and b.text != "✕")   # not the close button
 			if not bs.is_empty(): bs[vi % bs.size()].pressed.emit(); vi += 1
 	return false
