@@ -37,10 +37,10 @@ func _process(_d):
 			print("SKIPPED: the real minigames are switched off (PLACEHOLDER_MINIGAMES in minigames.gd)")
 			quit(); return true
 		g.story.sui._intro_done(); g.story.sui._close()
+		# the old minigames still in use (the other tasks are new minigames: tests/new_minigames_test.gd)
 		cases = [
-			["uvcal", "earth", 1, "ozone", "STOP"], ["tune", "earth", 1, "comms", "LOCK IN"], ["wind", "earth", 1, "nav", "cell"],
-			["perigee", "earth", 5, "nav", "LAUNCH NOW"], ["cargo", "earth", 5, "power", "SEAL CARGO"], ["bolts", "earth", 5, "pad", "TIGHTEN"],
-			["site", "earth", 5, "ozone", "card"], ["l1", "moon", 6, "port", "LOCK IN"]]
+			["wind", "earth", 1, "nav", "cell"], ["cargo", "earth", 5, "power", "SEAL CARGO"],
+			["site", "earth", 5, "ozone", "card"], ["split", "moon", 4, "fuel", "LOCK IN"]]
 		return false
 	n += 1
 	if phase == "" :
@@ -62,7 +62,8 @@ func _process(_d):
 	var cont := find("CONTINUE")
 	if cont:
 		cont.pressed.emit()
-		log.append(("OK   " if g.S["tasks"].get(c[0], false) else "FAIL ") + c[0] + " won and recorded=" + str(g.S["tasks"].get(c[0], false)))
+		var done: bool = (not g.S["storm"].is_empty()) if c[0] == "split" else g.S["tasks"].get(c[0], false)   # split starts the solar storm
+		log.append(("OK   " if done else "FAIL ") + c[0] + " won and recorded=" + str(done))
 		phase = ""; return false
 	if n > 900:
 		log.append("TIMEOUT " + c[0]); phase = ""; return false
@@ -72,7 +73,10 @@ func _process(_d):
 		"LOCK IN", "TEST BURN":
 			var sl := sliders().filter(func(x): return x is HSlider)
 			var s0: HSlider = sl[0]
-			s0.value = s0.min_value + vi * s0.step; vi += 1
+			if sl.size() == 2:            # split fuel: one slider must be twice the other (the order of the sliders is not known)
+				sl[vi % 2].value = 6; sl[(vi + 1) % 2].value = 3; vi += 1
+			else:
+				s0.value = s0.min_value + vi * s0.step; vi += 1
 			var b2 := find(c[4]); if b2: b2.pressed.emit()
 		"SEAL CARGO":
 			for cb in sliders():
