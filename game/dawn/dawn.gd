@@ -150,6 +150,14 @@ func place(p, room_id: String, at := Vector2.INF) -> void:
 	if p == camera.target:
 		camera.target = p
 
+## RESTART GAME (Esc menu). host: everyone back to the title. guest: only you. solo: start over.
+func restart_game() -> void:
+	if Network.is_online() and Network.is_host():
+		Network.kick_all("The host restarted the game.")
+		await get_tree().create_timer(0.3).timeout     # let the message reach everyone first
+	Network.leave()
+	Network.set_meta("last_message", "")
+	get_tree().change_scene_to_file(LOBBY)
 
 func _back_to_lobby(reason: String) -> void:
 	Network.set_meta("last_message", "Disconnected: " + reason)
