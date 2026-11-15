@@ -407,7 +407,7 @@ func role_task(k: String) -> Dictionary:
 					_send("tune"), "NASA's Deep Space Network talks to spacecraft on radio bands like this one.")}
 		if st == 5:
 			if k == "nav" and not task_done("perigee"):
-				return {"label": "PLAN THE MOON TRIP", "role": "nav", "fn": func(): mg.orbit("nav", "LAUNCH AT PERIGEE", "The Moon's orbit is an ellipse. Launch when it swings closest to Earth (perigee) for the shortest trip.", _send("perigee"), "The Moon's distance swings between about 363,000 and 405,000 km.")}
+				return {"label": "REACH ORBIT", "role": "nav", "fn": func(): mg.play("N1", "nav", _send("perigee"))}
 			if k == "power" and not task_done("cargo"):
 				return {"label": "PACK THE CARGO", "role": "qm", "fn": func(): mg.pack("qm", "PACK THE SHUTTLE", "The shuttle can carry 115 kg. Take everything we need on the Moon, and nothing that breaks the limit.",
 					[{"n": "Water", "kg": 30, "req": true}, {"n": "Food", "kg": 25, "req": true}, {"n": "Oxygen tanks", "kg": 30, "req": true}, {"n": "Ice drill", "kg": 20, "req": true}, {"n": "Spare radio", "kg": 10}, {"n": "Tool chest", "kg": 25}, {"n": "Books", "kg": 12}],
