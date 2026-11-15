@@ -1,4 +1,4 @@
-extends RefCounted
+extends "res://game/dawn/minigames/mini_game.gd"
 ## Role minigames: every station task is a small game tied to real science. Owner: Sufi (gameplay).
 ## Ported from the HTML demo (c6.js). Each one opens a panel; on a win it calls on_win (which asks
 ## the host to record the task). Nothing here changes the shared state directly.
