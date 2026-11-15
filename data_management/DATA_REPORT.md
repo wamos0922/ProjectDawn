@@ -4,15 +4,19 @@
 
 | shelf | rows | REAL | DERIVED | SCALED | PROTOTYPE |
 |---|---|---|---|---|---|
+| constants | 26 | 26 | 0 | 0 | 0 |
+| datasets | 7 | 0 | 0 | 0 | 0 |
 | destinations | 3 | 3 | 2 | 0 | 0 |
 | functions | 12 | 0 | 0 | 0 | 0 |
 | instruments | 34 | 52 | 5 | 0 | 45 |
+| media | 11 | 0 | 0 | 0 | 0 |
 | missions | 39 | 39 | 0 | 0 | 0 |
 | orbits | 6 | 0 | 6 | 0 | 6 |
 | platforms | 7 | 12 | 4 | 11 | 8 |
 
 ## Sources (cite these at submission)
 
+- C:\gmat-win-R2026a\lunar_arrival.script (retrieved 2026-11-15)
 - http://crism.jhuapl.edu/instrument/design/specifications.php (retrieved 2026-11-14)
 - http://webarchive.library.unt.edu/eot2008/20090830190910/http://aura.gsfc.nasa.gov/instruments/omi.html (retrieved 2026-11-14)
 - https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/M20/Instruments/M20%20ECAM.htm (retrieved 2026-11-14)
@@ -26,10 +30,17 @@
 - https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/MSL/Instruments/MastCam.htm (retrieved 2026-11-14)
 - https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/MSL/Instruments/RAD.htm (retrieved 2026-11-14)
 - https://an.rsl.wustl.edu/helpNoNav/Content/About%20the%20mission/MSL/Instruments/REMS.htm (retrieved 2026-11-14)
+- https://astrophysicsspectator.org/tables/Earth.html (retrieved 2026-11-15)
 - https://atmos.nmsu.edu/data_and_services/atmospheres_data/phoenix/phoenix.html (retrieved 2026-11-14)
+- https://corpora.tika.apache.org/base/docs/govdocs1/549/549756.pdf (retrieved 2026-11-15)
+- https://cpc.ncep.noaa.gov/products/stratosphere/uv_index/uv_nature.shtml (retrieved 2026-11-15)
 - https://crater.unh.edu/instrument.shtml (retrieved 2026-11-14)
+- https://doi.org/10.1126/science.1178658 (retrieved 2026-11-15)
+- https://experts.arizona.edu/en/publications/hydrogen-mapping-of-the-lunar-south-pole-using-the-lro-neutron-de/ (retrieved 2026-11-15)
+- https://lhea.gsfc.nasa.gov/archive/sm3b/art/pdf/media-guide/sec5.pdf (retrieved 2026-11-15)
 - https://lroc.im-ldi.com/about/specs (retrieved 2026-11-14)
 - https://mars.nasa.gov/mars2020/mission/instruments/moxie/ (retrieved 2026-11-14)
+- https://newatlas.com/space/areas-moon-confirmed-cold-enough-frozen-carbon-dioxide (retrieved 2026-11-15)
 - https://np.cosmos.ru/en-us/instruments/lend (retrieved 2026-11-14)
 - https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1964-077A (retrieved 2026-11-14)
 - https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-014A (retrieved 2026-11-14)
@@ -71,19 +82,48 @@
 - https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=2025-010A (retrieved 2026-11-14)
 - https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=PRIME-1 (retrieved 2026-11-14)
 - https://nssdc.gsfc.nasa.gov/planetary/factsheet/ (retrieved 2026-11-14)
+- https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html (retrieved 2026-11-15)
+- https://nssdc.gsfc.nasa.gov/planetary/factsheet/fact_notes.html (retrieved 2026-11-15)
+- https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html (retrieved 2026-11-15)
+- https://ntrs.nasa.gov/api/citations/20140005994/downloads/20140005994.pdf (retrieved 2026-11-15)
+- https://ntrs.nasa.gov/citations/20170003782 (retrieved 2026-11-15)
+- https://ntrs.nasa.gov/citations/20180004020 (retrieved 2026-11-15)
+- https://ozonewatch.gsfc.nasa.gov/ (retrieved 2026-11-15)
 - https://pds-atmospheres.nmsu.edu/data_and_services/atmospheres_data/MAVEN/logs/Mission%20and%20spacecraft%20description.pdf (retrieved 2026-11-14)
+- https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/ (retrieved 2026-11-15)
 - https://pds-geosciences.wustl.edu/lunar/lcross-e_l-mir1-2-raw-v1/lcro_0001/catalog/insthost.cat (retrieved 2026-11-14)
 - https://pds-geosciences.wustl.edu/lunar/lcross-e_l-mir1-2-raw-v1/lcro_0001/catalog/mir1_inst.cat (retrieved 2026-11-14)
 - https://pds-geosciences.wustl.edu/lunar/lcross-e_l-mir1-2-raw-v1/lcro_0001/catalog/nir1_inst.cat (retrieved 2026-11-14)
 - https://pds-geosciences.wustl.edu/lunar/lcross-e_l-mir1-2-raw-v1/lcro_0001/catalog/vsp_inst.cat (retrieved 2026-11-14)
+- https://pds-geosciences.wustl.edu/missions/lro/default.htm (retrieved 2026-11-15)
+- https://photojournal.jpl.nasa.gov/catalog/PIA07087 (retrieved 2026-11-15)
+- https://photojournal.jpl.nasa.gov/catalog/PIA09950 (retrieved 2026-11-15)
+- https://photojournal.jpl.nasa.gov/catalog/PIA16100 (retrieved 2026-11-15)
+- https://physics.nist.gov/PhysRefData/Handbook/Tables/silvertable3.htm (retrieved 2026-11-15)
 - https://science.gsfc.nasa.gov/sam/samiam.html (retrieved 2026-11-14)
+- https://science.nasa.gov/earth/earth-observatory/world-of-change/ozone-hole/ (retrieved 2026-11-15)
+- https://science.nasa.gov/image-detail/omi-pfm-3/ (retrieved 2026-11-15)
 - https://science.nasa.gov/mission/lro/spacecraft-and-instruments/ (retrieved 2026-11-14)
 - https://science.nasa.gov/mission/mars-reconnaissance-orbiter/science-instruments/ (retrieved 2026-11-14)
+- https://science.nasa.gov/photojournal/diviner-following-integration-to-the-lunar-reconnaissance-orbiter-lro (retrieved 2026-11-15)
 - https://science.nasa.gov/wp-content/uploads/2024/01/lola-fact-sheet.pdf (retrieved 2026-11-14)
+- https://smd-cms.nasa.gov/wp-content/uploads/2023/07/2023-hst-litho-updatefinal-ag.pdf (retrieved 2026-11-15)
 - https://spaceflightnow.com/atlas/av020/090610lro.html (retrieved 2026-11-14)
+- https://sscweb.gsfc.nasa.gov/ (retrieved 2026-11-15)
+- https://svs.gsfc.nasa.gov/10201 (retrieved 2026-11-15)
+- https://uv.substack.com/p/who-cares-about-uv-c-from-sunlight (retrieved 2026-11-15)
+- https://webarchive.library.unt.edu/web/20130226035304/http://www.nasa.gov/mission_pages/LRO/spacecraft/index.html (retrieved 2026-11-15)
+- https://www.chem.uci.edu/~unicorn/old/H2A/handouts/PDFs/sodium.pdf (retrieved 2026-11-15)
+- https://www.earthdata.nasa.gov/data/platforms/space-based-platforms/dscovr?level=3 (retrieved 2026-11-15)
+- https://www.eurekalert.org/news-releases/648084 (retrieved 2026-11-15)
 - https://www.jpl.nasa.gov/news/press_kits/insight/launch/download/mars_insight_launch_presskit.pdf (retrieved 2026-11-14)
+- https://www.msss.com/mro/marci/images/2006/04/13/index.html (retrieved 2026-11-15)
 - https://www.nasa.gov/smallsat-institute/sst-soa/ (retrieved 2026-11-14)
 - https://www.nasa.gov/wp-content/uploads/2023/09/sounding-rocket-program-handbook.pdf (retrieved 2026-11-14)
+- https://www.ncei.noaa.gov/node/2224 (retrieved 2026-11-15)
+- https://www.planetary.org/articles/0728-dscovrs-halo (retrieved 2026-11-15)
+- https://www.skyandtelescope.com/news/69991547.html (retrieved 2026-11-15)
+- https://www.techbriefs.com/component/content/article/7154-28050-116 (retrieved 2026-11-15)
 
 ## Problems
 

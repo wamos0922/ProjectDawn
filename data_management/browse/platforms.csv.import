@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://d31q1j8ap2sbe"
+
+[deps]
+
+files=["res://data_management/browse/platforms.name.translation", "res://data_management/browse/platforms.bus.translation", "res://data_management/browse/platforms.total.translation", "res://data_management/browse/platforms.peak.translation", "res://data_management/browse/platforms.payload.translation", "res://data_management/browse/platforms.payload.translation", "res://data_management/browse/platforms.downlink.translation", "res://data_management/browse/platforms.source.translation", "res://data_management/browse/platforms.retrieved.translation", "res://data_management/browse/platforms.flags.translation", "res://data_management/browse/platforms.notes.translation"]
+
+source_file="res://data_management/browse/platforms.csv"
+dest_files=["res://data_management/browse/platforms.name.translation", "res://data_management/browse/platforms.bus.translation", "res://data_management/browse/platforms.total.translation", "res://data_management/browse/platforms.peak.translation", "res://data_management/browse/platforms.payload.translation", "res://data_management/browse/platforms.payload.translation", "res://data_management/browse/platforms.downlink.translation", "res://data_management/browse/platforms.source.translation", "res://data_management/browse/platforms.retrieved.translation", "res://data_management/browse/platforms.flags.translation", "res://data_management/browse/platforms.notes.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true
