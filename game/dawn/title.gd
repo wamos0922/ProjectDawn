@@ -107,6 +107,8 @@ func _btn(parent: Node, text: String, fn: Callable, ghost := false) -> Button:
 
 # ---------------------------------------------------------------- title
 
+const GITHUB := "https://github.com/wamos0922/ProjectDawn"   ## opens in a new browser tab (web) or the default browser
+
 func _title() -> void:
 	Network.leave()
 	_mode = ""
@@ -136,6 +138,7 @@ func _title() -> void:
 	_btn(m, "HOST A CREW  ▸▸", _host_screen, true)
 	_btn(m, "JOIN A CREW  ▸▸", _join_screen, true)
 	_btn(m, "CREDITS & NASA DATA", _credits, true).custom_minimum_size = Vector2(0, 44)
+	_btn(m, "CHECK OUT OUR GITHUB  ▸▸", func(): OS.shell_open(GITHUB), true).custom_minimum_size = Vector2(0, 44)
 	solo.grab_focus.call_deferred()
 	var msg: String = Network.get_meta("last_message", "")
 	if msg != "":
