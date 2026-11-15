@@ -6,6 +6,7 @@ extends RefCounted
 
 const TITLE_FONT := "res://assets/fonts/PressStart2P-Regular.ttf"
 const BODY_FONT := "res://assets/fonts/PixelifySans.ttf"
+const SYMBOL_FONT := "res://assets/fonts/DawnSymbols.ttf"
 const C := {"ink": Color("#181425"), "navy": Color("#262b44"), "slate": Color("#3a4466"), "steel": Color("#5a6988"),
 	"amber": Color("#feae34"), "yellow": Color("#fee761"), "rust": Color("#be4a2f"), "sand": Color("#ead4aa"),
 	"cyan": Color("#2ce8f5"), "white": Color("#ffffff"), "grey": Color("#8b9bb4"), "green": Color("#63c74d")}
