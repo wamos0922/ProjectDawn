@@ -1,177 +1,198 @@
-# Project Dawn
+<p align="center">
+  <img src="docs/images/banner.png" alt="Project Dawn: design real space missions, heal the sky, bring humanity home" width="100%">
+</p>
 
-**Design real space missions. Heal the sky. Bring humanity home.**
+<p align="center">
+  <a href="https://34-50-21-254.sslip.io"><img src="https://img.shields.io/badge/%E2%96%B6%20PLAY%20NOW-in%20your%20browser-feae34?style=for-the-badge&labelColor=262b44" alt="Play now in your browser"></a>
+  <a href="https://youtu.be/XyVfqFLEl7w"><img src="https://img.shields.io/badge/WATCH-the%20video-e43b44?style=for-the-badge&labelColor=262b44" alt="Watch the video"></a>
+  <br>
+  <img src="https://img.shields.io/badge/NASA%20Space%20Apps-2026-0099db?style=flat-square" alt="NASA Space Apps 2026">
+  <img src="https://img.shields.io/badge/challenge-Space%20Mission%20Design%20Game-63c74d?style=flat-square" alt="Challenge: Space Mission Design Game">
+  <img src="https://img.shields.io/badge/made%20with-Godot%204-478cbf?style=flat-square" alt="Made with Godot 4">
+  <img src="https://img.shields.io/badge/players-1%E2%80%934%20co--op-feae34?style=flat-square" alt="1 to 4 players, co-op">
+</p>
 
-A space mission design game for the **2026 NASA Space Apps Challenge** · Challenge: **Space Mission Design Game** · Seoul, 14–15 November 2026
+> **The sky is broken.** A dying star far away exploded in a gamma-ray burst and tore Earth's ozone layer apart.
+> Everyone lives underground now. You have a crew of four, a bunker full of spare parts, a very chatty AI
+> named CERES, and one job: **fix the sky.**
+
+**Project Dawn** is a co-op pixel-art game where you and up to three friends run a real space mission,
+from a tiny sounding rocket on Earth all the way to a UV shield parked between the Sun and Earth.
+Every minigame runs on real NASA data. When your mission fails (and it will, at least once), the game
+tells you exactly *why*, with the real numbers.
+
+### ▶ [Play it now at 34-50-21-254.sslip.io](https://34-50-21-254.sslip.io), no download needed
+
+Desktop browser, sound on, press **PLAY SOLO**. Got friends nearby? One of you picks **HOST A CREW**
+and shares the room code, everyone else picks **JOIN A CREW**.
+
+<p align="center">
+  <img src="docs/images/gameplay.gif" alt="Gameplay: Moon arrival burn and data ripples minigames" width="70%">
+</p>
+
+---
+
+## 🎬 Watch it first
+
+<p align="center">
+  <a href="https://youtu.be/XyVfqFLEl7w"><img src="https://img.youtube.com/vi/XyVfqFLEl7w/maxresdefault.jpg" alt="Project Dawn video" width="70%"></a>
+  <br><sub>Click to watch on YouTube</sub>
+</p>
+
+---
+
+## Meet your crew
+
+You play one of four roles. The same four jobs exist on every real NASA mission.
+
+| | Role | What they do in the game | Real mission job |
+|---|---|---|---|
+| 🔧 | **Engineer** | Builds the rocket, tightens the bolts, opens the shield | Space segment: the spacecraft |
+| 🔬 | **Scientist** | Reads ozone maps, finds ice in spectra, scans sunlight | User segment: the science |
+| 🧭 | **Navigator** | Reaches orbit, nails the Moon arrival burn, holds the shield at L1 | Launch segment: getting there |
+| 📦 | **Quartermaster** | Picks instruments, packs cargo, keeps the data flowing home | Ground segment: resources and comms |
+
+Playing alone? Press **TAB** to jump between them, or let **CERES autopilot** walk the others around.
+The big moments (readiness review, boarding, launch) need all four crew on their spots at once,
+just like a real launch team.
+
+---
+
+## The mission
+
+| | Act | Where | What happens |
+|---|---|---|---|
+| 🌍 | **1 · First Light** | Bunker 4, Earth | Build a sounding rocket, launch it into the UV and find out how bad things really are |
+| 🌕 | **2 · Water Above Us** | Moon, south pole | Hunt for ice in craters the Sun never touches, turn it into rocket fuel, survive a solar storm |
+| ☀️ | **3 · The Shield** | Moon → L1 → home | Build a UV shield, fly it 1.5 million km to L1, then head home for the first real sunrise |
+
+How well your crew does decides the ending: **Quiet Dawn**, **Rising Dawn** or **Golden Dawn**.
+No bad endings. We think humanity deserves one.
 
 | | |
 |---|---|
-| ▶ **Play in your browser** | _itch.io link (added at submission)_ |
-| 🎬 **Demo video** | _link (added at submission)_ |
-| 🛠 **Engine** | Godot 4 (GDScript), web export |
-| 👥 **Players** | 1–4 (solo or local co-op) |
+| ![The crew in Bunker 4](docs/images/crew.png) | ![Bunker 4 map](docs/images/map.png) |
+| ![Ozone minigame with real NASA maps](docs/images/minigame_ozone.png) | ![Rocket designer](docs/images/workshop.png) |
+| ![Moon arrival burn on a NASA GMAT path](docs/images/minigame_arrival.png) | ![Mission report](docs/images/report.png) |
+
+<p align="center"><img src="docs/images/ending.png" alt="Rising Dawn ending" width="70%"></p>
 
 ---
 
-## The problem
+## A minigame at every station, all real science
 
-Space missions are a chain of trade-offs. A better instrument adds mass, power use, data and cost. More mass needs more fuel. Farther worlds get less sunlight. Students usually learn these topics one at a time (an orbit lesson, a rocket lesson, a budget lesson) and rarely get to make the whole set of linked decisions themselves. As the challenge puts it, students "rarely get to experiment with an entire mission from concept to operation."
+| | 🔧 Engineer | 🔬 Scientist | 🧭 Navigator | 📦 Quartermaster |
+|---|---|---|---|---|
+| **Act 1** | Build a CubeSat from the real CSA paper model · design the rocket · pre-flight bolts | Compare NASA ozone maps from 1984 to 2024 · pick the landing site | Pick a calm launch hour · Newton's cannon: find orbit speed | Pick rocket instruments by real mass, power and data · pack the shuttle |
+| **Act 2** | Scan for ice with LRO's Diviner and LEND | Find water's fingerprint in the LCROSS spectrum | Fire the Moon arrival burn on a NASA GMAT path · split ice into fuel | Pack the outpost instruments · power the outpost · wire the cable |
+| **Act 3** | Design the shield · open its aperture without jamming (like Hubble) | Sort sunlight: what does ozone stop? | Keep the shield balanced at L1 with 10 taps of fuel | Send the data home before the signal fades |
 
-## Our solution
+### Things you'll learn without noticing
 
-Project Dawn puts players in charge of a whole mission team. Every objective in the story is a **design brief with real requirements**. Players build a spacecraft, pass a readiness review, launch, and get a report that explains **why** the mission succeeded or failed. Then they redesign and try again.
-
-There is never one perfect answer. A cheap design and an expensive one can both succeed, for different reasons, and a design can launch but still fall short of its science goals.
-
----
-
-## The story
-
-A gamma-ray burst from a distant dying star damages Earth's ozone layer, and deadly ultraviolet light floods the surface. *(This is based on a real scientific hypothesis: some researchers have proposed that a burst like this damaged the ozone layer about 440 million years ago and contributed to the Ordovician mass extinction.)*
-
-Humanity survives underground in scattered bunkers. In **Bunker 4**, four scientists start **Project Dawn**: protect Earth from space while the ozone layer heals itself, and help every bunker survive until people can walk outside again.
-
-They are guided by **CERES**, the bunker's mission-control AI, named after the dwarf planet visited by NASA's real Dawn spacecraft.
-
-**Theme:** every technology built for the rocket becomes a gift to the people in the bunkers, just as NASA "spinoffs" improve everyday life on Earth.
-
-| Act | Title | World | Big objective |
-|---|---|---|---|
-| 1 | First Light | Earth | Learn how bad the sky really is |
-| 2 | Water Above Us | Moon | Find fuel beyond Earth |
-| 3 | The Shield | Moon → Earth | Launch the shield, fly home, watch the dawn |
-
-The shield goes up, the crew flies home and steps outside into the first real sunrise. The mission stars the team earns decide how bright the ending is: **Quiet Dawn**, **Rising Dawn** or **Golden Dawn**. (The game plays this shortened story; see `docs/STORY_MOON_ONLY.md`.)
+- Why going sideways fast enough means you **fall around the Earth** instead of into it (about 7.7 km/s)
+- Why ice survives at the Moon's poles: Cabeus crater sits around **37 K** (about −236 °C)
+- Why the 1994 ozone hole hit a record low of **73 Dobson units**, and why it's slowly healing
+- Why every extra kilogram on a rocket costs you fuel, power and money
 
 ---
 
-## How to play
+## For the judges
 
-1. **Read the brief.** Each objective comes with a story and 3–5 requirements, e.g. *"Carry a UV sensor · Stay powered through 36 minutes of Earth's shadow · Send home at least 5 MB per day · Stay within 200 credits."*
-2. **Design the spacecraft.** Pick a frame, computer, instruments, power, batteries, radio and launcher. Live bars show mass, cost, power, battery energy and data.
-3. **Pass the Readiness Review.** CERES lists every problem with the real numbers and a suggested fix: *"Battery too small: needs 2.7 Wh for 36 min of shadow, has 1.5 Wh."* Each of the four roles must sign off before launch.
-4. **Launch.** For trips to the Moon, the Navigator sets the fuel load. The exact amount needed is hidden and shown only as a range that narrows with every attempt.
-5. **Read the Mission Report.** Each requirement is marked met or missed, with the reason, a score, and the **real NASA mission** your design is closest to.
-6. **Redesign or continue.** Fix one thing and fly again, or move on with the story.
+**See the whole game in about 10 minutes:**
 
-### The four roles
+1. Open **[34-50-21-254.sslip.io](https://34-50-21-254.sslip.io)** in a desktop browser and press **PLAY SOLO**.
+2. Pick any role and choose **CERES AUTOPILOT**, so the other three crew walk to their spots by themselves.
+3. Follow the yellow bar at the top of the screen. Press **TAB** to switch to the role it asks for.
+4. Short on time? Press **F8** (or Esc → Settings → Review mode). Every minigame then finishes in one
+   click, so you can see all three acts, the reports and the ending. Press F8 again to play one for real.
 
-| Role | Decides | NASA mission segment |
-|---|---|---|
-| **Engineer** | Spacecraft parts, structure, total mass | Space segment |
-| **Scientist** | Instruments and research | User segment |
-| **Navigator** | Trajectory, fuel, launch window | Launch segment |
-| **Quartermaster** | Budget, power, resources, the bunker network | Ground segment |
+**Worth a look:**
 
-In **solo mode** one player runs all four roles. In **co-op (2–4 players)** each player owns a role, and all of them must sign off before every launch, as real mission teams do in a readiness review.
+- **The mission reports** after the rocket launch and the shield. They explain *why* the mission worked
+  or failed, with the numbers, and name the real NASA mission behind it.
+- **The "NASA data" line** at the end of every minigame, with where the numbers come from.
+- **The readiness review**, where all four roles have to agree before launch.
 
-### Controls
+**Where things are:**
 
-| Action | Mouse / keyboard |
+| Looking for | File |
 |---|---|
-| Select a part, button or option | Left click |
-| Advance dialogue | Click or Space |
-| Back | Esc |
-| Walk / use (Godot) | WASD or arrows / E or Enter |
-| Switch crew member · crew follow · autopilot | TAB · F · C |
-| World map · mission details | M · J |
+| The story, step by step | [`docs/STORY_MOON_ONLY.md`](docs/STORY_MOON_ONLY.md) |
+| Every NASA source with links | [`docs/SOURCES.md`](docs/SOURCES.md) |
+| The science behind the L1 shield | [`docs/L1_SHIELD_SCIENCE.md`](docs/L1_SHIELD_SCIENCE.md) |
+| Our data and image pack | [`data_management/`](data_management) |
+| The original longer design (with Mars) | [`GAMEPLAY.md`](GAMEPLAY.md) · [`docs/STORY.md`](docs/STORY.md) |
+| Credits for images, fonts and sounds | [`assets/CREDITS.md`](assets/CREDITS.md) |
+| How the code is organised | [`docs/CODE_MAP.md`](docs/CODE_MAP.md) |
+
+**What's real and what isn't:** costs, limits and scores are simplified game values unless
+[`docs/SOURCES.md`](docs/SOURCES.md) gives a real reference. The UV shield at L1 is game fiction,
+inspired by real proposals for space sunshades. The rest is real science and real NASA missions.
 
 ---
 
-## What players learn
+## NASA data inside the game
 
-| In the game | Real concept |
+| In the game | Where it comes from |
 |---|---|
-| Mass vs. launcher capacity and fuel | The rocket equation and the delta-v budget |
-| Battery through Earth's shadow or the lunar night | Power vs. energy; eclipses |
-| Data generated vs. radio link | Data volume vs. downlink capacity |
-| Solar output falling at farther worlds | The inverse-square law of sunlight |
-| Readiness review and role sign-off | NASA's gated mission reviews |
-| Flyby → orbiter → lander → outpost | How NASA explored the Moon and Mars, step by step |
-| Fuel range narrowing after each attempt | Estimation and iteration in mission design |
+| Ozone maps and hole sizes, 1984–2024 | NASA Earth Observatory (World of Change), NASA Ozone Watch |
+| Instruments: OMI, MARCI, CRaTER, LEND, LAMP, LOLA, LROC, Diviner, HiRISE, SAM, TEGA | NASA instrument fact sheets (our `instruments.csv`) |
+| The flight path around the Moon | A NASA GMAT run (General Mission Analysis Tool) |
+| Ice at the lunar south pole | LRO Diviner and LEND, LCROSS (Colaprete et al. 2010), M3 |
+| Orbit speed | NASA Earth Fact Sheet |
+| L1 and station-keeping | NASA Lagrange point pages, SOHO, DSCOVR |
+| Data rates | NASA Deep Space Network |
 
 ---
 
-## NASA data and resources
+## Controls
 
-The game follows NASA's own mission design process from the challenge resources:
-
-- **Design and Develop Science Missions** (NASA SmallSat webinar): the four mission segments become the four player roles; "begin with the end in mind" shapes every brief.
-- **JPL Concept Maturity Levels**: the scouting trips move a world from a rough idea to a point design.
-- **CubeSat 101** (NASA CubeSat Launch Initiative) and the **Goddard Mission Design Lab**: the readiness review and role sign-off before every launch.
-- **NASA Webb "Build It Yourself"**: each report matches your design to a real NASA mission.
-- **State-of-the-Art of Small Spacecraft Technology** (NASA): reference values for spacecraft parts.
-
-**Real NASA science and missions in the story:**
-
-| Story element | Real basis |
+| Key | Action |
 |---|---|
-| Ozone damage from a gamma-ray burst | Ordovician extinction hypothesis |
-| The ozone layer heals once the cause stops | Montreal Protocol recovery: projected around 2040, around 2066 over Antarctica |
-| Smartphone CubeSat | NASA PhoneSat; CubeSat Launch Initiative |
-| Water ice for rocket fuel | Ice in permanently shadowed craters near the lunar south pole |
-
-Full source list with links: [`docs/SOURCES.md`](docs/SOURCES.md).
-
-### Honesty note
-
-All costs, masses, power values, limits and scores are **simplified game values** unless `docs/SOURCES.md` lists a real reference for them. The **space UV shield is game fiction**, inspired by real proposals for space sunshades; no such network exists. Everything else in the story is grounded in real science and real NASA missions.
+| **W A S D** / arrows | Walk |
+| **E** / Enter | Use a console, talk |
+| **Space** / click | Next line of dialogue |
+| **TAB** · **F** · **C** | Switch crew member · crew follows you · CERES autopilot |
+| **M** · **J** | Bunker map · mission details |
+| **Esc** | Menu, or close a window |
+| **F8** | Review mode (one-click minigames) |
 
 ---
 
-## Run it locally
+## Run it yourself
 
-1. Install **Godot 4.7** (standard edition, not .NET).
-2. Clone this repository.
-3. Open Godot → **Import** → select `project.godot`.
-4. Press **F5** to play.
+1. Install **Godot 4.7** (standard version, not .NET).
+2. Clone this repo, open Godot → **Import** → pick `project.godot`.
+3. Press **F5**.
 
-Run the engine tests:
+A test bot plays every new minigame to a win and checks the task gets recorded:
 
 ```bash
-godot --headless --path . -s res://tests/run_tests.gd
+godot --headless -s tests/new_minigames_test.gd
 ```
 
-### Web build
-
-Project → Export → **Web** preset (Thread Support **off**) → export to `build/web/` → zip the folder contents → upload to itch.io as an HTML game.
+The browser version is a Godot **Web** export. Online crews connect through the small relay server in
+[`deploy/relay/`](deploy/relay).
 
 ---
 
-## Project structure
+## The team
 
-```
-engine/   game logic: checks, simulation, reports, game state (GameEngine autoload)
-ui/       all screens and UI components
-data/     acts, missions, parts, launchers, dialogue, real NASA missions (JSON)
-assets/   art, UI, audio, fonts (credits in assets/CREDITS.md)
-tests/    headless engine tests
-docs/     story, sources, developer handoff log
-```
+Made at NASA Space Apps 2026 in Seoul by:
 
-Developers: start with [`HANDOVER.md`](HANDOVER.md) and [`CONTRACT.md`](CONTRACT.md).
-
----
-
-## Team
-
-| Member | Role |
+| | |
 |---|---|
 | **Imran** | Team lead, integration, deployment |
-| **Sufi** | Engine developer (game logic and simulation) |
-| **Zaliq** | Interface developer (screens and UI) |
-| **Wam** | Story writer |
+| **Sufi** | Game logic and simulation |
+| **Zaliq** | Interface and screens |
+| **Wam** | Story |
 | **Dino** | Research and NASA data |
 | **Wafi** | Visuals, art and video |
 
----
+**Use of AI:** we used AI coding assistants (Claude Code and Codex) to help write and debug code. A team
+member reviewed and tested every change before it was merged. AI also helped with planning and
+brainstorming. The story, the game design and the NASA fact-checking are our own. Any AI-generated image
+carries a visible "AI-generated" label.
 
-## Use of AI
-
-We used AI coding assistants (Claude Code and Codex) to help write and debug code, under rules in `CLAUDE.md` / `AGENTS.md`: every change was reviewed and tested by a team member before merging. AI was also used for planning and brainstorming. All story concepts, game design decisions and NASA fact-checking were done by the team. Any AI-generated images are marked with a visible "AI-generated" label. _(Final details to be confirmed at submission.)_
-
-## Credits and license
-
-- Third-party assets and their licenses: [`assets/CREDITS.md`](assets/CREDITS.md)
-- Code license: MIT _(to be confirmed before submission)_
-- Project Dawn is a fan-made educational project for NASA Space Apps and is not endorsed by NASA.
+**Credits:** images, fonts and sounds are listed in [`assets/CREDITS.md`](assets/CREDITS.md).
+Instrument photos and ozone maps belong to NASA and the partner teams credited there.
