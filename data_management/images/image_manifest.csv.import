@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bhm0rh5ch12ml"
+
+[deps]
+
+files=["res://data_management/images/image_manifest.kind.translation", "res://data_management/images/image_manifest.instrument.translation", "res://data_management/images/image_manifest.raw.translation", "res://data_management/images/image_manifest.game.translation", "res://data_management/images/image_manifest.frame.translation", "res://data_management/images/image_manifest.fit.translation", "res://data_management/images/image_manifest.used.translation", "res://data_management/images/image_manifest.credit.translation", "res://data_management/images/image_manifest.source.translation", "res://data_management/images/image_manifest.flags.translation"]
+
+source_file="res://data_management/images/image_manifest.csv"
+dest_files=["res://data_management/images/image_manifest.kind.translation", "res://data_management/images/image_manifest.instrument.translation", "res://data_management/images/image_manifest.raw.translation", "res://data_management/images/image_manifest.game.translation", "res://data_management/images/image_manifest.frame.translation", "res://data_management/images/image_manifest.fit.translation", "res://data_management/images/image_manifest.used.translation", "res://data_management/images/image_manifest.credit.translation", "res://data_management/images/image_manifest.source.translation", "res://data_management/images/image_manifest.flags.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true
