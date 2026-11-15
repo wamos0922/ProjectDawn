@@ -395,7 +395,7 @@ func role_task(k: String) -> Dictionary:
 		if (st == 1 or st == 2) and k == "shop":
 			return {"label": "REBUILD THE ROCKET" if task_done("build") else "BUILD THE ROCKET", "role": "eng", "fn": _workshop}
 		if st == 1 and k == "ozone" and not task_done("uvcal"):
-			return {"label": "CALIBRATE UV SENSOR", "role": "sci", "fn": func(): mg.timing("sci", "CALIBRATE THE UV SENSOR", "Stop the scanner inside the UV-B band three times. UV-B is the part of sunlight the ozone layer should block, and it causes sunburn.", [0.3, 0.475], _send("uvcal"), {"bands": UVB, "fact": "Ozone absorbs almost all UV-C and most UV-B."})}
+			return {"label": "STUDY THE OZONE HOLE", "role": "sci", "fn": func(): mg.play("S1", "sci", _send("uvcal"))}
 		if st == 1 and k == "nav" and not task_done("wind"):
 			return {"label": "PICK LAUNCH HOUR", "role": "nav", "fn": func(): mg.wind("nav", _send("wind"))}
 		if st == 1 and k == "comms" and not task_done("tune"):
