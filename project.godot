@@ -22,6 +22,7 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 
 GameEngine="*res://engine/game_engine.gd"
 Network="*uid://inlxg53nyawt"
+Sound="*res://game/audio/sound.gd"
 
 [display]
 

@@ -4,6 +4,17 @@ Newest entry at the top. Write one at the end of every AI session. Read the last
 
 ---
 
+## 2026-11-15 · Wam (with Claude) · branch feat/sound-engine (local, not pushed)
+Done:
+- Sound engine: game/audio/sound.gd (autoload "Sound"). Music per situation (title, earth, moon, corridor,
+  minigame, storm, ending) with crossfade; one-shot sounds (success, failure, click, door, alarm, poster);
+  Music/SFX buses with set_volume() and toggle_mute().
+- For now every slot uses the HTML demo's sounds, rendered to assets/audio/html/*.wav by
+  tools/render_html_sounds.py. Corridor and minigame music are "" = keep the world music.
+- docs/SOUND.md explains every slot and how to swap a file. tests/sound_test.gd 22 ✓.
+Next:
+- Replace the files (one path per slot in sound.gd), add volume sliders to Esc > SETTINGS.
+
 ## 2026-11-15 · Wam (with Claude) · branch feat/moon-only-story (local, not pushed)
 Done:
 - Story cut to Earth → Moon → home: after the shield report the crew flies home (HOMECOMING), the
