@@ -120,17 +120,16 @@ func _review(role: String, title: String, on_win: Callable) -> bool:
 	return true
 
 
+## Opens the task window (dawn_ui.popup: fixed size, room visible behind) and returns the Game.
 func _open(role: String, title: String, text: String) -> Game:
 	var M := Game.new()
 	M.g = g
 	current = M
-	M.box = g.ui.panel(Color("#262b44"), RoleSprites.TAGS.get(role, P["amber"]), 860, 50)
-	g.ui.rich(M.box, "[color=#%s][b]%s TASK[/b][/color]" % [RoleSprites.TAGS[role].to_html(false), RoleSprites.NAMES[role]], 14)
-	g.ui.rich(M.box, "[b][color=#feae34]%s[/color][/b]" % title, 22)
+	var win: Dictionary = g.ui.popup(RoleSprites.NAMES[role] + " TASK", title, RoleSprites.TAGS.get(role, P["amber"]))
+	M.box = win["body"]
+	M.foot = win["foot"]
 	g.ui.rich(M.box, text, 17)
 	M.msg = g.ui.rich(M.box, "", 16)
-	M.foot = g.ui.row(M.box)
-	g.ui.button(M.foot, "LATER", g.ui.close_panel, false)
 	return M
 
 
@@ -277,12 +276,12 @@ func orbit(role: String, title: String, text: String, on_win: Callable, fact := 
 	var M := _open(role, title, text)
 	var st := {"th": randf() * TAU, "ok": false, "km": 0}
 	var read := _rt("", 18)
-	var S := 4.0                        # canvas pixels per demo pixel
+	var S := 2.5                       # canvas pixels per demo pixel
 	_canvas(M, 200 * S, 110 * S, func(c: Canvas):
 		var dt := c.get_process_delta_time()
-		c.draw_rect(Rect2(0, 0, 800, 440), P["ink"])
+		c.draw_rect(Rect2(0, 0, 200 * S, 110 * S), P["ink"])
 		for i in 40:
-			c.draw_rect(Rect2(fposmod(i * 77.7, 800), fposmod(i * 41.3, 440), 3, 3), P["steel"])
+			c.draw_rect(Rect2(fposmod(i * 77.7, 200 * S), fposmod(i * 41.3, 110 * S), 3, 3), P["steel"])
 		var a := 66.0
 		var e := 0.55
 		var b := a * sqrt(1.0 - e * e)
@@ -340,7 +339,7 @@ func wind(role: String, on_win: Callable) -> void:
 		hrs[k]["w"] = 12
 		hrs[k]["storm"] = false
 	var grid := GridContainer.new()
-	grid.columns = 6
+	grid.columns = 4
 	M.add(grid)
 	for s in hrs:
 		var b := Button.new()

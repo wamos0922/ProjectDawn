@@ -76,6 +76,6 @@ func _process(_d):
 				if cb is CheckBox and cb.text.find("needed") >= 0: cb.button_pressed = true
 			var b3 := find("SEAL"); if b3: b3.pressed.emit()
 		"cell", "card":
-			var bs := buttons(g.ui._panel, []).filter(func(b): return not b.disabled and b.text.find("LATER") < 0)
+			var bs := buttons(g.ui._panel, []).filter(func(b): return not b.disabled and b.text != "✕")   # not the close button
 			if not bs.is_empty(): bs[vi % bs.size()].pressed.emit(); vi += 1
 	return false
