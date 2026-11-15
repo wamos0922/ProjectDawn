@@ -25,6 +25,7 @@ signal panel_closed
 signal chat_send(message: String)
 
 var _chat_panel: PanelContainer
+var _chat_open := true
 var _chat_log: RichTextLabel
 var _chat_input: LineEdit
 
@@ -245,15 +246,9 @@ func _send_chat() -> void:
 func add_chat_message(sender: String, message: String) -> void:
 	if _chat_log == null:
 		return
-
-	# Keep player text from being interpreted as RichTextLabel formatting.
-	var safe_message := message.replace("[", "[lb]")
-	_chat_log.append_text(
-		"[color=#2ce8f5]%s[/color]: %s\n" % [sender, safe_message]
-	)
-	_chat_log.scroll_to_line(_chat_log.get_line_count())
-
-
+func toggle_chatbox() -> void:
+	_chat_open = not _chat_open
+	
 ## me = role I control; online = roles other people play; where = role -> room name.
 func update_crewbar(me: String, online: Array, where: Dictionary, autopilot: bool) -> void:
 	var key := "%s|%s|%s|%s" % [me, online, where, autopilot]
@@ -283,7 +278,7 @@ func _process(delta: float) -> void:
 			Sound.play("robot_type" if _who == "ceres" else "type")
 		_dlg_cont.visible = _dlg_text.visible_characters >= _full.length()
 		
-	_chat_panel.visible = not _dlg.visible and _panel == null
+	_chat_panel.visible = _chat_open and not _dlg.visible and _panel == null
 
 
 func _label(pos: Vector2, size: int, color: Color, title := false) -> Label:

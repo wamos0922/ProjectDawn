@@ -630,6 +630,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif k in [KEY_1, KEY_2, KEY_3, KEY_4] and not ui.panel_open() and not ui.dialogue_open():
 		crew_ctl.switch_to(ROLES[k - KEY_1])   # 1 ENG · 2 SCI · 3 NAV · 4 QM
 		get_viewport().set_input_as_handled()
+	elif k == KEY_T and not ui.panel_open():
+		ui.toggle_chatbox()
+		get_viewport().set_input_as_handled()
 	elif k == KEY_F and not ui.panel_open():
 		crew_ctl.toggle_follow()
 	elif k == KEY_C and not ui.panel_open():
