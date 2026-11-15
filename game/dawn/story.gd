@@ -420,6 +420,8 @@ func role_task(k: String) -> Dictionary:
 					_send("site"), {"fact": "NASA's Artemis missions target the lunar south pole for exactly this reason."})}
 	elif w == "moon":
 		var m: int = s["ms"]
+		if k == "landing" and m == 0 and not task_done("arrival"):
+			return {"label": "ARRIVAL BURN", "role": "nav", "fn": func(): mg.play("N2", "nav", _send("arrival"))}
 		if k == "science" and m == 1:
 			return {"label": "FIND THE ICE", "role": "sci", "fn": func(): mg.play("S2", "sci", func(): g.act("scan", {"ok": 1}, "sci"))}
 		if k == "mine" and m == 3 and not task_done("icescan"):
